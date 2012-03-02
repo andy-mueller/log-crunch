@@ -34,11 +34,11 @@ public class FilterChainTest {
     }
 
     @SuppressWarnings("unchecked")
-    static <T> List<Predicate<T>> predicateList(Predicate<T> pred) {
+    static List<Predicate<Integer>> predicateList(Predicate<Integer> pred) {
         return asList(pred);
     }
     @SuppressWarnings("unchecked")
-    static <T> List<Predicate<T>> predicateList(Predicate<T> pred1, Predicate<T> pred2) {
+    static List<Predicate<Integer>> predicateList(Predicate<Integer> pred1, Predicate<Integer> pred2) {
         return asList(pred1, pred2);
     }
 }
