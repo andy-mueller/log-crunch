@@ -1,13 +1,10 @@
-package com.crudetech.sample.logcrunch;
+package com.crudetech.sample.filter;
 
 import org.junit.Test;
 
 import java.util.Iterator;
 import java.util.List;
 
-import static com.crudetech.sample.logcrunch.IntegerPredicates.isEven;
-import static com.crudetech.sample.logcrunch.IntegerPredicates.isOdd;
-import static com.crudetech.sample.logcrunch.Iterables.copy;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -17,7 +14,7 @@ public class FilterIterableTest {
     @Test
     public void hasNextIsTrueOnFirstItemTrue() {
         Iterator<Integer> source = createSourceIterator(1, 2);
-        FilterIterator<Integer> it = new FilterIterator<Integer>(source, isOdd());
+        FilterIterator<Integer> it = new FilterIterator<Integer>(source, IntegerPredicates.isOdd());
 
         assertThat(it.hasNext(), is(true));
     }
@@ -25,7 +22,7 @@ public class FilterIterableTest {
     @Test
     public void hasNextWorksOnFirstItemFalse() {
         Iterator<Integer> source = createSourceIterator(1);
-        FilterIterator<Integer> it = new FilterIterator<Integer>(source, isEven());
+        FilterIterator<Integer> it = new FilterIterator<Integer>(source, IntegerPredicates.isEven());
 
         assertThat(it.hasNext(), is(false));
     }
@@ -33,7 +30,7 @@ public class FilterIterableTest {
     @Test
     public void hasNextIsFalseOnEmptySourceRange() {
         Iterator<Integer> source = createSourceIterator();
-        FilterIterator<Integer> it = new FilterIterator<Integer>(source, isEven());
+        FilterIterator<Integer> it = new FilterIterator<Integer>(source, IntegerPredicates.isEven());
 
         assertThat(it.hasNext(), is(false));
     }
@@ -41,7 +38,7 @@ public class FilterIterableTest {
     @Test
     public void hasNextIsFalseOnNonMatchingSourceRange() {
         Iterator<Integer> source = createSourceIterator(3, 5, 7);
-        FilterIterator<Integer> it = new FilterIterator<Integer>(source, isEven());
+        FilterIterator<Integer> it = new FilterIterator<Integer>(source, IntegerPredicates.isEven());
 
         assertThat(it.hasNext(), is(false));
     }
@@ -49,7 +46,7 @@ public class FilterIterableTest {
     @Test
     public void justNext() {
         Iterator<Integer> source = createSourceIterator(2, 3, 4);
-        FilterIterator<Integer> it = new FilterIterator<Integer>(source, isEven());
+        FilterIterator<Integer> it = new FilterIterator<Integer>(source, IntegerPredicates.isEven());
 
         assertThat(it.next(), is(2));
         assertThat(it.next(), is(4));
@@ -59,7 +56,7 @@ public class FilterIterableTest {
     @Test
     public void hasNextIsTrueWhenOnlyNextIsFalse() {
         Iterator<Integer> source = createSourceIterator(1, 2);
-        FilterIterator<Integer> it = new FilterIterator<Integer>(source, isEven());
+        FilterIterator<Integer> it = new FilterIterator<Integer>(source, IntegerPredicates.isEven());
 
         assertThat(it.hasNext(), is(true));
     }
@@ -67,7 +64,7 @@ public class FilterIterableTest {
     @Test
     public void nextGivesItemWhenHasNextIsCalled() {
         Iterator<Integer> source = createSourceIterator(1, 2);
-        FilterIterator<Integer> it = new FilterIterator<Integer>(source, isEven());
+        FilterIterator<Integer> it = new FilterIterator<Integer>(source, IntegerPredicates.isEven());
 
         it.hasNext();
         assertThat(it.next(), is(2));
@@ -76,7 +73,7 @@ public class FilterIterableTest {
     @Test
     public void noMatchesGiveEmptyIterator() {
         Iterator<Integer> source = createSourceIterator(1, 3, 5);
-        FilterIterator<Integer> it = new FilterIterator<Integer>(source, isEven());
+        FilterIterator<Integer> it = new FilterIterator<Integer>(source, IntegerPredicates.isEven());
 
         assertThat(it.hasNext(), is(false));
     }
@@ -84,7 +81,7 @@ public class FilterIterableTest {
     @Test
     public void nextGivesItemDirectly() {
         Iterator<Integer> source = createSourceIterator(1, 2);
-        FilterIterator<Integer> it = new FilterIterator<Integer>(source, isEven());
+        FilterIterator<Integer> it = new FilterIterator<Integer>(source, IntegerPredicates.isEven());
 
         assertThat(it.next(), is(2));
     }
@@ -92,9 +89,9 @@ public class FilterIterableTest {
     @Test
     public void filterRange() {
         Iterator<Integer> source = createSourceIterator(1, 2, 3, 4, 5, 6);
-        FilterIterator<Integer> it = new FilterIterator<Integer>(source, isOdd());
+        FilterIterator<Integer> it = new FilterIterator<Integer>(source, IntegerPredicates.isOdd());
 
-        List<Integer> actual = copy(it);
+        List<Integer> actual = Iterables.copy(it);
         List<Integer> expected = asList(1, 3, 5);
         assertThat(actual, is(expected));
     }

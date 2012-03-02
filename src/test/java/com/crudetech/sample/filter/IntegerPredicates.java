@@ -1,4 +1,4 @@
-package com.crudetech.sample.logcrunch;
+package com.crudetech.sample.filter;
 
 class IntegerPredicates {
     static Predicate<Integer> isEven(){

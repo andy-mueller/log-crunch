@@ -1,4 +1,4 @@
-package com.crudetech.sample.logcrunch;
+package com.crudetech.sample.filter;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
