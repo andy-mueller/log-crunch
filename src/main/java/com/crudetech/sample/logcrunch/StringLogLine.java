@@ -8,8 +8,10 @@ import java.util.Date;
 public class StringLogLine {
     private final String level;
     private Date date;
+    private final SimpleDateFormat dateFormat;
 
-    public StringLogLine(String line) {
+    public StringLogLine(String line, SimpleDateFormat dateFormat) {
+        this.dateFormat = dateFormat;
         String[] token = line.split(" ");
         level = getLogLevel(token);
 
@@ -18,9 +20,8 @@ public class StringLogLine {
     }
 
     private Date getDate(String[] token) {
-        SimpleDateFormat frm = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         try {
-            return frm.parse(token[0] + " " + token[1]);
+            return dateFormat.parse(token[0] + " " + token[1]);
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }

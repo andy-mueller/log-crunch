@@ -13,10 +13,12 @@ import static org.hamcrest.Matchers.is;
 public class StringLogLineTest {
 
     private StringLogLine line;
+    private SimpleDateFormat dateFormat;
 
     @Before
     public void setUp() throws Exception {
-        line = new StringLogLine("2009-06-07 13:23:57 demo.ZeroToFour main INFO: This is an informative message");
+        dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        line = new StringLogLine("2009-06-07 13:23:57 demo.ZeroToFour main INFO: This is an informative message", dateFormat);
     }
 
     @Test
@@ -26,14 +28,13 @@ public class StringLogLineTest {
 
     @Test
     public void ctorParsesWarnLevel() {
-        line = new StringLogLine("2009-06-07 13:23:57 demo.ZeroToFour main WARN: This is an informative message");
+        line = new StringLogLine("2009-06-07 13:23:57 demo.ZeroToFour main WARN: This is an informative message", new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"));
         assertThat(line.getLogLevel(), is("WARN"));
     }
 
     @Test
     public void ctorParsesDate() throws Exception {
-        SimpleDateFormat frm = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-        Date expected = frm.parse("2009-06-07 13:23:57");
+        Date expected = dateFormat.parse("2009-06-07 13:23:57");
         assertThat(line.getDate(), is(expected));
     }
 }

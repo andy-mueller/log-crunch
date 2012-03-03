@@ -1,13 +1,14 @@
 package com.crudetech.sample.filter;
 
-import org.hamcrest.MatcherAssert;
 import org.junit.Test;
 
 import java.util.List;
 
 import static com.crudetech.sample.filter.IntegerPredicates.isEven;
 import static com.crudetech.sample.filter.IntegerPredicates.isNegative;
+import static com.crudetech.sample.filter.Iterables.copy;
 import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 public class FilterChainTest {
@@ -19,7 +20,7 @@ public class FilterChainTest {
         FilterChain<Integer> chain = new FilterChain<Integer>(predicateList(isEven()));
 
         Iterable<Integer> even = chain.apply(source);
-        MatcherAssert.assertThat(Iterables.copy(even), is(asList(-4, -2, 0, 2, 4)));
+        assertThat(copy(even), is(asList(-4, -2, 0, 2, 4)));
     }
 
 
@@ -30,7 +31,7 @@ public class FilterChainTest {
         FilterChain<Integer> chain = new FilterChain<Integer>(predicateList(isEven(), isNegative()));
 
         Iterable<Integer> even = chain.apply(source);
-        MatcherAssert.assertThat(Iterables.copy(even), is(asList(-4, -2)));
+        assertThat(copy(even), is(asList(-4, -2)));
     }
 
     @SuppressWarnings("unchecked")
