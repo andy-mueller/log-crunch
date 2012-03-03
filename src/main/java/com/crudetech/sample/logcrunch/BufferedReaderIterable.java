@@ -17,9 +17,9 @@ class BufferedReaderIterable implements Iterable<String> {
         return new Iterator(reader);
     }
 
-    private static class Iterator implements java.util.Iterator<String>{
+    private static class Iterator implements java.util.Iterator<String> {
         private final BufferedReader reader;
-        private String current = null;
+        private String next = null;
         private boolean isPositioned = false;
 
         private Iterator(BufferedReader reader) {
@@ -28,11 +28,11 @@ class BufferedReaderIterable implements Iterable<String> {
 
         @Override
         public boolean hasNext() {
-            if(!isPositioned){
-                current = readNextLine();
+            if (!isPositioned) {
+                next = readNextLine();
                 isPositioned = true;
             }
-             return current != null;
+            return next != null;
         }
 
         private String readNextLine() {
@@ -45,12 +45,24 @@ class BufferedReaderIterable implements Iterable<String> {
 
         @Override
         public String next() {
-            if(!hasNext()){
+            if (!hasNext()) {
                 throw new NoSuchElementException();
             }
 
             isPositioned = false;
+            String current = next;
+            if (!hasNext()) {
+                closeReader();
+            }
             return current;
+        }
+
+        private void closeReader() {
+            try {
+                reader.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         @Override
