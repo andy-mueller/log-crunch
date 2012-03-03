@@ -13,8 +13,8 @@ public class LogFileTest {
     @Test
     public void lifeCycleEndClosesStream() throws IOException {
         InputStream fileIn = mock(InputStream.class);
-
         LogFile logFile = new LogFile(fileIn);
+
         logFile.close();
 
         verify(fileIn).close();
