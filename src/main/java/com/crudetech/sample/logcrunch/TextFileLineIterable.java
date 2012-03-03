@@ -18,22 +18,33 @@ class TextFileLineIterable implements Iterable<String> {
         return new LineIterator(reader);
     }
 
-    private static class LineIterator implements java.util.Iterator<String> {
+    static class LineIterator implements java.util.Iterator<String> {
         private final BufferedReader reader;
         private String next = null;
         private boolean isPositioned = false;
 
-        private LineIterator(BufferedReader reader) {
+        LineIterator(BufferedReader reader) {
             this.reader = reader;
+            closeReaderOnEnd();
+        }
+
+        private void closeReaderOnEnd() {
+            if(!hasNext()){
+                closeReader();
+            }
         }
 
         @Override
         public boolean hasNext() {
+            positionOnNextElement();
+            return next != null;
+        }
+
+        private void positionOnNextElement() {
             if (!isPositioned) {
                 next = readNextLine();
                 isPositioned = true;
             }
-            return next != null;
         }
 
         private String readNextLine() {
@@ -46,16 +57,24 @@ class TextFileLineIterable implements Iterable<String> {
 
         @Override
         public String next() {
+            verifyHasNextElement();
+
+            String current = next;
+
+            moved();
+
+            closeReaderOnEnd();
+            return current;
+        }
+
+        private void moved() {
+            isPositioned = false;
+        }
+
+        private void verifyHasNextElement() {
             if (!hasNext()) {
                 throw new NoSuchElementException();
             }
-
-            isPositioned = false;
-            String current = next;
-            if (!hasNext()) {
-                closeReader();
-            }
-            return current;
         }
 
         private void closeReader() {

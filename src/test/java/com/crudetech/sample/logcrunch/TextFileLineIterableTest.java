@@ -25,9 +25,9 @@ public class TextFileLineIterableTest {
     @Test
     public void emptyReader_IteratorIsEmpty() throws Exception {
         BufferedReader reader = readerFromString("");
-        TextFileLineIterable bi = new TextFileLineIterable(reader);
+        TextFileLineIterable.LineIterator iterator = new TextFileLineIterable.LineIterator(reader);
 
-        assertThat(bi.iterator().hasNext(), is(false));
+        assertThat(iterator.hasNext(), is(false));
     }
 
     private BufferedReader readerFromString(String s) {
@@ -44,16 +44,16 @@ public class TextFileLineIterableTest {
     @Test
     public void emptyReader_IteratorNextThrows() throws Exception {
         BufferedReader reader = readerFromString("");
-        TextFileLineIterable bi = new TextFileLineIterable(reader);
+        TextFileLineIterable.LineIterator iterator = new TextFileLineIterable.LineIterator(reader);
 
         expectedException.expect(NoSuchElementException.class);
-        bi.iterator().next();
+        iterator.next();
     }
 
     @Test
     public void oneLine_IteratorIsNotEmpty() throws Exception {
         BufferedReader reader = readerFromString("text");
-        Iterator<String> iterator = new TextFileLineIterable(reader).iterator();
+        Iterator<String> iterator = new TextFileLineIterable.LineIterator(reader);
 
         assertThat(iterator.hasNext(), is(true));
         assertThat(iterator.hasNext(), is(true));
@@ -62,7 +62,7 @@ public class TextFileLineIterableTest {
     @Test
     public void oneLine_IteratorReturnsThatLine() throws Exception {
         BufferedReader reader = readerFromString("text");
-        Iterator<String> iterator = new TextFileLineIterable(reader).iterator();
+        Iterator<String> iterator = new TextFileLineIterable.LineIterator(reader);
 
         assertThat(iterator.next(), is("text"));
     }
@@ -70,7 +70,7 @@ public class TextFileLineIterableTest {
     @Test
     public void oneLine_IteratorEndsAfterLine() throws Exception {
         BufferedReader reader = readerFromString("text");
-        Iterator<String> iterator = new TextFileLineIterable(reader).iterator();
+        Iterator<String> iterator = new TextFileLineIterable.LineIterator(reader);
         iterator.next();
 
         assertThat(iterator.hasNext(), is(false));
@@ -80,7 +80,7 @@ public class TextFileLineIterableTest {
     @Test
     public void twoLines_IteratorEndsAfterLine2() throws Exception {
         BufferedReader reader = readerFromString("line1\nline2");
-        Iterator<String> iterator = new TextFileLineIterable(reader).iterator();
+        Iterator<String> iterator = new TextFileLineIterable.LineIterator(reader);
 
         assertThat(iterator.next(), is("line1"));
         assertThat(iterator.next(), is("line2"));
@@ -92,7 +92,7 @@ public class TextFileLineIterableTest {
     @Test
     public void twoLines_IteratorActs() throws Exception {
         BufferedReader reader = readerFromString("line1\nline2");
-        Iterator<String> iterator = new TextFileLineIterable(reader).iterator();
+        Iterator<String> iterator = new TextFileLineIterable.LineIterator(reader);
 
         assertThat(iterator.hasNext(), is(true));
         assertThat(iterator.hasNext(), is(true));
@@ -111,9 +111,10 @@ public class TextFileLineIterableTest {
     public void multipleLines_IteratorDoesIterate() throws Exception {
         BufferedReader reader = readerFromString("line1\nline2\nline3");
         ArrayList<String> actual = new ArrayList<String>();
+        Iterator<String> iterator = new TextFileLineIterable.LineIterator(reader);
 
-        for (String s : new TextFileLineIterable(reader)) {
-            actual.add(s);
+        while(iterator.hasNext()){
+            actual.add(iterator.next());
         }
 
         assertThat(actual, is(asList("line1", "line2", "line3")));
@@ -121,14 +122,21 @@ public class TextFileLineIterableTest {
 
 
     @Test
-    public void closesReaderAfterIteratorFinishes() throws Exception {
+     public void closesReaderAfterIteratorFinishes() throws Exception {
         BufferedReader reader = spy(readerFromString("line1\nline2"));
-        Iterator<String> iterator = new TextFileLineIterable(reader).iterator();
+        Iterator<String> iterator = new TextFileLineIterable.LineIterator(reader);
 
         iterator.next();
         verify(reader, never()).close();
 
         iterator.next();
+        verify(reader, times(1)).close();
+    }
+    @Test
+    public void emptyReader_closesReaderOnConstruction() throws Exception {
+        BufferedReader reader = spy(readerFromString(""));
+        new TextFileLineIterable.LineIterator(reader);
+
         verify(reader, times(1)).close();
     }
 }
