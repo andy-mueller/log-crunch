@@ -21,11 +21,11 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-public class BufferedReaderIterableTest {
+public class TextFileLineIterableTest {
     @Test
     public void emptyReader_IteratorIsEmpty() throws Exception {
         BufferedReader reader = readerFromString("");
-        BufferedReaderIterable bi = new BufferedReaderIterable(reader);
+        TextFileLineIterable bi = new TextFileLineIterable(reader);
 
         assertThat(bi.iterator().hasNext(), is(false));
     }
@@ -44,7 +44,7 @@ public class BufferedReaderIterableTest {
     @Test
     public void emptyReader_IteratorNextThrows() throws Exception {
         BufferedReader reader = readerFromString("");
-        BufferedReaderIterable bi = new BufferedReaderIterable(reader);
+        TextFileLineIterable bi = new TextFileLineIterable(reader);
 
         expectedException.expect(NoSuchElementException.class);
         bi.iterator().next();
@@ -53,7 +53,7 @@ public class BufferedReaderIterableTest {
     @Test
     public void oneLine_IteratorIsNotEmpty() throws Exception {
         BufferedReader reader = readerFromString("text");
-        Iterator<String> iterator = new BufferedReaderIterable(reader).iterator();
+        Iterator<String> iterator = new TextFileLineIterable(reader).iterator();
 
         assertThat(iterator.hasNext(), is(true));
         assertThat(iterator.hasNext(), is(true));
@@ -62,7 +62,7 @@ public class BufferedReaderIterableTest {
     @Test
     public void oneLine_IteratorReturnsThatLine() throws Exception {
         BufferedReader reader = readerFromString("text");
-        Iterator<String> iterator = new BufferedReaderIterable(reader).iterator();
+        Iterator<String> iterator = new TextFileLineIterable(reader).iterator();
 
         assertThat(iterator.next(), is("text"));
     }
@@ -70,7 +70,7 @@ public class BufferedReaderIterableTest {
     @Test
     public void oneLine_IteratorEndsAfterLine() throws Exception {
         BufferedReader reader = readerFromString("text");
-        Iterator<String> iterator = new BufferedReaderIterable(reader).iterator();
+        Iterator<String> iterator = new TextFileLineIterable(reader).iterator();
         iterator.next();
 
         assertThat(iterator.hasNext(), is(false));
@@ -80,7 +80,7 @@ public class BufferedReaderIterableTest {
     @Test
     public void twoLines_IteratorEndsAfterLine2() throws Exception {
         BufferedReader reader = readerFromString("line1\nline2");
-        Iterator<String> iterator = new BufferedReaderIterable(reader).iterator();
+        Iterator<String> iterator = new TextFileLineIterable(reader).iterator();
 
         assertThat(iterator.next(), is("line1"));
         assertThat(iterator.next(), is("line2"));
@@ -92,7 +92,7 @@ public class BufferedReaderIterableTest {
     @Test
     public void twoLines_IteratorActs() throws Exception {
         BufferedReader reader = readerFromString("line1\nline2");
-        Iterator<String> iterator = new BufferedReaderIterable(reader).iterator();
+        Iterator<String> iterator = new TextFileLineIterable(reader).iterator();
 
         assertThat(iterator.hasNext(), is(true));
         assertThat(iterator.hasNext(), is(true));
@@ -112,7 +112,7 @@ public class BufferedReaderIterableTest {
         BufferedReader reader = readerFromString("line1\nline2\nline3");
         ArrayList<String> actual = new ArrayList<String>();
 
-        for (String s : new BufferedReaderIterable(reader)) {
+        for (String s : new TextFileLineIterable(reader)) {
             actual.add(s);
         }
 
@@ -123,7 +123,7 @@ public class BufferedReaderIterableTest {
     @Test
     public void closesReaderAfterIteratorFinishes() throws Exception {
         BufferedReader reader = spy(readerFromString("line1\nline2"));
-        Iterator<String> iterator = new BufferedReaderIterable(reader).iterator();
+        Iterator<String> iterator = new TextFileLineIterable(reader).iterator();
 
         iterator.next();
         verify(reader, never()).close();

@@ -3,26 +3,27 @@ package com.crudetech.sample.logcrunch;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-class BufferedReaderIterable implements Iterable<String> {
+class TextFileLineIterable implements Iterable<String> {
     private final BufferedReader reader;
 
-    BufferedReaderIterable(BufferedReader reader) {
+    TextFileLineIterable(BufferedReader reader) {
         this.reader = reader;
     }
 
     @Override
-    public java.util.Iterator<String> iterator() {
-        return new Iterator(reader);
+    public Iterator<String> iterator() {
+        return new LineIterator(reader);
     }
 
-    private static class Iterator implements java.util.Iterator<String> {
+    private static class LineIterator implements java.util.Iterator<String> {
         private final BufferedReader reader;
         private String next = null;
         private boolean isPositioned = false;
 
-        private Iterator(BufferedReader reader) {
+        private LineIterator(BufferedReader reader) {
             this.reader = reader;
         }
 
