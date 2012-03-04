@@ -1,6 +1,7 @@
 package com.crudetech.sample.logcrunch;
 
 
+import java.io.PrintWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -8,9 +9,11 @@ import java.util.Date;
 public class StringLogLine {
     private final String level;
     private Date date;
+    private final String line;
     private final SimpleDateFormat dateFormat;
 
     public StringLogLine(String line, SimpleDateFormat dateFormat) {
+        this.line = line;
         this.dateFormat = dateFormat;
         String[] token = line.split(" ");
         level = getLogLevel(token);
@@ -37,5 +40,9 @@ public class StringLogLine {
 
     public Date getDate() {
         return (Date) date.clone();
+    }
+
+    public void print(PrintWriter writer) {
+         writer.print(line);
     }
 }
