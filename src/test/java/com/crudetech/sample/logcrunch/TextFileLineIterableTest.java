@@ -139,4 +139,20 @@ public class TextFileLineIterableTest {
 
         verify(reader, times(1)).close();
     }
+
+    @Test
+    public void multipleLines_IterablerDoesIterate() throws Exception {
+        ArrayList<String> actual = new ArrayList<String>();
+        TextFileLineIterable.BufferedReaderProvider provider = new TextFileLineIterable.BufferedReaderProvider() {
+            @Override
+            public BufferedReader newReader() {
+                return readerFromString("line1\nline2\nline3");
+            }
+        };
+        for(String s : new TextFileLineIterable(provider)){
+            actual.add(s);
+        }
+
+        assertThat(actual, is(asList("line1", "line2", "line3")));
+    }
 }
