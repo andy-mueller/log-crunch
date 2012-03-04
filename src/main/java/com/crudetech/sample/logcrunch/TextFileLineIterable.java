@@ -7,15 +7,19 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 class TextFileLineIterable implements Iterable<String> {
-    private final BufferedReader reader;
+    interface BufferedReaderProvider {
+        BufferedReader newReader();
+    }
 
-    TextFileLineIterable(BufferedReader reader) {
-        this.reader = reader;
+    private final BufferedReaderProvider readerProvider;
+
+    TextFileLineIterable(BufferedReaderProvider readerProvider) {
+        this.readerProvider = readerProvider;
     }
 
     @Override
     public Iterator<String> iterator() {
-        return new LineIterator(reader);
+        return new LineIterator(readerProvider.newReader());
     }
 
     static class LineIterator implements java.util.Iterator<String> {
@@ -29,7 +33,7 @@ class TextFileLineIterable implements Iterable<String> {
         }
 
         private void closeReaderOnEnd() {
-            if(!hasNext()){
+            if (!hasNext()) {
                 closeReader();
             }
         }
