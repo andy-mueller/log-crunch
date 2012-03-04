@@ -40,11 +40,8 @@ class TestLogFile {
     }
 
     void close() throws IOException {
-        if (!file.delete()) {
+        if (!file.delete() && file.exists()) {
             throw new IOException();
-        }
-        if (file.exists()) {
-            throw new RuntimeException();
         }
     }
 
