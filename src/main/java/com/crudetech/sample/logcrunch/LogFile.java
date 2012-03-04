@@ -24,7 +24,6 @@ public class LogFile {
 
     public Iterable<? extends StringLogLine> getLines() {
         Iterable<String> textLines = new TextFileLineIterable(createNewReaderProvider());
-        
         return new MappingIterable<String, StringLogLine>(textLines, selectLogLine());
     }
 
@@ -50,7 +49,9 @@ public class LogFile {
        try {
             return new BufferedReader(
                     new InputStreamReader(
-                            new FileInputStream(logFile), encoding));
+                            new FileInputStream(logFile),
+                            encoding)
+            );
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
