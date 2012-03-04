@@ -18,7 +18,6 @@ public class StringLogLine {
         String[] token = line.split(" ");
         level = getLogLevel(token);
 
-        
         date = getDate(token);
     }
 
