@@ -16,8 +16,8 @@ class TestLogFile {
     static final String Line1 = "2009-06-07 13:23:57 demo.ZeroToFour main INFO: This is an informative message";
     static final String Line2 = "2009-06-07 13:25:57 demo.ZeroToFive subroutine WARN: This is another informative message";
     static final String Line3 = "2009-06-08 10:11:36 demo.ZeroToFive subroutine DEBUG: This is another informative message";
-    static final Charset UTF8 = Charset.forName("UTF-8");
-    private List<String> logLines;
+    static final Charset Encoding = Charset.forName("UTF-8");
+    private final List<String> logLines;
 
 
     TestLogFile(String name) throws IOException {
@@ -29,7 +29,7 @@ class TestLogFile {
     }
 
     private void writeLinesToTestLogFile() throws IOException {
-        PrintWriter writer = new PrintWriter(new OutputStreamWriter(new FileOutputStream(file), UTF8));
+        PrintWriter writer = new PrintWriter(new OutputStreamWriter(new FileOutputStream(file), Encoding));
         try {
             for (String logLine : logLines) {
                 writer.println(logLine);

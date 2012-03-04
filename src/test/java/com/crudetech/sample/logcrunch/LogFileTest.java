@@ -30,7 +30,7 @@ public class LogFileTest {
 
     @Test
     public void logLineIterableReturnsFileContent() throws Exception {
-        LogFile logFile = new LogFile(testLogFile.getFile(), new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"), TestLogFile.UTF8);
+        LogFile logFile = new LogFile(testLogFile.getFile(), new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"), TestLogFile.Encoding);
 
         Iterable<? extends StringLogLine> lines = logFile.getLines();
         ArrayList<String> actual = logLinesToString(lines);
