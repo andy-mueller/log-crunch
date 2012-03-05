@@ -1,9 +1,7 @@
 package com.crudetech.sample.logcrunch;
 
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
@@ -17,23 +15,9 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
 public class FileSystemLogFileLocatorTest {
-    private static File logFilePath = null;
-    private static File dummyFile = null;
     private TestLogFile testLogFile1;
     private LogFileLocator locator;
     private Date sixthOfMay2007;
-
-    @BeforeClass
-    public static void beforeClass() throws IOException {
-        dummyFile = File.createTempFile("dummy", null);
-        logFilePath = dummyFile.getParentFile();
-    }
-    @AfterClass
-    public static void afterClass(){
-        if(!dummyFile.delete()){
-            throw new RuntimeException();
-        }
-    }
 
     @Before
     public void addTestLogFiles() throws Exception {
@@ -61,7 +45,7 @@ public class FileSystemLogFileLocatorTest {
                 return new LogFile(logFile, fileNameDateFormat, encoding);
             }
         };
-        return new FileSystemLogFileLocator(logFilePath, logFileFactory);
+        return new FileSystemLogFileLocator(new TempDir(), logFileFactory);
     }
 
     @After
