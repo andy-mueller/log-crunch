@@ -23,8 +23,10 @@ class TestLogFile {
     static final Charset Encoding = Charset.forName("UTF-8");
     private final List<String> logLines;
 
+    private static final TempDir tempDir = new TempDir();
+
     TestLogFile(String name) throws IOException {
-        file = File.createTempFile(name, null);
+        file = new File(tempDir, name);
         logLines = Collections.unmodifiableList(asList(
                 Line1, Line2, Line3
         ));

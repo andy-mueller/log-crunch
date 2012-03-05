@@ -5,7 +5,6 @@ import com.crudetech.sample.filter.Predicate;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -14,16 +13,19 @@ import static java.util.Arrays.asList;
 
 public class FileSystemLogFileLocator implements LogFileLocator {
     private final File logFilePath;
+    private final LogFileFactory factory;
     private static final String filePattern = "{0}-{1}";
     private SimpleDateFormat fileNameDateFormat= new SimpleDateFormat("yyyyMMdd");
 
 
+    interface LogFileFactory{
+        LogFile create(File logFile);
+    }
     //TODO: move to LogFileFactor
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-    private Charset encoding = Charset.forName("UTF-8");
 
-    public FileSystemLogFileLocator(File logFilePath) {
+    public FileSystemLogFileLocator(File logFilePath, LogFileFactory factory) {
         this.logFilePath = logFilePath;
+        this.factory = factory;
     }
 
     @Override
@@ -33,7 +35,7 @@ public class FileSystemLogFileLocator implements LogFileLocator {
         Iterable<File> matches = new FilterIterable<File>(asList(logFilePath.listFiles()), nameContains(logFileName));
         
         for(File matchedFile : matches){
-            return new LogFile(matchedFile, dateFormat, encoding);
+            return factory.create(matchedFile);
         }
 
         // TODO: return null object instead

@@ -9,22 +9,18 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class LogFileFilterInteractorTest {
-    @Test
-    public void ctor(){
-        LogFileFilterInteractor interactor = new LogFileFilterInteractor();
-    }
+public class LogFileFinderInteractorTest {
 
     @Test
-    public void apply(){
+    public void filterFiles(){
         Date date = null;
         LogFile logFileStub = mock(LogFile.class);
         LogFileLocator locator = mock(LogFileLocator.class);
         when(locator.find("machine101", date)).thenReturn(logFileStub);
         
-        LogFileFilterInteractor interactor = new LogFileFilterInteractor();
+        LogFileFinderInteractor interactor = new LogFileFinderInteractor(locator);
 
-        Iterable<LogFile> logFiles = interactor.filterFiles("machine101", date);
+        Iterable<LogFile> logFiles = interactor.getLogFiles("machine101", date);
         
         assertThat(logFiles.iterator().next(), is(logFileStub));
     }
