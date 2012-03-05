@@ -12,7 +12,7 @@ import java.util.Date;
 
 import static java.util.Arrays.asList;
 
-public class FileSystemLogFileLocator {
+public class FileSystemLogFileLocator implements LogFileLocator {
     private final File logFilePath;
     private static final String filePattern = "{0}-{1}";
     private SimpleDateFormat fileNameDateFormat= new SimpleDateFormat("yyyyMMdd");
@@ -26,6 +26,7 @@ public class FileSystemLogFileLocator {
         this.logFilePath = logFilePath;
     }
 
+    @Override
     public LogFile find(String fileName, Date sixthOfJune) {
         String logFileName = MessageFormat.format(filePattern, fileName, fileNameDateFormat.format(sixthOfJune));
 

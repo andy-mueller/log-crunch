@@ -43,7 +43,7 @@ public class FileSystemLogFileLocatorTest {
 
     @Test
     public void locationIsSuccessful() throws Exception {
-        FileSystemLogFileLocator locator = new FileSystemLogFileLocator(logFilePath);
+        LogFileLocator locator = new FileSystemLogFileLocator(logFilePath);
 
         Date sixthOfJune = dateFormat.parse("20070506");
         LogFile located = locator.find("machinename101", sixthOfJune);
@@ -52,7 +52,7 @@ public class FileSystemLogFileLocatorTest {
     }
     @Test
     public void locatedFileHasCorrectContent() throws Exception {
-        FileSystemLogFileLocator locator = new FileSystemLogFileLocator(logFilePath);
+        LogFileLocator locator = new FileSystemLogFileLocator(logFilePath);
 
         Date sixthOfMay2007 = dateFormat.parse("20070506");
         LogFile located = locator.find("machinename101", sixthOfMay2007);
