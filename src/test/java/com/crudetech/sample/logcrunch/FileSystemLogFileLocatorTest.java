@@ -40,10 +40,6 @@ public class FileSystemLogFileLocatorTest {
     }
     private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 
-    @Test
-    public void ctor(){
-        FileSystemLogFileLocator locator = new FileSystemLogFileLocator(logFilePath);
-    }
 
     @Test
     public void locationIsSuccessful() throws Exception {
