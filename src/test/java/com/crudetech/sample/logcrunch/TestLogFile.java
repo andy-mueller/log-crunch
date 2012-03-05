@@ -5,11 +5,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 
 class TestLogFile {
     private File file;
@@ -18,7 +22,6 @@ class TestLogFile {
     static final String Line3 = "2009-06-08 10:11:36 demo.ZeroToFive subroutine DEBUG: This is another informative message";
     static final Charset Encoding = Charset.forName("UTF-8");
     private final List<String> logLines;
-
 
     TestLogFile(String name) throws IOException {
         file = File.createTempFile(name, null);
@@ -39,7 +42,7 @@ class TestLogFile {
         }
     }
 
-    void close() throws IOException {
+    void delete() throws IOException {
         if (!file.delete() && file.exists()) {
             throw new IOException();
         }
@@ -51,5 +54,23 @@ class TestLogFile {
 
     List<String> getLogLines() {
         return logLines;
+    }
+
+    void assertSameContent(LogFile logFile) {
+        Iterable<? extends StringLogLine> lines = logFile.getLines();
+        ArrayList<String> actual = logLinesToString(lines);
+
+        assertThat(actual, is(getLogLines()));
+
+    }
+
+    private ArrayList<String> logLinesToString(Iterable<? extends StringLogLine> lines) {
+        ArrayList<String> actual = new ArrayList<String>();
+        for (StringLogLine s : lines) {
+            StringWriter sw = new StringWriter();
+            s.print(new PrintWriter(sw));
+            actual.add(sw.toString());
+        }
+        return actual;
     }
 }

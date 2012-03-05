@@ -1,0 +1,8 @@
+-internalize queries to log line object
+    class StringLogLine{
+        boolean hasDate(Date date){..}
+        boolean hasLevel(Level level){..}
+    }
+
+-introduce LogFileFactory for  FileSystemLogFileLocator
+-introduce null LogFileObject for FileSystemLogFileLocator
