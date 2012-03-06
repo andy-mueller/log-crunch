@@ -6,3 +6,4 @@
 
 -introduce LogFileFactory for  FileSystemLogFileLocator
 -introduce null LogFileObject for FileSystemLogFileLocator
+-provide factory for LogLine creation in LogFile class

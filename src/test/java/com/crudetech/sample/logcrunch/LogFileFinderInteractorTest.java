@@ -12,9 +12,9 @@ import static org.mockito.Mockito.when;
 public class LogFileFinderInteractorTest {
 
     @Test
-    public void filterFiles(){
-        Date date = null;
-        LogFile logFileStub = mock(LogFile.class);
+    public void findFiles(){
+        Date date = new Date();
+        LogFile logFileStub = mock(FileLogFile.class);
         LogFileLocator locator = mock(LogFileLocator.class);
         when(locator.find("machine101", date)).thenReturn(logFileStub);
         
@@ -24,5 +24,19 @@ public class LogFileFinderInteractorTest {
         
         assertThat(logFiles.iterator().next(), is(logFileStub));
     }
+
+//    @Test
+//    public void foundFilesAreFiltered(){
+//        Date date = new Date();
+//        FileLogFile logFileStub = new FileLogFile();
+//        LogFileLocator locator = mock(LogFileLocator.class);
+//        when(locator.find("machine101", date)).thenReturn(logFileStub);
+//
+//        LogFileFinderInteractor interactor = new LogFileFinderInteractor(locator);
+//
+//        Iterable<FileLogFile> logFiles = interactor.getLogFiles("machine101", date);
+//
+//        assertThat(logFiles.iterator().next(), is(logFileStub));
+//    }
 
 }

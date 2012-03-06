@@ -14,7 +14,7 @@ public class StringLogLine {
 
     public StringLogLine(String line, SimpleDateFormat dateFormat) {
         this.line = line;
-        this.dateFormat = dateFormat;
+        this.dateFormat = (SimpleDateFormat) dateFormat.clone();
         String[] token = line.split(" ");
         level = getLogLevel(token);
 

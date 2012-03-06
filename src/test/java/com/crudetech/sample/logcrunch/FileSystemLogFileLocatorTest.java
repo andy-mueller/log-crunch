@@ -39,10 +39,16 @@ public class FileSystemLogFileLocatorTest {
     private FileSystemLogFileLocator newLocator() {
         final SimpleDateFormat fileNameDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         final Charset encoding = Charset.forName("UTF-8");
+        final LogFile.LogLineFactory logLineFactory = new LogFile.LogLineFactory() {
+            @Override
+            public StringLogLine newLogLine(String lineContent) {
+                return new StringLogLine(lineContent, new SimpleDateFormat("yyyMMdd"));
+            }
+        };
         FileSystemLogFileLocator.LogFileFactory logFileFactory = new FileSystemLogFileLocator.LogFileFactory() {
             @Override
             public LogFile create(File logFile) {
-                return new LogFile(logFile, fileNameDateFormat, encoding);
+                return new FileLogFile(logFile, logLineFactory, encoding);
             }
         };
         return new FileSystemLogFileLocator(new TempDir(), logFileFactory);

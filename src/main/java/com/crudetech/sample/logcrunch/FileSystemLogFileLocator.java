@@ -21,7 +21,6 @@ public class FileSystemLogFileLocator implements LogFileLocator {
     interface LogFileFactory{
         LogFile create(File logFile);
     }
-    //TODO: move to LogFileFactor
 
     public FileSystemLogFileLocator(File logFilePath, LogFileFactory factory) {
         this.logFilePath = logFilePath;

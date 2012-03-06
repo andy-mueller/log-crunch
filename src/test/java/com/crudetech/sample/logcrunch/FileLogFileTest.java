@@ -7,7 +7,7 @@ import org.junit.Test;
 
 import java.text.SimpleDateFormat;
 
-public class LogFileTest {
+public class FileLogFileTest {
 
     private TestLogFile testLogFile;
 
@@ -24,7 +24,13 @@ public class LogFileTest {
 
     @Test
     public void logLineIterableReturnsFileContent() throws Exception {
-        LogFile logFile = new LogFile(testLogFile.getFile(), new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"), TestLogFile.Encoding);
+        LogFile.LogLineFactory logLineFactory = new LogFile.LogLineFactory() {
+            @Override
+            public StringLogLine newLogLine(String lineContent) {
+                return new StringLogLine(lineContent, new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"));
+            }
+        };
+        LogFile logFile = new FileLogFile(testLogFile.getFile(), logLineFactory, TestLogFile.Encoding);
 
         testLogFile.assertSameContent(logFile);
     }
