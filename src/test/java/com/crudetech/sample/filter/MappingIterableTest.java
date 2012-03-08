@@ -6,7 +6,7 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static com.crudetech.sample.filter.Iterables.copy;
+import static com.crudetech.sample.Iterables.copy;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static org.hamcrest.MatcherAssert.assertThat;

@@ -58,7 +58,7 @@ class TestLogFile {
         return logLines;
     }
 
-    void assertSameContent(LogFile logFile) {
+    void assertSameContent(BufferedReaderLogFile logFile) {
         Iterable<? extends StringLogLine> lines = logFile.getLines();
         ArrayList<String> actual = logLinesToString(lines);
 

@@ -5,12 +5,12 @@ import com.crudetech.sample.filter.UnaryFunction;
 
 import java.io.BufferedReader;
 
-public abstract class LogFile {
+public abstract class BufferedReaderLogFile {
     interface LogLineFactory{
         StringLogLine newLogLine(String lineContent);
     }
     private final LogLineFactory logLineFactory;
-    public LogFile(LogLineFactory logLineFactory) {
+    public BufferedReaderLogFile(LogLineFactory logLineFactory) {
         this.logLineFactory = logLineFactory;
     }
 

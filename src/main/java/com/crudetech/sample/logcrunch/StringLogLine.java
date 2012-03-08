@@ -44,4 +44,28 @@ public class StringLogLine {
     public void print(PrintWriter writer) {
          writer.print(line);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        StringLogLine that = (StringLogLine) o;
+
+        if (line != null ? !line.equals(that.line) : that.line != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return line != null ? line.hashCode() : 0;
+    }
+
+    @Override
+    public String toString() {
+        return "StringLogLine{" +
+                "line='" + line + '\'' +
+                '}';
+    }
 }

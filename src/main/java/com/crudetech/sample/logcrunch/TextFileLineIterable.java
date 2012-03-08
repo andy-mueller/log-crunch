@@ -62,13 +62,12 @@ class TextFileLineIterable implements Iterable<String> {
         @Override
         public String next() {
             verifyHasNextElement();
-
-            String current = next;
-
-            moved();
-
-            closeReaderOnEnd();
-            return current;
+            try {
+                return next;
+            } finally {
+                moved();
+                closeReaderOnEnd();
+            }
         }
 
         private void moved() {

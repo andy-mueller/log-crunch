@@ -24,13 +24,13 @@ public class FileLogFileTest {
 
     @Test
     public void logLineIterableReturnsFileContent() throws Exception {
-        LogFile.LogLineFactory logLineFactory = new LogFile.LogLineFactory() {
+        BufferedReaderLogFile.LogLineFactory logLineFactory = new BufferedReaderLogFile.LogLineFactory() {
             @Override
             public StringLogLine newLogLine(String lineContent) {
                 return new StringLogLine(lineContent, new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"));
             }
         };
-        LogFile logFile = new FileLogFile(testLogFile.getFile(), logLineFactory, TestLogFile.Encoding);
+        BufferedReaderLogFile logFile = new FileLogFile(testLogFile.getFile(), logLineFactory, TestLogFile.Encoding);
 
         testLogFile.assertSameContent(logFile);
     }

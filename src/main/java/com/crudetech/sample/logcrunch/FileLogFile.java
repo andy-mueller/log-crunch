@@ -7,7 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 
-public class FileLogFile extends LogFile {
+public class FileLogFile extends BufferedReaderLogFile {
     private final File logFile;
     private final Charset encoding;
 

@@ -37,9 +37,8 @@ public class FileSystemLogFileLocatorTest {
 
 
     private FileSystemLogFileLocator newLocator() {
-        final SimpleDateFormat fileNameDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         final Charset encoding = Charset.forName("UTF-8");
-        final LogFile.LogLineFactory logLineFactory = new LogFile.LogLineFactory() {
+        final BufferedReaderLogFile.LogLineFactory logLineFactory = new BufferedReaderLogFile.LogLineFactory() {
             @Override
             public StringLogLine newLogLine(String lineContent) {
                 return new StringLogLine(lineContent, new SimpleDateFormat("yyyMMdd"));
@@ -47,7 +46,7 @@ public class FileSystemLogFileLocatorTest {
         };
         FileSystemLogFileLocator.LogFileFactory logFileFactory = new FileSystemLogFileLocator.LogFileFactory() {
             @Override
-            public LogFile create(File logFile) {
+            public BufferedReaderLogFile create(File logFile) {
                 return new FileLogFile(logFile, logLineFactory, encoding);
             }
         };
@@ -62,13 +61,13 @@ public class FileSystemLogFileLocatorTest {
 
     @Test
     public void locationIsSuccessful() throws Exception {
-        LogFile located = locator.find("machinename101", sixthOfMay2007);
+        BufferedReaderLogFile located = locator.find("machinename101", sixthOfMay2007);
 
         assertThat(located, is(notNullValue())) ;
     }
     @Test
     public void locatedFileHasCorrectContent() throws Exception {
-        LogFile located = locator.find("machinename101", sixthOfMay2007);
+        BufferedReaderLogFile located = locator.find("machinename101", sixthOfMay2007);
 
         testLogFile1.assertSameContent(located);
     }
