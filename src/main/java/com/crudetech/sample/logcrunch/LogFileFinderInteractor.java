@@ -15,7 +15,7 @@ public class LogFileFinderInteractor {
         this.infoFilter = infoFilter;
     }
 
-    public Iterable<BufferedReaderLogFile> getLogFiles(String name, Date date) {
+    public Iterable<LogFile> getLogFiles(String name, Date date) {
         return  asList(locator.find(name, date));
     }
 }

@@ -46,7 +46,7 @@ public class FileSystemLogFileLocatorTest {
         };
         FileSystemLogFileLocator.LogFileFactory logFileFactory = new FileSystemLogFileLocator.LogFileFactory() {
             @Override
-            public BufferedReaderLogFile create(File logFile) {
+            public LogFile create(File logFile) {
                 return new FileLogFile(logFile, logLineFactory, encoding);
             }
         };
@@ -61,13 +61,13 @@ public class FileSystemLogFileLocatorTest {
 
     @Test
     public void locationIsSuccessful() throws Exception {
-        BufferedReaderLogFile located = locator.find("machinename101", sixthOfMay2007);
+        LogFile located = locator.find("machinename101", sixthOfMay2007);
 
         assertThat(located, is(notNullValue())) ;
     }
     @Test
     public void locatedFileHasCorrectContent() throws Exception {
-        BufferedReaderLogFile located = locator.find("machinename101", sixthOfMay2007);
+        LogFile located = locator.find("machinename101", sixthOfMay2007);
 
         testLogFile1.assertSameContent(located);
     }

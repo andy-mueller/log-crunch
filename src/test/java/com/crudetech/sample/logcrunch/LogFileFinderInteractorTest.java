@@ -24,7 +24,7 @@ public class LogFileFinderInteractorTest {
     @Test
     public void findFiles() {
         Date date = new Date();
-        BufferedReaderLogFile logFileStub = mock(FileLogFile.class);
+        LogFile logFileStub = mock(FileLogFile.class);
         LogFileLocator locator = mock(LogFileLocator.class);
         when(locator.find("machine101", date)).thenReturn(logFileStub);
 
@@ -32,7 +32,7 @@ public class LogFileFinderInteractorTest {
         FilterChain<StringLogLine> infoFilter = mock(FilterChain.class);
         LogFileFinderInteractor interactor = new LogFileFinderInteractor(locator, infoFilter);
 
-        Iterable<BufferedReaderLogFile> logFiles = interactor.getLogFiles("machine101", date);
+        Iterable<LogFile> logFiles = interactor.getLogFiles("machine101", date);
 
         assertThat(getFirst(logFiles), is(logFileStub));
         assertThat(size(logFiles), is(1));
@@ -71,7 +71,7 @@ public class LogFileFinderInteractorTest {
             }
         };
         String content = TestLogFile.Line1 + "\n" + TestLogFile.Line2;
-        BufferedReaderLogFile logFileStub = new StringLogFile(loglineFactory, content);
+        LogFile logFileStub = new StringLogFile(loglineFactory, content);
         LogFileLocator locator = mock(LogFileLocator.class);
         when(locator.find("machine101", date)).thenReturn(logFileStub);
 
@@ -88,9 +88,9 @@ public class LogFileFinderInteractorTest {
 
         LogFileFinderInteractor interactor = new LogFileFinderInteractor(locator, infoFilter);
 
-        Iterable<BufferedReaderLogFile> logFiles = interactor.getLogFiles("machine101", date);
+        Iterable<LogFile> logFiles = interactor.getLogFiles("machine101", date);
 
-        BufferedReaderLogFile foundFile = getFirst(logFiles);
+        LogFile foundFile = getFirst(logFiles);
 
         @SuppressWarnings("unchecked") // hate this!
         List<StringLogLine> logLines = (List<StringLogLine>) copy(foundFile.getLines());

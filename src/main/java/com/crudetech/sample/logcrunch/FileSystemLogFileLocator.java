@@ -19,7 +19,7 @@ public class FileSystemLogFileLocator implements LogFileLocator {
 
 
     interface LogFileFactory{
-        BufferedReaderLogFile create(File logFile);
+        LogFile create(File logFile);
     }
 
     public FileSystemLogFileLocator(File logFilePath, LogFileFactory factory) {
@@ -28,7 +28,7 @@ public class FileSystemLogFileLocator implements LogFileLocator {
     }
 
     @Override
-    public BufferedReaderLogFile find(String fileName, Date logFileData) {
+    public LogFile find(String fileName, Date logFileData) {
         String logFileName = MessageFormat.format(filePattern, fileName, fileNameDateFormat.format(logFileData));
 
         Iterable<File> matches = new FilterIterable<File>(asList(logFilePath.listFiles()), nameContains(logFileName));

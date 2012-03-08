@@ -30,7 +30,7 @@ public class FileLogFileTest {
                 return new StringLogLine(lineContent, new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"));
             }
         };
-        BufferedReaderLogFile logFile = new FileLogFile(testLogFile.getFile(), logLineFactory, TestLogFile.Encoding);
+        LogFile logFile = new FileLogFile(testLogFile.getFile(), logLineFactory, TestLogFile.Encoding);
 
         testLogFile.assertSameContent(logFile);
     }

@@ -5,7 +5,7 @@ import com.crudetech.sample.filter.UnaryFunction;
 
 import java.io.BufferedReader;
 
-public abstract class BufferedReaderLogFile {
+public abstract class BufferedReaderLogFile implements LogFile {
     interface LogLineFactory{
         StringLogLine newLogLine(String lineContent);
     }
@@ -14,6 +14,7 @@ public abstract class BufferedReaderLogFile {
         this.logLineFactory = logLineFactory;
     }
 
+    @Override
     public Iterable<? extends StringLogLine> getLines() {
         Iterable<String> textLines = new TextFileLineIterable(createNewReaderProvider());
         return new MappingIterable<String, StringLogLine>(textLines, selectLogLine());
