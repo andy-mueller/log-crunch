@@ -52,7 +52,17 @@ public class LogFileFinderInteractorTest {
 
     @Test
     public void findFiles() {
-        @SuppressWarnings("unchecked")
+        FilterChain<StringLogLine> infoFilter = identityFilter();
+        LogFileFinderInteractor interactor = new LogFileFinderInteractor(locator, infoFilter);
+
+        Iterable<LogFile> logFiles = interactor.getLogFiles("machine101", searchDate);
+
+        assertThat(getFirst(logFiles), is(equalTo(logFileStub)));
+        assertThat(size(logFiles), is(1));
+    }
+
+    @SuppressWarnings("unchecked")
+    private FilterChain<StringLogLine> identityFilter() {
         FilterChain<StringLogLine> infoFilter = mock(FilterChain.class);
         when(infoFilter.apply(any(Iterable.class))).thenAnswer(new Answer<Object>() {
             @Override
@@ -60,12 +70,7 @@ public class LogFileFinderInteractorTest {
                 return invocation.getArguments()[0];
             }
         });
-        LogFileFinderInteractor interactor = new LogFileFinderInteractor(locator, infoFilter);
-
-        Iterable<LogFile> logFiles = interactor.getLogFiles("machine101", searchDate);
-
-        assertThat(getFirst(logFiles), is(equalTo(logFileStub)));
-        assertThat(size(logFiles), is(1));
+        return infoFilter;
     }
 
     private Matcher<LogFile> equalTo(final LogFile file) {
