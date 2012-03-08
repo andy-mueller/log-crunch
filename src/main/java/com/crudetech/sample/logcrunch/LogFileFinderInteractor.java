@@ -1,6 +1,8 @@
 package com.crudetech.sample.logcrunch;
 
 import com.crudetech.sample.filter.FilterChain;
+import com.crudetech.sample.filter.MappingIterable;
+import com.crudetech.sample.filter.UnaryFunction;
 
 import java.util.Date;
 
@@ -16,6 +18,30 @@ public class LogFileFinderInteractor {
     }
 
     public Iterable<LogFile> getLogFiles(String name, Date date) {
-        return  asList(locator.find(name, date));
+        return new MappingIterable<LogFile, LogFile>(asList(locator.find(name, date)), filters());
+    }
+
+    private UnaryFunction<LogFile, LogFile> filters() {
+        return new UnaryFunction<LogFile, LogFile>() {
+            @Override
+            public LogFile evaluate(LogFile logFile) {
+                return new FilterLogFile(logFile, infoFilter);
+            }
+        };
+    }
+
+    private class FilterLogFile implements LogFile {
+        private final LogFile logFile;
+        private final FilterChain<StringLogLine> filterChain;
+
+        public FilterLogFile(LogFile logFile, FilterChain<StringLogLine> filterChain) {
+            this.logFile = logFile;
+            this.filterChain = filterChain;
+        }
+
+        @Override
+        public Iterable<StringLogLine> getLines() {
+            return filterChain.apply(logFile.getLines());
+        }
     }
 }

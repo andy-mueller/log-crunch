@@ -15,7 +15,7 @@ public abstract class BufferedReaderLogFile implements LogFile {
     }
 
     @Override
-    public Iterable<? extends StringLogLine> getLines() {
+    public Iterable<StringLogLine> getLines() {
         Iterable<String> textLines = new TextFileLineIterable(createNewReaderProvider());
         return new MappingIterable<String, StringLogLine>(textLines, selectLogLine());
     }
