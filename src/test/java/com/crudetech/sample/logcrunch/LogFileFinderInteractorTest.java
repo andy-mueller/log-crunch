@@ -32,7 +32,6 @@ public class LogFileFinderInteractorTest {
     private LogFileLocator locator;
     private Date searchDate;
     private BufferedReaderLogFile.LogLineFactory loglineFactory;
-    private Iterable<StringLogLine> identity;
 
     @Before
     public void setUp() throws Exception {
