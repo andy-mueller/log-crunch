@@ -7,6 +7,7 @@ import org.junit.Test;
 import java.io.BufferedReader;
 import java.io.StringReader;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -80,7 +81,10 @@ public class LogFileFinderInteractorTest {
                 return item.getLogLevel().equals("INFO");
             }
         };
-        FilterChain<StringLogLine> infoFilter = new FilterChain<StringLogLine>(asList(isInfo));
+
+        @SuppressWarnings("unchecked")
+        Collection<Predicate<StringLogLine>> predicates = asList(isInfo);
+        FilterChain<StringLogLine> infoFilter = new FilterChain<StringLogLine>(predicates);
 
         LogFileFinderInteractor interactor = new LogFileFinderInteractor(locator, infoFilter);
 
