@@ -90,7 +90,11 @@ public class LogFileFinderInteractorTest {
     private int size(Iterable<?> iterable) {
         int count = 0;
         Iterator<?> it = iterable.iterator();
-        while (it.hasNext()){ count ++; it.next();}
+        //noinspection WhileLoopReplaceableByForEach
+        while (it.hasNext()) {
+            count++;
+            it.next();
+        }
         return count;
     }
 
@@ -112,32 +116,28 @@ public class LogFileFinderInteractorTest {
 
     @Test
     public void foundFilesAreFiltered() {
-
-        Predicate<StringLogLine> isInfo = new Predicate<StringLogLine>() {
-            @Override
-            public boolean evaluate(StringLogLine item) {
-                return item.getLogLevel().equals("INFO");
-            }
-        };
-
-        @SuppressWarnings("unchecked")
-        Collection<Predicate<StringLogLine>> predicates = asList(isInfo);
-        FilterChain<StringLogLine> infoFilter = new FilterChain<StringLogLine>(predicates);
-
+        FilterChain<StringLogLine> infoFilter = new FilterChain<StringLogLine>(infoLevel());
         LogFileFinderInteractor interactor = new LogFileFinderInteractor(locator, infoFilter);
 
         Iterable<LogFile> logFiles = interactor.getLogFiles("machine101", searchDate);
 
         LogFile foundFile = getFirst(logFiles);
-
         List<StringLogLine> logLines = copy(foundFile.getLines());
 
         List<StringLogLine> expected = asList(loglineFactory.newLogLine(TestLogFile.Line1));
         assertThat(logLines, is(expected));
     }
 
+    @SuppressWarnings("unchecked")
+    private Collection<Predicate<StringLogLine>> infoLevel() {
+        Predicate<StringLogLine> isInfo = new Predicate<StringLogLine>() {
+            @Override
+            public boolean evaluate(StringLogLine item) { return item.getLogLevel().equals(LogLevel.Info); }
+        };
+        return asList(isInfo);
+    }
+
     private <T> T getFirst(Iterable<T> i) {
         return i.iterator().next();
     }
-
 }

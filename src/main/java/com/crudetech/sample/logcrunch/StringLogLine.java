@@ -7,7 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class StringLogLine {
-    private final String level;
+    private final LogLevel level;
     private Date date;
     private final String line;
     private final SimpleDateFormat dateFormat;
@@ -29,11 +29,20 @@ public class StringLogLine {
         }
     }
 
-    private String getLogLevel(String[] token) {
-        return token[4].substring(0, token[4].length()-1);
+    private LogLevel getLogLevel(String[] token) {
+        String rawLevel = token[4].substring(0, token[4].length() - 1);
+        if ("WARN".equals(rawLevel)) {
+            return LogLevel.Warn;
+        } else if ("INFO".equals(rawLevel)) {
+            return LogLevel.Info;
+        } else if ("DEBUG".equals(rawLevel)) {
+            return LogLevel.Debug;
+        } else {
+            throw new IllegalArgumentException("Unknown loglevel " + rawLevel);
+        }
     }
 
-    public String getLogLevel() {
+    public LogLevel getLogLevel() {
         return level;
     }
 
@@ -42,7 +51,7 @@ public class StringLogLine {
     }
 
     public void print(PrintWriter writer) {
-         writer.print(line);
+        writer.print(line);
     }
 
     @Override
@@ -52,9 +61,7 @@ public class StringLogLine {
 
         StringLogLine that = (StringLogLine) o;
 
-        if (line != null ? !line.equals(that.line) : that.line != null) return false;
-
-        return true;
+        return !(line != null ? !line.equals(that.line) : that.line != null);
     }
 
     @Override

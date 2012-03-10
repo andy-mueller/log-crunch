@@ -30,7 +30,7 @@ public class LogFileFinderInteractor {
         };
     }
 
-    private class FilterLogFile implements LogFile {
+    private static class FilterLogFile implements LogFile {
         private final LogFile logFile;
         private final FilterChain<StringLogLine> filterChain;
 
