@@ -1,9 +1,9 @@
--internalize queries to log line object
-    class StringLogLine{
-        boolean hasDate(Date date){..}
-        boolean hasLevel(Level level){..}
-    }
-
--introduce LogFileFactory for  FileSystemLogFileLocator
+-provide cleanup for buffered readers
+    -extend iterators with callbacks
+    -BufferedReaderLogFile stores all opened readers
+    -BufferedReaderLogFile cleans up on close
+    -throws on further iteration
+    -invalidates running iterators, use Adaptor around TextFileLineIterable
 -introduce null LogFileObject for FileSystemLogFileLocator
--provide factory for LogLine creation in LogFile class
+-Provide http query mechanism
+ GET http://localhost:8080/log-crunch/FilteredLines?from=...&to=...&level=ERROR&level=WARN&logger=...

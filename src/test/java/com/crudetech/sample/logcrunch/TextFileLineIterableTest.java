@@ -10,24 +10,26 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 public class TextFileLineIterableTest {
     @Test
     public void emptyReader_IteratorIsEmpty() throws Exception {
-        BufferedReader reader = readerFromString("");
-        TextFileLineIterable.LineIterator iterator = new TextFileLineIterable.LineIterator(reader);
+        Iterator<String> iterator = createIterator("");
 
         assertThat(iterator.hasNext(), is(false));
+    }
+
+    private Iterator<String> createIterator(String content) {
+        BufferedReaderProviderStub stub = new BufferedReaderProviderStub(content);
+        return new TextFileLineIterable(stub).iterator();
     }
 
     private BufferedReader readerFromString(String s) {
@@ -43,8 +45,7 @@ public class TextFileLineIterableTest {
 
     @Test
     public void emptyReader_IteratorNextThrows() throws Exception {
-        BufferedReader reader = readerFromString("");
-        TextFileLineIterable.LineIterator iterator = new TextFileLineIterable.LineIterator(reader);
+        Iterator<String> iterator = createIterator("");
 
         expectedException.expect(NoSuchElementException.class);
         iterator.next();
@@ -52,8 +53,7 @@ public class TextFileLineIterableTest {
 
     @Test
     public void oneLine_IteratorIsNotEmpty() throws Exception {
-        BufferedReader reader = readerFromString("text");
-        Iterator<String> iterator = new TextFileLineIterable.LineIterator(reader);
+        Iterator<String> iterator = createIterator("text");
 
         assertThat(iterator.hasNext(), is(true));
         assertThat(iterator.hasNext(), is(true));
@@ -61,26 +61,24 @@ public class TextFileLineIterableTest {
 
     @Test
     public void oneLine_IteratorReturnsThatLine() throws Exception {
-        BufferedReader reader = readerFromString("text");
-        Iterator<String> iterator = new TextFileLineIterable.LineIterator(reader);
+        Iterator<String> iterator = createIterator("text");
 
         assertThat(iterator.next(), is("text"));
     }
 
     @Test
     public void oneLine_IteratorEndsAfterLine() throws Exception {
-        BufferedReader reader = readerFromString("text");
-        Iterator<String> iterator = new TextFileLineIterable.LineIterator(reader);
+        Iterator<String> iterator = createIterator("text");
         iterator.next();
 
         assertThat(iterator.hasNext(), is(false));
         expectedException.expect(NoSuchElementException.class);
         iterator.next();
     }
+
     @Test
     public void twoLines_IteratorEndsAfterLine2() throws Exception {
-        BufferedReader reader = readerFromString("line1\nline2");
-        Iterator<String> iterator = new TextFileLineIterable.LineIterator(reader);
+        Iterator<String> iterator = createIterator("line1\nline2");
 
         assertThat(iterator.next(), is("line1"));
         assertThat(iterator.next(), is("line2"));
@@ -91,8 +89,7 @@ public class TextFileLineIterableTest {
 
     @Test
     public void twoLines_IteratorActs() throws Exception {
-        BufferedReader reader = readerFromString("line1\nline2");
-        Iterator<String> iterator = new TextFileLineIterable.LineIterator(reader);
+        Iterator<String> iterator = createIterator("line1\nline2");
 
         assertThat(iterator.hasNext(), is(true));
         assertThat(iterator.hasNext(), is(true));
@@ -109,11 +106,10 @@ public class TextFileLineIterableTest {
 
     @Test
     public void multipleLines_IteratorDoesIterate() throws Exception {
-        BufferedReader reader = readerFromString("line1\nline2\nline3");
         ArrayList<String> actual = new ArrayList<String>();
-        Iterator<String> iterator = new TextFileLineIterable.LineIterator(reader);
+        Iterator<String> iterator = createIterator("line1\nline2\nline3");
 
-        while(iterator.hasNext()){
+        while (iterator.hasNext()) {
             actual.add(iterator.next());
         }
 
@@ -121,23 +117,52 @@ public class TextFileLineIterableTest {
     }
 
 
-    @Test
-     public void closesReaderAfterIteratorFinishes() throws Exception {
-        BufferedReader reader = spy(readerFromString("line1\nline2"));
-        Iterator<String> iterator = new TextFileLineIterable.LineIterator(reader);
+    static class BufferedReaderProviderStub implements TextFileLineIterable.BufferedReaderProvider {
+        private final String content;
+        private final Set<BufferedReader> trackedReaders = new HashSet<BufferedReader>();
 
-        iterator.next();
-        verify(reader, never()).close();
+        BufferedReaderProviderStub(String content) {
+            this.content = content;
+        }
 
-        iterator.next();
-        verify(reader, times(1)).close();
+        @Override
+        public BufferedReader newReader() {
+            try {
+                BufferedReader r = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(content.getBytes("UTF-8"))));
+                trackedReaders.add(r);
+                return r;
+            } catch (UnsupportedEncodingException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        @Override
+        public void closeReader(BufferedReader reader) {
+            trackedReaders.remove(reader);
+        }
     }
+
+    @Test
+    public void closesReaderAfterIteratorFinishes() throws Exception {
+        BufferedReaderProviderStub providerStub = new BufferedReaderProviderStub("line1\nline2");
+        assertThat(providerStub.trackedReaders.isEmpty(), is(true));
+
+        Iterator<String> iterator = new TextFileLineIterable(providerStub).iterator();
+
+
+        iterator.next();
+        assertThat(providerStub.trackedReaders.size(), is(1));
+
+        iterator.next();
+        assertThat(providerStub.trackedReaders.isEmpty(), is(true));
+    }
+
     @Test
     public void emptyReader_closesReaderOnConstruction() throws Exception {
-        BufferedReader reader = spy(readerFromString(""));
-        new TextFileLineIterable.LineIterator(reader);
+        BufferedReaderProviderStub providerStub = new BufferedReaderProviderStub("");
+        new TextFileLineIterable(providerStub).iterator();
 
-        verify(reader, times(1)).close();
+        assertThat(providerStub.trackedReaders.isEmpty(), is(true));
     }
 
     @Test
@@ -148,8 +173,12 @@ public class TextFileLineIterableTest {
             public BufferedReader newReader() {
                 return readerFromString("line1\nline2\nline3");
             }
+
+            @Override
+            public void closeReader(BufferedReader reader) {
+            }
         };
-        for(String s : new TextFileLineIterable(provider)){
+        for (String s : new TextFileLineIterable(provider)) {
             actual.add(s);
         }
 

@@ -4,6 +4,7 @@ import com.crudetech.sample.filter.MappingIterable;
 import com.crudetech.sample.filter.UnaryFunction;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 
 public abstract class BufferedReaderLogFile implements LogFile {
     interface LogLineFactory{
@@ -25,6 +26,15 @@ public abstract class BufferedReaderLogFile implements LogFile {
             @Override
             public BufferedReader newReader() {
                 return createNewReader();
+            }
+
+            @Override
+            public void closeReader(BufferedReader reader) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         };
     }

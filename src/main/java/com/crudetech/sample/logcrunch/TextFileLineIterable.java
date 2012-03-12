@@ -9,6 +9,7 @@ import java.util.NoSuchElementException;
 class TextFileLineIterable implements Iterable<String> {
     interface BufferedReaderProvider {
         BufferedReader newReader();
+        void closeReader(BufferedReader reader);
     }
 
     private final BufferedReaderProvider readerProvider;
@@ -19,16 +20,16 @@ class TextFileLineIterable implements Iterable<String> {
 
     @Override
     public Iterator<String> iterator() {
-        return new LineIterator(readerProvider.newReader());
+        return new LineIterator();
     }
 
-    static class LineIterator implements java.util.Iterator<String> {
+    private class LineIterator implements java.util.Iterator<String> {
         private final BufferedReader reader;
         private String next = null;
         private boolean isPositioned = false;
 
-        LineIterator(BufferedReader reader) {
-            this.reader = reader;
+        LineIterator() {
+            this.reader = readerProvider.newReader();
             closeReaderOnEnd();
         }
 
@@ -81,11 +82,7 @@ class TextFileLineIterable implements Iterable<String> {
         }
 
         private void closeReader() {
-            try {
-                reader.close();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            readerProvider.closeReader(reader);
         }
 
         @Override
