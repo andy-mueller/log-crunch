@@ -12,12 +12,16 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
+import static com.crudetech.sample.Iterables.copy;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.sameInstance;
 
 public class TextFileLineIterableTest {
     @Test
@@ -158,12 +162,49 @@ public class TextFileLineIterableTest {
     }
 
     @Test
-    public void multipleLines_IterablerDoesIterate() throws Exception {
+    public void multipleLines_IterableDoesIterate() throws Exception {
         ArrayList<String> actual = new ArrayList<String>();
         for (String s : new TextFileLineIterable(new BufferedReaderProviderStub("line1\nline2\nline3"))) {
             actual.add(s);
         }
 
         assertThat(actual, is(asList("line1", "line2", "line3")));
+    }
+
+    @Test
+    public void allowsMultipleIterations() throws Exception {
+        TextFileLineIterable.BufferedReaderProvider providerStub = new BufferedReaderProviderStub("line1\nline2\nline3");
+        TextFileLineIterable iterable = new TextFileLineIterable(providerStub);
+
+        Iterator<String> it1= iterable.iterator();
+        Iterator<String> it2= iterable.iterator();
+        
+        assertThat(it1, is(not(sameInstance(it2))));
+
+        List<String> copy1 = copy(it1);
+        List<String> copy2 = copy(it2);
+        
+        assertThat(copy1, is(copy2));
+        assertThat(copy1, is(asList("line1", "line2", "line3")));
+    }
+
+    @Test
+    public void providerTracksMultipleIterations() throws Exception {
+        BufferedReaderProviderStub providerStub = new BufferedReaderProviderStub("line1\nline2\nline3");
+        TextFileLineIterable iterable = new TextFileLineIterable(providerStub);
+
+        Iterator<String> it1= iterable.iterator();
+        Iterator<String> it2= iterable.iterator();
+
+        assertThat(providerStub.trackedReaders.size(), is(2));
+
+        iterate(it1);
+        iterate(it2);
+
+        assertThat(providerStub.trackedReaders.isEmpty(), is(true));
+    }
+
+    private void iterate(Iterator<String> iterator) {
+        copy(iterator);
     }
 }
