@@ -190,7 +190,7 @@ public class TextFileLineIterableTest {
 
     @Test
     public void providerIsCalledOnMultipleIterations() throws Exception {
-        BufferedReaderProviderStub providerStub = new BufferedReaderProviderStub("line1\nline2\nline3");
+        BufferedReaderProviderStub providerStub = new BufferedReaderProviderStub("text");
         TextFileLineIterable iterable = new TextFileLineIterable(providerStub);
 
         Iterator<String> it1= iterable.iterator();
