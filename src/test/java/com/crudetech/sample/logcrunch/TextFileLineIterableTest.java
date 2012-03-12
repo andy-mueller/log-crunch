@@ -168,17 +168,7 @@ public class TextFileLineIterableTest {
     @Test
     public void multipleLines_IterablerDoesIterate() throws Exception {
         ArrayList<String> actual = new ArrayList<String>();
-        TextFileLineIterable.BufferedReaderProvider provider = new TextFileLineIterable.BufferedReaderProvider() {
-            @Override
-            public BufferedReader newReader() {
-                return readerFromString("line1\nline2\nline3");
-            }
-
-            @Override
-            public void closeReader(BufferedReader reader) {
-            }
-        };
-        for (String s : new TextFileLineIterable(provider)) {
+        for (String s : new TextFileLineIterable(new BufferedReaderProviderStub("line1\nline2\nline3"))) {
             actual.add(s);
         }
 
