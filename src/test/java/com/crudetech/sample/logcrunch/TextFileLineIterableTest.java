@@ -32,14 +32,6 @@ public class TextFileLineIterableTest {
         return new TextFileLineIterable(stub).iterator();
     }
 
-    private BufferedReader readerFromString(String s) {
-        try {
-            return new BufferedReader(new InputStreamReader(new ByteArrayInputStream(s.getBytes("UTF-8"))));
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
