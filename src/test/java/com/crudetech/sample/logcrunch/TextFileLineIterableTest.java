@@ -189,7 +189,7 @@ public class TextFileLineIterableTest {
     }
 
     @Test
-    public void providerTracksMultipleIterations() throws Exception {
+    public void providerIsCalledOnMultipleIterations() throws Exception {
         BufferedReaderProviderStub providerStub = new BufferedReaderProviderStub("line1\nline2\nline3");
         TextFileLineIterable iterable = new TextFileLineIterable(providerStub);
 
