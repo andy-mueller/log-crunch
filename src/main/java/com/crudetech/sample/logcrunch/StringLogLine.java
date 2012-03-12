@@ -42,11 +42,11 @@ public class StringLogLine {
         }
     }
 
-    public LogLevel getLogLevel() {
+    private LogLevel getLogLevel() {
         return level;
     }
 
-    public Date getDate() {
+    private Date getDate() {
         return (Date) date.clone();
     }
 
@@ -74,5 +74,13 @@ public class StringLogLine {
         return "StringLogLine{" +
                 "line='" + line + '\'' +
                 '}';
+    }
+
+    public boolean hasDate(Date expected) {
+        return getDate().equals(expected);
+    }
+
+    public boolean hasLogLevel(LogLevel level) {
+        return getLogLevel().equals(level);
     }
 }

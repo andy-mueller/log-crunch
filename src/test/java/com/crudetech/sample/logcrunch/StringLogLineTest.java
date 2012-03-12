@@ -26,19 +26,19 @@ public class StringLogLineTest {
 
     @Test
     public void ctorParsesInfoLevel() {
-        assertThat(line.getLogLevel(), is(LogLevel.Info));
-    }
+        assertThat(line.hasLogLevel(LogLevel.Info), is(true));
+   }
 
     @Test
     public void ctorParsesWarnLevel() {
         line = new StringLogLine("2009-06-07 13:23:57 demo.ZeroToFour main WARN: This is an informative message", new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"));
-        assertThat(line.getLogLevel(), is(LogLevel.Warn));
+        assertThat(line.hasLogLevel(LogLevel.Warn), is(true));
     }
 
     @Test
     public void ctorParsesDate() throws Exception {
         Date expected = dateFormat.parse("2009-06-07 13:23:57");
-        assertThat(line.getDate(), is(expected));
+        assertThat(line.hasDate(expected), is(true));
     }
 
     @Test

@@ -132,7 +132,7 @@ public class LogFileFinderInteractorTest {
     private Collection<Predicate<StringLogLine>> infoLevel() {
         Predicate<StringLogLine> isInfo = new Predicate<StringLogLine>() {
             @Override
-            public boolean evaluate(StringLogLine item) { return item.getLogLevel().equals(LogLevel.Info); }
+            public boolean evaluate(StringLogLine item) { return item.hasLogLevel(LogLevel.Info); }
         };
         return asList(isInfo);
     }
