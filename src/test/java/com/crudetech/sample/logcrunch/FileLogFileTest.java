@@ -7,7 +7,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.text.SimpleDateFormat;
 import java.util.Iterator;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -21,12 +20,7 @@ public class FileLogFileTest {
     @Before
     public void setUp() throws Exception {
         testLogFile = new TestLogFile("testLogFile");
-        BufferedReaderLogFile.LogLineFactory logLineFactory = new BufferedReaderLogFile.LogLineFactory() {
-            @Override
-            public StringLogLine newLogLine(String lineContent) {
-                return new StringLogLine(lineContent, new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"));
-            }
-        };
+        BufferedReaderLogFile.LogLineFactory logLineFactory = new TestLogLineFactory();
         fileLogFile = new FileLogFile(testLogFile.getFile(), logLineFactory, TestLogFile.Encoding);
 
     }

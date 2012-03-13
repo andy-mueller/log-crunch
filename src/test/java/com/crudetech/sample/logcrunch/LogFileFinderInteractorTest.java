@@ -12,7 +12,6 @@ import org.mockito.stubbing.Answer;
 
 import java.io.BufferedReader;
 import java.io.StringReader;
-import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
@@ -36,12 +35,7 @@ public class LogFileFinderInteractorTest {
     @Before
     public void setUp() throws Exception {
         searchDate = new Date();
-        loglineFactory = new BufferedReaderLogFile.LogLineFactory() {
-            @Override
-            public StringLogLine newLogLine(String lineContent) {
-                return new StringLogLine(lineContent, new SimpleDateFormat("yyyMMdd"));
-            }
-        };
+        loglineFactory = new TestLogLineFactory();
         String content = TestLogFile.Line1 + "\n" + TestLogFile.Line2;
         logFileStub = new StringLogFile(loglineFactory, content);
 

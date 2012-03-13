@@ -38,12 +38,7 @@ public class FileSystemLogFileLocatorTest {
 
     private FileSystemLogFileLocator newLocator() {
         final Charset encoding = Charset.forName("UTF-8");
-        final BufferedReaderLogFile.LogLineFactory logLineFactory = new BufferedReaderLogFile.LogLineFactory() {
-            @Override
-            public StringLogLine newLogLine(String lineContent) {
-                return new StringLogLine(lineContent, new SimpleDateFormat("yyyMMdd"));
-            }
-        };
+        final BufferedReaderLogFile.LogLineFactory logLineFactory = new TestLogLineFactory();
         FileSystemLogFileLocator.LogFileFactory logFileFactory = new FileSystemLogFileLocator.LogFileFactory() {
             @Override
             public LogFile create(File logFile) {
