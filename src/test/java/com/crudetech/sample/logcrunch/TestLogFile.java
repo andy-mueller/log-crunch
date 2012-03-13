@@ -1,5 +1,7 @@
 package com.crudetech.sample.logcrunch;
 
+import org.junit.rules.ExternalResource;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -16,25 +18,22 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-class TestLogFile {
-    private File file;
+class TestLogFile extends ExternalResource {
     static final String Line1 = "2009-06-07 13:23:57 demo.ZeroToFour main INFO: This is an informative message";
     static final String Line2 = "2009-06-07 13:25:57 demo.ZeroToFive subroutine WARN: This is another informative message";
     static final String Line3 = "2009-06-08 10:11:36 demo.ZeroToFive subroutine DEBUG: This is another informative message";
     static final Charset Encoding = Charset.forName("UTF-8");
-    private final List<String> logLines;
-
     static SimpleDateFormat DateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-
     private static final TempDir tempDir = new TempDir();
 
-    TestLogFile(String name) throws IOException {
-        file = new File(tempDir, name);
-        logLines = Collections.unmodifiableList(asList(
-                Line1, Line2, Line3
-        ));
-        writeLinesToTestLogFile();
-    }
+    private File file;
+    private List<String> logLines;
+    private final String name;
+
+
+    TestLogFile(String name){
+        this.name = name;
+     }
 
     private void writeLinesToTestLogFile() throws IOException {
         PrintWriter writer = new PrintWriter(new OutputStreamWriter(new FileOutputStream(file), Encoding));
@@ -47,14 +46,27 @@ class TestLogFile {
         }
     }
 
-    void delete() throws IOException {
-        if(!file.exists()){
+    @Override
+    protected void before() throws Throwable {
+        super.before();
+        file = new File(tempDir, name);
+        logLines = Collections.unmodifiableList(asList(
+                Line1, Line2, Line3
+        ));
+        writeLinesToTestLogFile();
+
+    }
+
+    @Override
+    protected void after() {
+        super.after();
+        if (!file.exists()) {
             throw new RuntimeException("The test file does not exist. Cannot delete it!");
         }
         if (!file.delete()) {
-            throw new IOException("Could not delete file. File is probably still open!");
+            throw new RuntimeException("Could not delete file. File is probably still open!");
         }
-        if(file.exists()){
+        if (file.exists()) {
             throw new RuntimeException("The test file does still not exist");
         }
     }

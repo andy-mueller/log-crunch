@@ -1,7 +1,6 @@
 package com.crudetech.sample.logcrunch;
 
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -15,20 +14,15 @@ import static org.hamcrest.Matchers.is;
 
 public class FileLogFileTest {
 
-    private TestLogFile testLogFile;
+    @Rule
+    public TestLogFile testLogFile = new TestLogFile("testLogFile");
     private LogFile fileLogFile;
 
     @Before
     public void setUp() throws Exception {
-        testLogFile = new TestLogFile("testLogFile");
         BufferedReaderLogFile.LogLineFactory logLineFactory = new TestLogLineFactory();
         fileLogFile = new FileLogFile(testLogFile.getFile(), logLineFactory, TestLogFile.Encoding);
 
-    }
-
-    @After
-    public void after() throws Exception {
-        testLogFile.delete();
     }
 
     @Test
