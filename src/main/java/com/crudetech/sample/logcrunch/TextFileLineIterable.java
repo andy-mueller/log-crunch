@@ -3,6 +3,7 @@ package com.crudetech.sample.logcrunch;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -26,10 +27,11 @@ class TextFileLineIterable implements Iterable<String> {
         return new LineIterator();
     }
 
-    private class LineIterator implements java.util.Iterator<String> {
+    private class LineIterator implements Iterator<String> {
         private final BufferedReader reader;
         private String next = null;
         private boolean isPositioned = false;
+        private boolean closedReader = false;
 
         LineIterator() {
             this.reader = readerProvider.newReader();
@@ -72,12 +74,19 @@ class TextFileLineIterable implements Iterable<String> {
 
         @Override
         public String next() {
+            verifyConcurrentModification();
             verifyHasNextElement();
             try {
                 return next;
             } finally {
                 moved();
                 closeReaderOnEnd();
+            }
+        }
+
+        private void verifyConcurrentModification() {
+            if(isBufferedReaderClosed() && !closedReader){
+                throw new ConcurrentModificationException();
             }
         }
 
@@ -93,6 +102,7 @@ class TextFileLineIterable implements Iterable<String> {
 
         private void closeReader() {
             readerProvider.closeReader(reader);
+            closedReader = true;
         }
 
         @Override

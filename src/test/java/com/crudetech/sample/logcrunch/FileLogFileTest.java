@@ -7,8 +7,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.util.ConcurrentModificationException;
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -48,7 +48,7 @@ public class FileLogFileTest {
         fileLogFile.close();
 
         assertThat(logLineIterator.hasNext(), is(false));
-        expectedException.expect(NoSuchElementException.class);
+        expectedException.expect(ConcurrentModificationException.class);
         logLineIterator.next();
     }
 }
