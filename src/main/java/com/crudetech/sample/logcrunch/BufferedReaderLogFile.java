@@ -31,12 +31,19 @@ public abstract class BufferedReaderLogFile implements LogFile {
         return new TextFileLineIterable.BufferedReaderProvider() {
             @Override
             public BufferedReader newReader() {
-                return createNewReader();
+                BufferedReader r = createNewReader();
+                trackedReaders.add(r);
+                return r;
             }
 
             @Override
             public void closeReader(BufferedReader reader) {
                 BufferedReaderLogFile.this.closeReader(reader);
+            }
+
+            @Override
+            public boolean isClosed(BufferedReader reader) {
+                return !trackedReaders.contains(reader);
             }
         };
     }
@@ -64,5 +71,17 @@ public abstract class BufferedReaderLogFile implements LogFile {
 
     @Override
     public void close() {
+        for (Closeable trackedReader : trackedReaders) {
+            close(trackedReader);
+        }
+        trackedReaders.clear();
+    }
+
+    private void close(Closeable closeable) {
+        try {
+            closeable.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

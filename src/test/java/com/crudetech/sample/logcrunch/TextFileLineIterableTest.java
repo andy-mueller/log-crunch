@@ -136,6 +136,11 @@ public class TextFileLineIterableTest {
         public void closeReader(BufferedReader reader) {
             trackedReaders.remove(reader);
         }
+
+        @Override
+        public boolean isClosed(BufferedReader reader) {
+            return !trackedReaders.contains(reader);
+        }
     }
 
     @Test

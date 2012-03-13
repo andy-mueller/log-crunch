@@ -9,7 +9,10 @@ import java.util.NoSuchElementException;
 class TextFileLineIterable implements Iterable<String> {
     interface BufferedReaderProvider {
         BufferedReader newReader();
+
         void closeReader(BufferedReader reader);
+
+        boolean isClosed(BufferedReader reader);
     }
 
     private final BufferedReaderProvider readerProvider;
@@ -41,8 +44,15 @@ class TextFileLineIterable implements Iterable<String> {
 
         @Override
         public boolean hasNext() {
+            if (isBufferedReaderClosed()) {
+                return false;
+            }
             positionOnNextElement();
             return next != null;
+        }
+
+        private boolean isBufferedReaderClosed() {
+            return readerProvider.isClosed(reader);
         }
 
         private void positionOnNextElement() {

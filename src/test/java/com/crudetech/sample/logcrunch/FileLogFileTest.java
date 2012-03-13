@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -25,7 +26,6 @@ public class FileLogFileTest {
 
     }
 
-
     @After
     public void after() throws Exception {
         testLogFile.delete();
@@ -35,8 +35,10 @@ public class FileLogFileTest {
     public void logLineIterableReturnsFileContent() throws Exception {
         testLogFile.assertSameContent(fileLogFile);
     }
+
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
+
     @Test
     public void closingLogFileInvalidatesLineIteration() {
         Iterator<StringLogLine> logLineIterator = fileLogFile.getLines().iterator();
@@ -46,7 +48,7 @@ public class FileLogFileTest {
         fileLogFile.close();
 
         assertThat(logLineIterator.hasNext(), is(false));
-        expectedException.expect(IllegalStateException.class);
+        expectedException.expect(NoSuchElementException.class);
         logLineIterator.next();
     }
 }
