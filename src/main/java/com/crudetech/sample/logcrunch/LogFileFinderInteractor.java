@@ -43,5 +43,10 @@ public class LogFileFinderInteractor {
         public Iterable<StringLogLine> getLines() {
             return filterChain.apply(logFile.getLines());
         }
+
+        @Override
+        public void close() {
+            logFile.close();
+        }
     }
 }

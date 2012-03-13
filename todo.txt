@@ -1,9 +1,28 @@
 -provide cleanup for buffered readers
-    -extend iterators with callbacks
+    +extend iterators with callbacks
     -BufferedReaderLogFile stores all opened readers
-    -BufferedReaderLogFile cleans up on close
-    -throws on further iteration
+    +BufferedReaderLogFile cleans up on close
+    -throws on further iteration if readers are closed
     -invalidates running iterators, use Adaptor around TextFileLineIterable
 -introduce null LogFileObject for FileSystemLogFileLocator
+-provide decorator base class for LogFile. Fix FilterLogFile then
 -Provide http query mechanism
  GET http://localhost:8080/log-crunch/FilteredLines?from=...&to=...&level=ERROR&level=WARN&logger=...
+
+
+
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+    @Test
+    public void closingLogFileInvalidatesLineIteration() {
+        Iterator<StringLogLine> logLineIterator = fileLogFile.getLines().iterator();
+        logLineIterator.next();
+        assertThat(logLineIterator.hasNext(), is(true));
+
+        fileLogFile.close();
+
+        assertThat(logLineIterator.hasNext(), is(false));
+        expectedException.expect(IllegalStateException.class);
+        logLineIterator.next();
+    }

@@ -7,7 +7,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 
 public abstract class BufferedReaderLogFile implements LogFile {
-    interface LogLineFactory{
+    public interface LogLineFactory{
         StringLogLine newLogLine(String lineContent);
     }
     private final LogLineFactory logLineFactory;
@@ -49,4 +49,8 @@ public abstract class BufferedReaderLogFile implements LogFile {
     }
 
     protected abstract BufferedReader createNewReader();
+
+    @Override
+    public void close() {
+    }
 }
