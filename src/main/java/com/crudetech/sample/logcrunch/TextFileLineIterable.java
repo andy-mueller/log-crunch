@@ -10,9 +10,7 @@ import java.util.NoSuchElementException;
 class TextFileLineIterable implements Iterable<String> {
     interface BufferedReaderProvider {
         BufferedReader newReader();
-
         void closeReader(BufferedReader reader);
-
         boolean isClosed(BufferedReader reader);
     }
 
