@@ -34,6 +34,16 @@
         </license>
     </licenses>
 
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>cobertura-maven-plugin</artifactId>
+                <version>2.5.1</version>
+            </plugin>
+        </plugins>
+    </reporting>
+
     <build>
         <finalName>log-crunch</finalName>
         <pluginManagement>
@@ -55,6 +65,27 @@
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>exec-maven-plugin</artifactId>
                     <version>1.2</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>cobertura-maven-plugin</artifactId>
+                    <version>2.5.1</version>
+                    <configuration>
+                        <instrumentation>
+                            <ignores>
+                            </ignores>
+                            <excludes>
+                            </excludes>
+                        </instrumentation>
+                        <check/>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>clean</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>

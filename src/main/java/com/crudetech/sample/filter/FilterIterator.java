@@ -16,7 +16,7 @@ public class FilterIterator<T> implements Iterator<T> {
 
     @Override
     public boolean hasNext() {
-        return !isPositioned && position();
+        return isPositioned || position();
     }
 
     private boolean position() {

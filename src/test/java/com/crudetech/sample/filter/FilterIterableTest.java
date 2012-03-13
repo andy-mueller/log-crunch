@@ -19,6 +19,14 @@ public class FilterIterableTest {
 
         assertThat(it.hasNext(), is(true));
     }
+    @Test
+    public void hasNextIsMultipleTimes() {
+        Iterator<Integer> source = createSourceIterator(1, 2);
+        FilterIterator<Integer> it = new FilterIterator<Integer>(source, IntegerPredicates.isOdd());
+
+        assertThat(it.hasNext(), is(true));
+        assertThat(it.hasNext(), is(true));
+    }
 
     @Test
     public void hasNextWorksOnFirstItemFalse() {
