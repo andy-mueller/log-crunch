@@ -4,13 +4,19 @@ import com.crudetech.sample.filter.MappingIterable;
 import com.crudetech.sample.filter.UnaryFunction;
 
 import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 public abstract class BufferedReaderLogFile implements LogFile {
-    public interface LogLineFactory{
+    public interface LogLineFactory {
         StringLogLine newLogLine(String lineContent);
     }
+
     private final LogLineFactory logLineFactory;
+    private final Set<Closeable> trackedReaders = new HashSet<Closeable>();
+
     public BufferedReaderLogFile(LogLineFactory logLineFactory) {
         this.logLineFactory = logLineFactory;
     }
@@ -30,13 +36,19 @@ public abstract class BufferedReaderLogFile implements LogFile {
 
             @Override
             public void closeReader(BufferedReader reader) {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                BufferedReaderLogFile.this.closeReader(reader);
             }
         };
+    }
+
+    private void closeReader(BufferedReader reader) {
+        try {
+            reader.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            trackedReaders.remove(reader);
+        }
     }
 
     private UnaryFunction<String, StringLogLine> selectLogLine() {

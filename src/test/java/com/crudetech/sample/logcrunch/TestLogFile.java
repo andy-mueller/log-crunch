@@ -46,7 +46,7 @@ class TestLogFile {
 
     void delete() throws IOException {
         if(!file.exists()){
-            throw new RuntimeException("The test file does not exist");
+            throw new RuntimeException("The test file does not exist. Cannot delete it!");
         }
         if (!file.delete()) {
             throw new IOException("Could not delete file. File is probably still open!");
