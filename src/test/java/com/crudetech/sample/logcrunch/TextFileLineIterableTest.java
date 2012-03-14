@@ -118,7 +118,6 @@ public class TextFileLineIterableTest {
         }
 
         @Override
-
         Reader createNewReader() {
             try {
                 return new InputStreamReader(new ByteArrayInputStream(content.getBytes("UTF-8")));
