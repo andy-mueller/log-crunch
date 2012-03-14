@@ -3,60 +3,38 @@ package com.crudetech.sample.logcrunch;
 import com.crudetech.sample.filter.MappingIterable;
 import com.crudetech.sample.filter.UnaryFunction;
 
-import java.io.BufferedReader;
-import java.io.Closeable;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
+import java.io.Reader;
 
 public abstract class BufferedReaderLogFile implements LogFile {
+
+    private final TrackingBufferedReaderProvider trackingBufferedReaderProvider;
+
     public interface LogLineFactory {
         StringLogLine newLogLine(String lineContent);
     }
 
     private final LogLineFactory logLineFactory;
-    private final Set<Closeable> trackedReaders = new HashSet<Closeable>();
 
     public BufferedReaderLogFile(LogLineFactory logLineFactory) {
         this.logLineFactory = logLineFactory;
+        trackingBufferedReaderProvider = createNewReaderProvider();
     }
 
-    @Override
-    public Iterable<StringLogLine> getLines() {
-        Iterable<String> textLines = new TextFileLineIterable(createNewReaderProvider());
-        return new MappingIterable<String, StringLogLine>(textLines, selectLogLine());
-    }
-
-    private TextFileLineIterable.BufferedReaderProvider createNewReaderProvider() {
-        return new TextFileLineIterable.BufferedReaderProvider() {
+    private TrackingBufferedReaderProvider createNewReaderProvider() {
+        return new TrackingBufferedReaderProvider() {
             @Override
-            public BufferedReader newReader() {
-                BufferedReader r = createNewReader();
-                trackedReaders.add(r);
-                return r;
-            }
-
-            @Override
-            public void closeReader(BufferedReader reader) {
-                BufferedReaderLogFile.this.closeReader(reader);
-            }
-
-            @Override
-            public boolean isClosed(BufferedReader reader) {
-                return !trackedReaders.contains(reader);
+            Reader createNewReader() {
+                return BufferedReaderLogFile.this.createNewReader();
             }
         };
     }
 
-    private void closeReader(BufferedReader reader) {
-        try {
-            reader.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } finally {
-            trackedReaders.remove(reader);
-        }
+    @Override
+    public Iterable<StringLogLine> getLines() {
+        Iterable<String> textLines = new TextFileLineIterable(trackingBufferedReaderProvider);
+        return new MappingIterable<String, StringLogLine>(textLines, selectLogLine());
     }
+
 
     private UnaryFunction<String, StringLogLine> selectLogLine() {
         return new UnaryFunction<String, StringLogLine>() {
@@ -67,21 +45,10 @@ public abstract class BufferedReaderLogFile implements LogFile {
         };
     }
 
-    protected abstract BufferedReader createNewReader();
+    protected abstract Reader createNewReader();
 
     @Override
     public void close() {
-        for (Closeable trackedReader : trackedReaders) {
-            close(trackedReader);
-        }
-        trackedReaders.clear();
-    }
-
-    private void close(Closeable closeable) {
-        try {
-            closeable.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        trackingBufferedReaderProvider.closeAllReaders();
     }
 }

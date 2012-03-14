@@ -5,16 +5,14 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Set;
 
 import static com.crudetech.sample.Iterables.copy;
 import static java.util.Arrays.asList;
@@ -113,49 +111,38 @@ public class TextFileLineIterableTest {
     }
 
 
-    static class BufferedReaderProviderStub implements TextFileLineIterable.BufferedReaderProvider {
+    static class BufferedReaderProviderStub extends TrackingBufferedReaderProvider {
         private final String content;
-        private final Set<BufferedReader> trackedReaders = new HashSet<BufferedReader>();
-
         BufferedReaderProviderStub(String content) {
             this.content = content;
         }
 
         @Override
-        public BufferedReader newReader() {
+
+        Reader createNewReader() {
             try {
-                BufferedReader r = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(content.getBytes("UTF-8"))));
-                trackedReaders.add(r);
-                return r;
+                return new InputStreamReader(new ByteArrayInputStream(content.getBytes("UTF-8")));
             } catch (UnsupportedEncodingException e) {
                 throw new RuntimeException(e);
             }
         }
 
-        @Override
-        public void closeReader(BufferedReader reader) {
-            trackedReaders.remove(reader);
-        }
-
-        @Override
-        public boolean isClosed(BufferedReader reader) {
-            return !trackedReaders.contains(reader);
-        }
     }
+
 
     @Test
     public void closesReaderAfterIteratorFinishes() throws Exception {
         BufferedReaderProviderStub providerStub = new BufferedReaderProviderStub("line1\nline2");
-        assertThat(providerStub.trackedReaders.isEmpty(), is(true));
+        assertThat(providerStub.hasReaders(), is(true));
 
         Iterator<String> iterator = new TextFileLineIterable(providerStub).iterator();
 
 
         iterator.next();
-        assertThat(providerStub.trackedReaders.size(), is(1));
+        assertThat(providerStub.amountOfReaders(), is(1));
 
         iterator.next();
-        assertThat(providerStub.trackedReaders.isEmpty(), is(true));
+        assertThat(providerStub.hasReaders(), is(true));
     }
 
     @Test
@@ -163,7 +150,7 @@ public class TextFileLineIterableTest {
         BufferedReaderProviderStub providerStub = new BufferedReaderProviderStub("");
         new TextFileLineIterable(providerStub).iterator();
 
-        assertThat(providerStub.trackedReaders.isEmpty(), is(true));
+        assertThat(providerStub.hasReaders(), is(true));
     }
 
     @Test
@@ -181,14 +168,14 @@ public class TextFileLineIterableTest {
         TextFileLineIterable.BufferedReaderProvider providerStub = new BufferedReaderProviderStub("line1\nline2\nline3");
         TextFileLineIterable iterable = new TextFileLineIterable(providerStub);
 
-        Iterator<String> it1= iterable.iterator();
-        Iterator<String> it2= iterable.iterator();
-        
+        Iterator<String> it1 = iterable.iterator();
+        Iterator<String> it2 = iterable.iterator();
+
         assertThat(it1, is(not(sameInstance(it2))));
 
         List<String> copy1 = copy(it1);
         List<String> copy2 = copy(it2);
-        
+
         assertThat(copy1, is(copy2));
         assertThat(copy1, is(asList("line1", "line2", "line3")));
     }
@@ -198,15 +185,15 @@ public class TextFileLineIterableTest {
         BufferedReaderProviderStub providerStub = new BufferedReaderProviderStub("text");
         TextFileLineIterable iterable = new TextFileLineIterable(providerStub);
 
-        Iterator<String> it1= iterable.iterator();
-        Iterator<String> it2= iterable.iterator();
+        Iterator<String> it1 = iterable.iterator();
+        Iterator<String> it2 = iterable.iterator();
 
-        assertThat(providerStub.trackedReaders.size(), is(2));
+        assertThat(providerStub.amountOfReaders(), is(2));
 
         iterate(it1);
         iterate(it2);
 
-        assertThat(providerStub.trackedReaders.isEmpty(), is(true));
+        assertThat(providerStub.hasReaders(), is(true));
     }
 
     private void iterate(Iterator<String> iterator) {

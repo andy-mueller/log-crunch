@@ -1,6 +1,8 @@
 -introduce null LogFileObject for FileSystemLogFileLocator
 -provide decorator base class for LogFile. Fix FilterLogFile then
 -Provide http query mechanism
- GET http://localhost:8080/log-crunch/FilteredLines?from=...&to=...&level=ERROR&level=WARN&logger=...
+ GET http://localhost:8080/log-crunch/FilteredLines?from=...&to=...&level=ERROR&level=WARN&logger=com.ui.sample.SomeClass
 
+-closing the BufferedReader removes it from tracking
+    ->build  yet another wrapper when returning it
  -remove duplicated BufferedReaderProvider implementations

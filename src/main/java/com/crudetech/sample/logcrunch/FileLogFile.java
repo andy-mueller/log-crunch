@@ -1,10 +1,10 @@
 package com.crudetech.sample.logcrunch;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.charset.Charset;
 
 public class FileLogFile extends BufferedReaderLogFile {
@@ -18,13 +18,11 @@ public class FileLogFile extends BufferedReaderLogFile {
     }
 
     @Override
-    protected BufferedReader createNewReader() {
-       try {
-            return new BufferedReader(
-                    new InputStreamReader(
-                            new FileInputStream(logFile),
-                            encoding)
-            );
+    protected Reader createNewReader() {
+        try {
+            return new InputStreamReader(
+                    new FileInputStream(logFile),
+                    encoding);
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
