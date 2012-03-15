@@ -83,4 +83,8 @@ public class StringLogLine {
     public boolean hasLogLevel(LogLevel level) {
         return getLogLevel().equals(level);
     }
+
+    public boolean isInRange(DateTimeRange range) {
+        return range.contains(getDate());
+    }
 }

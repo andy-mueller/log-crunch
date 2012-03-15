@@ -31,7 +31,7 @@ public class MappingIterableTest {
 
         Iterable<Integer> src = asList(0, 1, 2, 3);
 
-         Iterable<String> mapped = new MappingIterable<Integer, String>(src, intToString);
+        Iterable<String> mapped = new MappingIterable<Integer, String>(src, intToString);
 
         List<String> result = copy(mapped);
         assertThat(result, is(asList("0", "1", "2", "3")));
