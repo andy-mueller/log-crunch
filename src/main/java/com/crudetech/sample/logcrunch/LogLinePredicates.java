@@ -3,19 +3,19 @@ package com.crudetech.sample.logcrunch;
 import com.crudetech.sample.filter.Predicate;
 
 public class LogLinePredicates {
-    public static Predicate<StringLogLine> hasLogLevel(final LogLevel level) {
-        return new Predicate<StringLogLine>() {
+    public static Predicate<LogLine> hasLogLevel(final LogLevel level) {
+        return new Predicate<LogLine>() {
             @Override
-            public Boolean evaluate(StringLogLine logLine) {
+            public Boolean evaluate(LogLine logLine) {
                 return logLine.hasLogLevel(level);
             }
         };
     }
 
-    public static Predicate<StringLogLine> isInDateTimeRange(final DateTimeRange range) {
-        return new Predicate<StringLogLine>() {
+    public static Predicate<LogLine> isInDateTimeRange(final DateTimeRange range) {
+        return new Predicate<LogLine>() {
             @Override
-            public Boolean evaluate(StringLogLine argument) {
+            public Boolean evaluate(LogLine argument) {
                 return argument.isInRange(range);
             }
         };

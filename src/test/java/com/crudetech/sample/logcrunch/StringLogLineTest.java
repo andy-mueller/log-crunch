@@ -9,6 +9,7 @@ import java.io.StringWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.regex.Pattern;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -17,8 +18,8 @@ import static org.mockito.Mockito.verify;
 
 public class StringLogLineTest {
 
-    public static final String LogLineText = "2009-06-07 13:23:57 demo.ZeroToFour main INFO: This is an informative message";
-    private StringLogLine line;
+    public static final String LogLineText = "2009-06-07 13:23:57 com.demo.ZeroToFour main INFO: This is an informative message";
+    private LogLine line;
     private SimpleDateFormat dateFormat;
     private Date lineDate;
 
@@ -62,5 +63,12 @@ public class StringLogLineTest {
 
         assertThat(line.isInRange(range), is(true));
         verify(range).contains(lineDate);
+    }
+
+    @Test
+    public void hasLogger() throws ParseException {
+        Pattern demoLogger = Pattern.compile("com\\.demo\\..*");
+        
+        assertThat(line.hasLogger(demoLogger), is(true));
     }
 }

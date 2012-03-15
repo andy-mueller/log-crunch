@@ -12,7 +12,7 @@ import static java.util.Arrays.asList;
 
 public class LogFileFilterInteractor {
     private final LogFileLocator locator;
-    private final FilterChain<StringLogLine> infoFilter;
+    private final FilterChain<LogLine> infoFilter;
 
 
     public static class RequestModel{
@@ -23,7 +23,7 @@ public class LogFileFilterInteractor {
         List<Pattern> messageRegex;
     }
 
-    public LogFileFilterInteractor(LogFileLocator locator, FilterChain<StringLogLine> infoFilter) {
+    public LogFileFilterInteractor(LogFileLocator locator, FilterChain<LogLine> infoFilter) {
         this.locator = locator;
         this.infoFilter = infoFilter;
     }
@@ -43,15 +43,15 @@ public class LogFileFilterInteractor {
 
     private static class FilterLogFile implements LogFile {
         private final LogFile logFile;
-        private final FilterChain<StringLogLine> filterChain;
+        private final FilterChain<LogLine> filterChain;
 
-        public FilterLogFile(LogFile logFile, FilterChain<StringLogLine> filterChain) {
+        public FilterLogFile(LogFile logFile, FilterChain<LogLine> filterChain) {
             this.logFile = logFile;
             this.filterChain = filterChain;
         }
 
         @Override
-        public Iterable<StringLogLine> getLines() {
+        public Iterable<LogLine> getLines() {
             return filterChain.apply(logFile.getLines());
         }
 

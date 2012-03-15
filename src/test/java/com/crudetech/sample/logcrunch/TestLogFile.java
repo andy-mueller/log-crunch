@@ -80,16 +80,16 @@ class TestLogFile extends ExternalResource {
     }
 
     void assertSameContent(LogFile logFile) {
-        Iterable<? extends StringLogLine> lines = logFile.getLines();
+        Iterable<? extends LogLine> lines = logFile.getLines();
         ArrayList<String> actual = logLinesToString(lines);
 
         assertThat(actual, is(getLogLines()));
 
     }
 
-    private ArrayList<String> logLinesToString(Iterable<? extends StringLogLine> lines) {
+    private ArrayList<String> logLinesToString(Iterable<? extends LogLine> lines) {
         ArrayList<String> actual = new ArrayList<String>();
-        for (StringLogLine s : lines) {
+        for (LogLine s : lines) {
             StringWriter sw = new StringWriter();
             s.print(new PrintWriter(sw));
             actual.add(sw.toString());

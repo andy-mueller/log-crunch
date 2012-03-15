@@ -13,13 +13,12 @@ import static org.hamcrest.Matchers.is;
 public class DateTimeRangeTest {
 
     private Date start;
-    private Date end;
     private DateTimeRange range;
 
     @Before
     public void setUp() throws Exception {
         start = new Date(100);
-        end = new Date(1000);
+        Date end = new Date(1000);
         range = new DateTimeRange(start, end);
     }
 

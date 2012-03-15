@@ -10,7 +10,7 @@ public abstract class BufferedReaderLogFile implements LogFile {
     private final TrackingBufferedReaderProvider trackingBufferedReaderProvider;
 
     public interface LogLineFactory {
-        StringLogLine newLogLine(String lineContent);
+        LogLine newLogLine(String lineContent);
     }
 
     private final LogLineFactory logLineFactory;
@@ -30,16 +30,16 @@ public abstract class BufferedReaderLogFile implements LogFile {
     }
 
     @Override
-    public Iterable<StringLogLine> getLines() {
+    public Iterable<LogLine> getLines() {
         Iterable<String> textLines = new TextFileLineIterable(trackingBufferedReaderProvider);
-        return new MappingIterable<String, StringLogLine>(textLines, selectLogLine());
+        return new MappingIterable<String, LogLine>(textLines, selectLogLine());
     }
 
 
-    private UnaryFunction<StringLogLine, String> selectLogLine() {
-        return new UnaryFunction<StringLogLine, String>() {
+    private UnaryFunction<LogLine, String> selectLogLine() {
+        return new UnaryFunction<LogLine, String>() {
             @Override
-            public StringLogLine evaluate(String argument) {
+            public LogLine evaluate(String argument) {
                 return logLineFactory.newLogLine(argument);
             }
         };

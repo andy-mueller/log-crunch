@@ -35,7 +35,7 @@ public class FileLogFileTest {
 
     @Test
     public void closingLogFileInvalidatesLineIteration() {
-        Iterator<StringLogLine> logLineIterator = fileLogFile.getLines().iterator();
+        Iterator<LogLine> logLineIterator = fileLogFile.getLines().iterator();
         logLineIterator.next();
         assertThat(logLineIterator.hasNext(), is(true));
 

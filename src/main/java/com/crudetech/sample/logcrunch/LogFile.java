@@ -1,7 +1,7 @@
 package com.crudetech.sample.logcrunch;
 
 public interface LogFile {
-    Iterable<StringLogLine> getLines();
+    Iterable<LogLine> getLines();
 
     void close();
 }

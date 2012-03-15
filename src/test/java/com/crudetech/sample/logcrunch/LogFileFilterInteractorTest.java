@@ -46,7 +46,7 @@ public class LogFileFilterInteractorTest {
 
     @Test
     public void findFiles() {
-        FilterChain<StringLogLine> infoFilter = identityFilter();
+        FilterChain<LogLine> infoFilter = identityFilter();
         LogFileFilterInteractor interactor = new LogFileFilterInteractor(locator, infoFilter);
 
         Iterable<LogFile> logFiles = interactor.getLogFiles("machine101", searchDate);
@@ -56,8 +56,8 @@ public class LogFileFilterInteractorTest {
     }
 
     @SuppressWarnings("unchecked")
-    private FilterChain<StringLogLine> identityFilter() {
-        FilterChain<StringLogLine> infoFilter = mock(FilterChain.class);
+    private FilterChain<LogLine> identityFilter() {
+        FilterChain<LogLine> infoFilter = mock(FilterChain.class);
         when(infoFilter.apply(any(Iterable.class))).thenAnswer(new Answer<Object>() {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
@@ -71,7 +71,7 @@ public class LogFileFilterInteractorTest {
         return new TypeSafeMatcher<LogFile>() {
             @Override
             protected boolean matchesSafely(LogFile item) {
-                List<StringLogLine> lines = copy(item.getLines());
+                List<LogLine> lines = copy(item.getLines());
                 return lines.equals(copy(file.getLines()));
             }
 
@@ -98,23 +98,23 @@ public class LogFileFilterInteractorTest {
 
     @Test
     public void foundFilesAreFiltered() {
-        FilterChain<StringLogLine> infoFilter = new FilterChain<StringLogLine>(infoLevel());
+        FilterChain<LogLine> infoFilter = new FilterChain<LogLine>(infoLevel());
         LogFileFilterInteractor interactor = new LogFileFilterInteractor(locator, infoFilter);
 
         Iterable<LogFile> logFiles = interactor.getLogFiles("machine101", searchDate);
 
         LogFile foundFile = getFirst(logFiles);
-        List<StringLogLine> logLines = copy(foundFile.getLines());
+        List<LogLine> logLines = copy(foundFile.getLines());
 
-        List<StringLogLine> expected = asList(loglineFactory.newLogLine(TestLogFile.Line1));
+        List<LogLine> expected = asList(loglineFactory.newLogLine(TestLogFile.Line1));
         assertThat(logLines, is(expected));
     }
 
     @SuppressWarnings("unchecked")
-    private Collection<Predicate<StringLogLine>> infoLevel() {
-        Predicate<StringLogLine> isInfo = new Predicate<StringLogLine>() {
+    private Collection<Predicate<LogLine>> infoLevel() {
+        Predicate<LogLine> isInfo = new Predicate<LogLine>() {
             @Override
-            public Boolean evaluate(StringLogLine item) {
+            public Boolean evaluate(LogLine item) {
                 return item.hasLogLevel(LogLevel.Info);
             }
         };
