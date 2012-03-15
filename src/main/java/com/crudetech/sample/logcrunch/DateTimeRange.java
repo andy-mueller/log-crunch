@@ -21,6 +21,6 @@ public class DateTimeRange {
         if (date == null) {
             throw new IllegalArgumentException();
         }
-        return (date.before(start) || start.equals(date)) && date.before(end);
+        return (!date.before(start) || start.equals(date)) && date.before(end);
     }
 }

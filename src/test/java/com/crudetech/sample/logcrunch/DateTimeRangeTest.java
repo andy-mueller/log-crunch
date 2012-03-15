@@ -1,5 +1,6 @@
 package com.crudetech.sample.logcrunch;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -10,16 +11,34 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 public class DateTimeRangeTest {
+
+    private Date start;
+    private Date end;
+    private DateTimeRange range;
+
+    @Before
+    public void setUp() throws Exception {
+        start = new Date(100);
+        end = new Date(1000);
+        range = new DateTimeRange(start, end);
+    }
+
     @Test
-    public void rangeIsOpenInterval() {
-        Date start = new Date(0);
-        Date end = new Date(1000);
-
-        DateTimeRange range = new DateTimeRange(start, end);
-
+    public void dateOnStart() {
         assertThat(range.contains((Date) start.clone()), is(true));
-        assertThat(range.contains((Date) end.clone()), is(false));
-        assertThat(range.contains(new Date(20)), is(false));
+    }
+    @Test
+    public void dateBeforeStart() {
+        assertThat(range.contains(new Date(10)), is(false));
+    }
+
+    @Test
+    public void dateInRange() {
+        assertThat(range.contains(new Date(500)), is(true));
+    }
+    @Test
+    public void dateOnEnd() {
+        assertThat(range.contains(new Date(1000)), is(false));
     }
 
     @Rule
