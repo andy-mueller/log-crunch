@@ -16,7 +16,6 @@ public class FileSystemLogFileLocator implements LogFileLocator {
     private static final String filePattern = "{0}-{1}";
     private SimpleDateFormat fileNameDateFormat= new SimpleDateFormat("yyyyMMdd");
 
-    //logFile.%d{yyyy-MM-dd}.log
 
     interface LogFileFactory{
         LogFile create(File logFile);

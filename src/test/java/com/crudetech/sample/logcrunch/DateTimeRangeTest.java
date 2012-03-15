@@ -69,4 +69,12 @@ public class DateTimeRangeTest {
         expectedException.expect(IllegalArgumentException.class);
         new DateTimeRange(start, null);
     }
+
+    @Test
+    public void constructionWithOnePointInTime() throws Exception {
+        Date now = new Date();
+        DateTimeRange range = new DateTimeRange(now);
+
+        assertThat(range.contains((Date) now.clone()), is(true));
+    }
 }

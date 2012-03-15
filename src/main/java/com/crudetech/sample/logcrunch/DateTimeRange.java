@@ -17,6 +17,10 @@ public class DateTimeRange {
         this.end = (Date) end.clone();
     }
 
+    public DateTimeRange(Date now) {
+        this(now, new Date(now.getTime()+1));
+    }
+
     public boolean contains(Date date) {
         if (date == null) {
             throw new IllegalArgumentException();
