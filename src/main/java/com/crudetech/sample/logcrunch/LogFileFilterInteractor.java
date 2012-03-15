@@ -5,14 +5,25 @@ import com.crudetech.sample.filter.MappingIterable;
 import com.crudetech.sample.filter.UnaryFunction;
 
 import java.util.Date;
+import java.util.List;
+import java.util.regex.Pattern;
 
 import static java.util.Arrays.asList;
 
-public class LogFileFinderInteractor {
+public class LogFileFilterInteractor {
     private final LogFileLocator locator;
     private final FilterChain<StringLogLine> infoFilter;
 
-    public LogFileFinderInteractor(LogFileLocator locator, FilterChain<StringLogLine> infoFilter) {
+
+    public static class RequestModel{
+        String logFileName;
+        List<DateTimeRange> dates;
+        List<LogLevel> levels;
+        List<String> loggers;
+        List<Pattern> messageRegex;
+    }
+
+    public LogFileFilterInteractor(LogFileLocator locator, FilterChain<StringLogLine> infoFilter) {
         this.locator = locator;
         this.infoFilter = infoFilter;
     }

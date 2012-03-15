@@ -10,14 +10,15 @@ import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import java.io.BufferedReader;
+import java.io.Reader;
 import java.io.StringReader;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 import static com.crudetech.sample.Iterables.copy;
+import static com.crudetech.sample.Iterables.getFirst;
+import static com.crudetech.sample.Iterables.size;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -25,7 +26,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class LogFileFinderInteractorTest {
+public class LogFileFilterInteractorTest {
 
     private LogFile logFileStub;
     private LogFileLocator locator;
@@ -46,7 +47,7 @@ public class LogFileFinderInteractorTest {
     @Test
     public void findFiles() {
         FilterChain<StringLogLine> infoFilter = identityFilter();
-        LogFileFinderInteractor interactor = new LogFileFinderInteractor(locator, infoFilter);
+        LogFileFilterInteractor interactor = new LogFileFilterInteractor(locator, infoFilter);
 
         Iterable<LogFile> logFiles = interactor.getLogFiles("machine101", searchDate);
 
@@ -81,37 +82,24 @@ public class LogFileFinderInteractorTest {
         };
     }
 
-    private int size(Iterable<?> iterable) {
-        int count = 0;
-        Iterator<?> it = iterable.iterator();
-        //noinspection WhileLoopReplaceableByForEach
-        while (it.hasNext()) {
-            count++;
-            it.next();
-        }
-        return count;
-    }
-
     static class StringLogFile extends BufferedReaderLogFile {
         private final String content;
 
-        public StringLogFile(LogLineFactory logLineFactory, String content) {
+        StringLogFile(LogLineFactory logLineFactory, String content) {
             super(logLineFactory);
             this.content = content;
         }
 
         @Override
-        protected BufferedReader createNewReader() {
-            return new BufferedReader(
-                    new StringReader(content)
-            );
+        protected Reader createNewReader() {
+            return new StringReader(content);
         }
     }
 
     @Test
     public void foundFilesAreFiltered() {
         FilterChain<StringLogLine> infoFilter = new FilterChain<StringLogLine>(infoLevel());
-        LogFileFinderInteractor interactor = new LogFileFinderInteractor(locator, infoFilter);
+        LogFileFilterInteractor interactor = new LogFileFilterInteractor(locator, infoFilter);
 
         Iterable<LogFile> logFiles = interactor.getLogFiles("machine101", searchDate);
 
@@ -126,12 +114,11 @@ public class LogFileFinderInteractorTest {
     private Collection<Predicate<StringLogLine>> infoLevel() {
         Predicate<StringLogLine> isInfo = new Predicate<StringLogLine>() {
             @Override
-            public boolean evaluate(StringLogLine item) { return item.hasLogLevel(LogLevel.Info); }
+            public boolean evaluate(StringLogLine item) {
+                return item.hasLogLevel(LogLevel.Info);
+            }
         };
         return asList(isInfo);
     }
 
-    private <T> T getFirst(Iterable<T> i) {
-        return i.iterator().next();
-    }
 }

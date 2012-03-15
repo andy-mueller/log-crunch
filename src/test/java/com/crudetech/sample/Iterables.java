@@ -15,4 +15,19 @@ public class Iterables {
     public static <T> List<T> copy(Iterable<T> src) {
         return copy(src.iterator());
     }
+
+    public static int size(Iterable<?> iterable) {
+        int count = 0;
+        Iterator<?> it = iterable.iterator();
+        //noinspection WhileLoopReplaceableByForEach
+        while (it.hasNext()) {
+            count++;
+            it.next();
+        }
+        return count;
+    }
+
+    public static <T> T getFirst(Iterable<T> i) {
+        return i.iterator().next();
+    }
 }
