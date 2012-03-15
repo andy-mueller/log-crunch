@@ -15,6 +15,8 @@ public class StringLogLine implements LogLine {
     private final SimpleDateFormat dateFormat;
     private final String logger;
 
+    // %-4relative [%thread] %-5level %logger{35} - %msg %n
+
     public StringLogLine(String line, SimpleDateFormat dateFormat) {
         this.line = line;
         this.dateFormat = (SimpleDateFormat) dateFormat.clone();

@@ -23,4 +23,8 @@ public class DateTimeRange {
         }
         return (!date.before(start) || start.equals(date)) && date.before(end);
     }
+
+    public Date getStart() {
+        return (Date) start.clone();
+    }
 }

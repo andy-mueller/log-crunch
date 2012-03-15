@@ -7,7 +7,6 @@ import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import static java.util.Arrays.asList;
 
@@ -17,6 +16,7 @@ public class FileSystemLogFileLocator implements LogFileLocator {
     private static final String filePattern = "{0}-{1}";
     private SimpleDateFormat fileNameDateFormat= new SimpleDateFormat("yyyyMMdd");
 
+    //logFile.%d{yyyy-MM-dd}.log
 
     interface LogFileFactory{
         LogFile create(File logFile);
@@ -28,8 +28,8 @@ public class FileSystemLogFileLocator implements LogFileLocator {
     }
 
     @Override
-    public LogFile find(String fileName, Date logFileData) {
-        String logFileName = MessageFormat.format(filePattern, fileName, fileNameDateFormat.format(logFileData));
+    public LogFile find(String fileName, DateTimeRange range) {
+        String logFileName = MessageFormat.format(filePattern, fileName, fileNameDateFormat.format(range.getStart()));
 
         Iterable<File> matches = new FilterIterable<File>(asList(logFilePath.listFiles()), nameContains(logFileName));
         

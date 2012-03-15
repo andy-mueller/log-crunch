@@ -7,7 +7,6 @@ import org.junit.Test;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -15,7 +14,7 @@ import static org.hamcrest.Matchers.notNullValue;
 
 public class FileSystemLogFileLocatorTest {
     private LogFileLocator locator;
-    private Date sixthOfMay2007;
+    private DateTimeRange sixthOfMay2007;
 
 
     @Before
@@ -23,7 +22,8 @@ public class FileSystemLogFileLocatorTest {
         locator = newLocator();
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-        sixthOfMay2007 = dateFormat.parse("20070506");
+
+        sixthOfMay2007 = new DateTimeRange(dateFormat.parse("20070506"), dateFormat.parse("20070507"));
     }
 
     @Rule
