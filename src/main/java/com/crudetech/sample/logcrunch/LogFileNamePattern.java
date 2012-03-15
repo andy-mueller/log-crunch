@@ -21,10 +21,7 @@ public class LogFileNamePattern {
         for (String part : parts) {
             comparePattern += Pattern.quote(part) + ".*";
         }
-
-        boolean matches = Pattern.matches(comparePattern, fileName);
-
-        return matches;
+        return Pattern.matches(comparePattern, fileName);
     }
 
     private static SimpleDateFormat extractDateFormat(String patternString) {
