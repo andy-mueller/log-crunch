@@ -36,8 +36,8 @@ public abstract class BufferedReaderLogFile implements LogFile {
     }
 
 
-    private UnaryFunction<String, StringLogLine> selectLogLine() {
-        return new UnaryFunction<String, StringLogLine>() {
+    private UnaryFunction<StringLogLine, String> selectLogLine() {
+        return new UnaryFunction<StringLogLine, String>() {
             @Override
             public StringLogLine evaluate(String argument) {
                 return logLineFactory.newLogLine(argument);

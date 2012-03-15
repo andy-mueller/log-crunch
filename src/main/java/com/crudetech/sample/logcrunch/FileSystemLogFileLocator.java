@@ -44,7 +44,7 @@ public class FileSystemLogFileLocator implements LogFileLocator {
     private Predicate<? super File> nameContains(final String name) {
         return new Predicate<File>() {
             @Override
-            public boolean evaluate(File item) {
+            public Boolean evaluate(File item) {
                 try {
                     return item.getCanonicalPath().toLowerCase().contains(name.toLowerCase());
                 } catch (IOException e) {

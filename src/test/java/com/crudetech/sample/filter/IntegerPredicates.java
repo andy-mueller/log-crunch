@@ -4,7 +4,7 @@ class IntegerPredicates {
     static Predicate<Integer> isEven(){
         return new Predicate<Integer>() {
             @Override
-            public boolean evaluate(Integer item) {
+            public Boolean evaluate(Integer item) {
                 return item % 2 == 0;
             }
         };
@@ -12,7 +12,7 @@ class IntegerPredicates {
     static Predicate<Integer> isOdd(){
         return new Predicate<Integer>() {
             @Override
-            public boolean evaluate(Integer item) {
+            public Boolean evaluate(Integer item) {
                 return item % 2 != 0;
             }
         };
@@ -21,7 +21,7 @@ class IntegerPredicates {
     static Predicate<Integer> isNegative(){
         return new Predicate<Integer>() {
             @Override
-            public boolean evaluate(Integer item) {
+            public Boolean evaluate(Integer item) {
                 return item < 0;
             }
         };

@@ -19,7 +19,7 @@ public class LogFileFilterInteractor {
         String logFileName;
         List<DateTimeRange> dates;
         List<LogLevel> levels;
-        List<String> loggers;
+        List<Pattern> loggers;
         List<Pattern> messageRegex;
     }
 

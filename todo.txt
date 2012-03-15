@@ -2,3 +2,5 @@
 -provide decorator base class for LogFile. Fix FilterLogFile then
 -Provide http query mechanism
  GET http://localhost:8080/log-crunch/FilteredLines?from=...&to=...&level=ERROR&level=WARN&logger=com.ui.sample.SomeClass
+
+-use yoda time!

@@ -114,11 +114,10 @@ public class LogFileFilterInteractorTest {
     private Collection<Predicate<StringLogLine>> infoLevel() {
         Predicate<StringLogLine> isInfo = new Predicate<StringLogLine>() {
             @Override
-            public boolean evaluate(StringLogLine item) {
+            public Boolean evaluate(StringLogLine item) {
                 return item.hasLogLevel(LogLevel.Info);
             }
         };
         return asList(isInfo);
     }
-
 }

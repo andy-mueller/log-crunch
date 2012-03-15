@@ -1,5 +1,3 @@
 package com.crudetech.sample.filter;
 
-public interface Predicate<T> {
-    boolean evaluate(T item);
-}
+public interface Predicate<T> extends UnaryFunction<Boolean, T> { }

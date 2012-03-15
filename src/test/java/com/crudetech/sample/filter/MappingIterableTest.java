@@ -14,11 +14,11 @@ import static org.hamcrest.Matchers.is;
 
 public class MappingIterableTest {
 
-    private UnaryFunction<Integer,String> intToString;
+    private UnaryFunction<String, Integer> intToString;
 
     @Before
     public void setUp() throws Exception {
-        intToString = new UnaryFunction<Integer, String>() {
+        intToString = new UnaryFunction<String, Integer>() {
             @Override
             public String evaluate(Integer argument) {
                 return argument.toString();

@@ -5,9 +5,9 @@ import java.util.Iterator;
 
 public class MappingIterable<TFrom, TTo> implements Iterable<TTo>{
     private final Iterable<TFrom> source;
-    private final UnaryFunction<TFrom, TTo> select;
+    private final UnaryFunction<TTo, TFrom> select;
 
-    public MappingIterable(Iterable<TFrom> source, UnaryFunction<TFrom, TTo> select) {
+    public MappingIterable(Iterable<TFrom> source, UnaryFunction<TTo, TFrom> select) {
         this.source = source;
         this.select = select;
     }
