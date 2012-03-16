@@ -1,15 +1,11 @@
 package com.crudetech.sample.logcrunch;
 
 import com.crudetech.sample.filter.FilterChain;
-import com.crudetech.sample.filter.MappingIterable;
 import com.crudetech.sample.filter.UnaryFunction;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
-
-import static java.util.Arrays.asList;
 
 public class LogFileFilterInteractor {
     private final LogFileLocator locator;
@@ -33,10 +29,10 @@ public class LogFileFilterInteractor {
     public Iterable<LogFile> getFilteredLogFiles(RequestModel model) {
         throw new UnsupportedOperationException("Implement me!");
     }
-    public Iterable<LogFile> getLogFiles(String name, Date date) {
-        DateTimeRange range = new DateTimeRange(date, new Date(date.getTime() + 1));
-        return new MappingIterable<LogFile, LogFile>(asList(locator.find(name, range)), filters());
-    }
+//    public Iterable<LogFile> getLogFiles(String name, Date date) {
+//        DateTimeRange range = new DateTimeRange(date, new Date(date.getTime() + 1));
+//        return new MappingIterable<LogFile, LogFile>(asList(locator.find(name, range)), filters());
+//    }
 
     private UnaryFunction<LogFile, LogFile> filters() {
         return new UnaryFunction<LogFile, LogFile>() {

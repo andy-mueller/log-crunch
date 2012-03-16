@@ -41,7 +41,8 @@ public class LogFileFilterInteractorTest {
         logFileStub = new StringLogFile(loglineFactory, content);
 
         locator = mock(LogFileLocator.class);
-        when(locator.find("machine101", new DateTimeRange(searchDate, new Date()))).thenReturn(logFileStub);
+        LogFileNamePattern name = new LogFileNamePattern("machine101-%d{yyyyMMdd}");
+        when(locator.find(name, new DateTimeRange(searchDate, new Date()))).thenReturn(asList(logFileStub));
     }
 
 //    @Test

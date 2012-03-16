@@ -1,57 +1,63 @@
 package com.crudetech.sample.logcrunch;
 
 import com.crudetech.sample.filter.FilterIterable;
+import com.crudetech.sample.filter.MappingIterable;
 import com.crudetech.sample.filter.Predicate;
+import com.crudetech.sample.filter.UnaryFunction;
 
 import java.io.File;
-import java.io.IOException;
-import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.List;
 
 import static java.util.Arrays.asList;
 
 public class FileSystemLogFileLocator implements LogFileLocator {
     private final File logFilePath;
-    private final LogFileFactory factory;
-    private static final String filePattern = "{0}-{1}";
-    private SimpleDateFormat fileNameDateFormat= new SimpleDateFormat("yyyyMMdd");
+    private final LogFileFactory logFileFactory;
 
-
-    interface LogFileFactory{
+    interface LogFileFactory {
         LogFile create(File logFile);
     }
 
-    public FileSystemLogFileLocator(File logFilePath, LogFileFactory factory) {
+    public FileSystemLogFileLocator(File logFilePath, LogFileFactory logFileFactory) {
         this.logFilePath = logFilePath;
-        this.factory = factory;
+        this.logFileFactory = logFileFactory;
     }
 
     @Override
-    public LogFile find(String fileName, DateTimeRange range) {
-        String logFileName = MessageFormat.format(filePattern, fileName, fileNameDateFormat.format(range.getStart()));
+    public Iterable<LogFile> find(LogFileNamePattern fileName, DateTimeRange range) {
+        List<File> allPossibleFiles = asList(logFilePath.listFiles());
+        Collections.sort(allPossibleFiles);
+        Iterable<File> matchingNameFiles = new FilterIterable<File>(allPossibleFiles, fileNameMatches(fileName));
+        Iterable<File> matchingDateFiles = new FilterIterable<File>(matchingNameFiles, fileNameInDateRange(fileName, range));
 
-        Iterable<File> matches = new FilterIterable<File>(asList(logFilePath.listFiles()), nameContains(logFileName));
-        
-        for(File matchedFile : matches){
-            return factory.create(matchedFile);
-        }
-
-        // TODO: return null object instead
-        throw new IllegalArgumentException();
+        return new MappingIterable<File, LogFile>(matchingDateFiles, createLogFile());
     }
 
-    private Predicate<? super File> nameContains(final String name) {
+    private Predicate<File> fileNameInDateRange(final LogFileNamePattern fileName, final DateTimeRange range) {
         return new Predicate<File>() {
             @Override
-            public Boolean evaluate(File item) {
-                try {
-                    return item.getCanonicalPath().toLowerCase().contains(name.toLowerCase());
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+            public Boolean evaluate(File argument) {
+                return range.contains(fileName.dateOf(argument.getName()));
             }
         };
     }
 
+    private UnaryFunction<LogFile, File> createLogFile() {
+        return new UnaryFunction<LogFile, File>() {
+            @Override
+            public LogFile evaluate(File logFile) {
+                return logFileFactory.create(logFile);
+            }
+        };
+    }
 
+    private Predicate<File> fileNameMatches(final LogFileNamePattern fileName) {
+        return new Predicate<File>() {
+            @Override
+            public Boolean evaluate(File argument) {
+                return fileName.matches(argument.getName());
+            }
+        };
+    }
 }
