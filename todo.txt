@@ -1,4 +1,5 @@
 -Locator
+    -Use LogFileNamePattern for matching
     -locator shall return list of files
     -introduce null LogFileObject for FileSystemLogFileLocator
 

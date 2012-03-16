@@ -12,6 +12,9 @@ public class LogFileNamePattern {
     private final SimpleDateFormat dateFormat;
 
     public LogFileNamePattern(String pattern) {
+        if(pattern == null){
+            throw new IllegalArgumentException();
+        }
         parts = datePattern.split(pattern);
         dateFormat = extractDateFormat(pattern);
     }
@@ -26,13 +29,14 @@ public class LogFileNamePattern {
 
     private static SimpleDateFormat extractDateFormat(String patternString) {
         Matcher dateMatcher = datePattern.matcher(patternString);
-        if (dateMatcher.find()) {
-            int start = dateMatcher.start();
-            int end = dateMatcher.end();
-            String dateVal = patternString.substring(start + 3, end - 1);
-            return new SimpleDateFormat(dateVal);
+        if (!dateMatcher.find()) {
+            throw new IllegalArgumentException();
         }
-        throw new IllegalArgumentException();
+        int start = dateMatcher.start();
+        int end = dateMatcher.end();
+        String dateVal = patternString.substring(start + 3, end - 1);
+        return new SimpleDateFormat(dateVal);
+
     }
 
     public Date dateOf(String fileName) {
