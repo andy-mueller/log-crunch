@@ -1,10 +1,17 @@
 package com.crudetech.sample.logcrunch;
 
+import com.crudetech.sample.filter.MappingIterable;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.crudetech.sample.filter.Algorithm.accumulate;
+import static com.crudetech.sample.filter.Strings.concat;
+import static com.crudetech.sample.filter.Strings.regexQuote;
+import static java.util.Arrays.asList;
 
 public class LogFileNamePattern {
     private static final Pattern datePattern = Pattern.compile("%d\\{.*\\}");
@@ -12,7 +19,7 @@ public class LogFileNamePattern {
     private final SimpleDateFormat dateFormat;
 
     public LogFileNamePattern(String pattern) {
-        if(pattern == null){
+        if (pattern == null) {
             throw new IllegalArgumentException();
         }
         parts = datePattern.split(pattern);
@@ -20,12 +27,11 @@ public class LogFileNamePattern {
     }
 
     public boolean matches(String fileName) {
-        String comparePattern = ".*";
-        for (String part : parts) {
-            comparePattern += Pattern.quote(part) + ".*";
-        }
+        Iterable<String> quotedParts = new MappingIterable<String, String>(asList(parts), regexQuote());
+        String comparePattern = accumulate(".*", quotedParts, concat());
         return Pattern.matches(comparePattern, fileName);
     }
+
 
     private static SimpleDateFormat extractDateFormat(String patternString) {
         Matcher dateMatcher = datePattern.matcher(patternString);
