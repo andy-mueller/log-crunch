@@ -1,5 +1,8 @@
 package com.crudetech.sample.logcrunch;
 
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.junit.rules.ExternalResource;
 
 import java.io.File;
@@ -10,10 +13,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,7 +27,7 @@ class TestLogFile extends ExternalResource {
     static final String Line2 = "2009-06-07 13:25:57 demo.ZeroToFive subroutine WARN: This is another informative message";
     static final String Line3 = "2009-06-08 10:11:36 demo.ZeroToFive subroutine DEBUG: This is another informative message";
     static final Charset Encoding = Charset.forName("UTF-8");
-    static SimpleDateFormat DateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+    static DateTimeFormatter DateFormat = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
     private static final TempDir tempDir = new TempDir();
 
     private File file;
@@ -52,7 +53,7 @@ class TestLogFile extends ExternalResource {
     @Override
     protected void before() throws Throwable {
         super.before();
-        line4 = MessageFormat.format("{0} {1} subroutine INFO: {2}", DateFormat.format(new Date()), getClass().getName(), UUID.randomUUID());
+        line4 = MessageFormat.format("{0} {1} subroutine INFO: {2}", DateFormat.print(new DateTime()), getClass().getName(), UUID.randomUUID());
         file = new File(tempDir, name);
         logLines = Collections.unmodifiableList(asList(
                 Line1, Line2, Line3, line4

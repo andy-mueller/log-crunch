@@ -1,6 +1,7 @@
 package com.crudetech.sample.logcrunch;
 
 import com.crudetech.sample.filter.Predicate;
+import org.joda.time.Interval;
 
 public class LogLinePredicates {
     public static Predicate<LogLine> hasLogLevel(final LogLevel level) {
@@ -12,7 +13,7 @@ public class LogLinePredicates {
         };
     }
 
-    public static Predicate<LogLine> isInDateTimeRange(final DateTimeRange range) {
+    public static Predicate<LogLine> isInDateTimeRange(final Interval range) {
         return new Predicate<LogLine>() {
             @Override
             public Boolean evaluate(LogLine argument) {

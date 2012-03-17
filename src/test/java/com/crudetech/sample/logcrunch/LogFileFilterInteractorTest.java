@@ -5,6 +5,8 @@ import com.crudetech.sample.filter.Predicate;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
+import org.joda.time.DateTime;
+import org.joda.time.Interval;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -14,7 +16,6 @@ import org.mockito.stubbing.Answer;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 import static com.crudetech.sample.Iterables.copy;
@@ -30,19 +31,19 @@ public class LogFileFilterInteractorTest {
 
     private LogFile logFileStub;
     private LogFileLocator locator;
-    private Date searchDate;
+    private DateTime searchDate;
     private BufferedReaderLogFile.LogLineFactory loglineFactory;
 
     @Before
     public void setUp() throws Exception {
-        searchDate = new Date(1000);
+        searchDate = new DateTime(1000);
         loglineFactory = new TestLogLineFactory();
         String content = TestLogFile.Line1 + "\n" + TestLogFile.Line2;
         logFileStub = new StringLogFile(loglineFactory, content);
 
         locator = mock(LogFileLocator.class);
         LogFileNamePattern name = new LogFileNamePattern("machine101-%d{yyyyMMdd}");
-        when(locator.find(name, new DateTimeRange(searchDate, new Date()))).thenReturn(asList(logFileStub));
+        when(locator.find(name, new Interval(searchDate, new DateTime()))).thenReturn(asList(logFileStub));
     }
 
 //    @Test
@@ -127,7 +128,7 @@ public class LogFileFilterInteractorTest {
     public void filtersApplied() {
         LogFileFilterInteractor.RequestModel model = new LogFileFilterInteractor.RequestModel();
         model.logFileName = "machine101";
-        model.dates.add(new DateTimeRange(searchDate, new Date()));
+        model.dates.add(new Interval(searchDate, new DateTime()));
         model.levels.add(LogLevel.Info);
 
         LogFileFilterInteractor interactor = new LogFileFilterInteractor(locator, null);

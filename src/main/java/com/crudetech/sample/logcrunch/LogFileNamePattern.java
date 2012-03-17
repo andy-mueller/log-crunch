@@ -1,10 +1,10 @@
 package com.crudetech.sample.logcrunch;
 
 import com.crudetech.sample.filter.MappingIterable;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,14 +16,17 @@ import static java.util.Arrays.asList;
 public class LogFileNamePattern {
     private static final Pattern datePattern = Pattern.compile("%d\\{.*\\}");
     private final String[] parts;
-    private final SimpleDateFormat dateFormat;
+    private final DateTimeFormatter dateFormat;
+    private final int dateFormatPatternLength;
 
     public LogFileNamePattern(String pattern) {
         if (pattern == null) {
             throw new IllegalArgumentException();
         }
         parts = datePattern.split(pattern);
-        dateFormat = extractDateFormat(pattern);
+        String dateFormatPattern = extractDateFormat(pattern);
+        dateFormatPatternLength = dateFormatPattern.length();
+        dateFormat = DateTimeFormat.forPattern(dateFormatPattern);
     }
 
     public boolean matches(String fileName) {
@@ -33,31 +36,21 @@ public class LogFileNamePattern {
     }
 
 
-    private static SimpleDateFormat extractDateFormat(String patternString) {
-        Matcher dateMatcher = datePattern.matcher(patternString);
+    private static String extractDateFormat(String fileNamePattern) {
+        Matcher dateMatcher = datePattern.matcher(fileNamePattern);
         if (!dateMatcher.find()) {
             throw new IllegalArgumentException();
         }
         int start = dateMatcher.start();
         int end = dateMatcher.end();
-        String dateVal = patternString.substring(start + 3, end - 1);
-        return new SimpleDateFormat(dateVal);
-
+        return fileNamePattern.substring(start + 3, end - 1);
     }
 
-    public Date dateOf(String fileName) {
+    public DateTime dateOf(String fileName) {
         int start = fileName.indexOf(parts[0]) + parts[0].length();
-        int end = start + dateFormat.toPattern().length();
+        int end = start + dateFormatPatternLength;
         String dateString = fileName.substring(start, end);
 
-        return parseDate(dateString);
-    }
-
-    private Date parseDate(String dateString) {
-        try {
-            return dateFormat.parse(dateString);
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
+        return dateFormat.parseDateTime(dateString);
     }
 }

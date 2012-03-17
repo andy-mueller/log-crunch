@@ -1,25 +1,26 @@
 package com.crudetech.sample.logcrunch;
 
 
+import org.joda.time.DateTime;
+import org.joda.time.Interval;
+import org.joda.time.format.DateTimeFormatter;
+
 import java.io.PrintWriter;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StringLogLine implements LogLine {
     private final LogLevel level;
-    private Date date;
+    private DateTime date;
     private final String line;
-    private final SimpleDateFormat dateFormat;
+    private final DateTimeFormatter dateFormat;
     private final String logger;
 
     // %-4relative [%thread] %-5level %logger{35} - %msg %n
 
-    public StringLogLine(String line, SimpleDateFormat dateFormat) {
+    public StringLogLine(String line, DateTimeFormatter dateFormat) {
         this.line = line;
-        this.dateFormat = (SimpleDateFormat) dateFormat.clone();
+        this.dateFormat = dateFormat;
         String[] token = line.split(" ");
         level = getLogLevel(token);
 
@@ -31,12 +32,8 @@ public class StringLogLine implements LogLine {
         return token[2];
     }
 
-    private Date getDate(String[] token) {
-        try {
-            return dateFormat.parse(token[0] + " " + token[1]);
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
+    private DateTime getDate(String[] token) {
+        return dateFormat.parseDateTime(token[0] + " " + token[1]);
     }
 
     private LogLevel getLogLevel(String[] token) {
@@ -56,8 +53,8 @@ public class StringLogLine implements LogLine {
         return level;
     }
 
-    private Date getDate() {
-        return (Date) date.clone();
+    private DateTime getDate() {
+        return date;
     }
 
     @Override
@@ -88,7 +85,7 @@ public class StringLogLine implements LogLine {
     }
 
     @Override
-    public boolean hasDate(Date expected) {
+    public boolean hasDate(DateTime expected) {
         return getDate().equals(expected);
     }
 
@@ -98,7 +95,7 @@ public class StringLogLine implements LogLine {
     }
 
     @Override
-    public boolean isInRange(DateTimeRange range) {
+    public boolean isInRange(Interval range) {
         return range.contains(getDate());
     }
 

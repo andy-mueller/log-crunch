@@ -1,6 +1,10 @@
 package com.crudetech.sample.logcrunch;
 
 import com.crudetech.sample.Iterables;
+import org.joda.time.DateTime;
+import org.joda.time.Interval;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -8,8 +12,6 @@ import org.junit.Test;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 import static com.crudetech.sample.Iterables.copy;
@@ -19,7 +21,7 @@ import static org.hamcrest.Matchers.notNullValue;
 
 public class FileSystemLogFileLocatorTest {
     private LogFileLocator locator;
-    private DateTimeRange sixthOfMay2007;
+    private Interval sixthOfMay2007;
     private LogFileNamePattern namePattern;
 
 
@@ -28,13 +30,13 @@ public class FileSystemLogFileLocatorTest {
         locator = newLocator();
 
 
-        sixthOfMay2007 = new DateTimeRange(dateOf("20070506"), dateOf("20070507"));
+        sixthOfMay2007 = new Interval(dateOf("20070506"), dateOf("20070507"));
         namePattern = new LogFileNamePattern("machinename101-%d{yyyyMMdd}");
     }
 
-    private Date dateOf(String date) throws ParseException {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-        return dateFormat.parse(date);
+    private DateTime dateOf(String date) throws ParseException {
+        DateTimeFormatter  dateFormat = DateTimeFormat.forPattern("yyyyMMdd");
+        return dateFormat.parseDateTime(date);
     }
 
     @Rule
@@ -71,7 +73,7 @@ public class FileSystemLogFileLocatorTest {
 
     @Test
     public void noLocationGivesNoLogFiles() throws Exception {
-        DateTimeRange noMatch = new DateTimeRange(dateOf("20070101"), dateOf("20070201"));
+        Interval noMatch = new Interval(dateOf("20070101"), dateOf("20070201"));
         Iterable<LogFile> located = locator.find(namePattern, noMatch);
 
         assertThat(Iterables.size(located), is(0));
@@ -79,7 +81,7 @@ public class FileSystemLogFileLocatorTest {
 
     @Test
     public void multipleFilesFound() throws Exception {
-        DateTimeRange noMatch = new DateTimeRange(dateOf("20070506"), dateOf("20070508"));
+        Interval noMatch = new Interval(dateOf("20070506"), dateOf("20070508"));
         Iterable<LogFile> located = locator.find(namePattern, noMatch);
 
         assertThat(Iterables.size(located), is(2));
@@ -87,7 +89,7 @@ public class FileSystemLogFileLocatorTest {
 
     @Test
     public void multipleFilesFoundHaveCorrectContent() throws Exception {
-        DateTimeRange noMatch = new DateTimeRange(dateOf("20070506"), dateOf("20070508"));
+        Interval noMatch = new Interval(dateOf("20070506"), dateOf("20070508"));
         Iterable<LogFile> located = locator.find(namePattern, noMatch);
 
         List<LogFile> loc = copy(located);

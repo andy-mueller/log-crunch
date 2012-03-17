@@ -1,10 +1,11 @@
 package com.crudetech.sample.logcrunch;
 
 import com.crudetech.sample.filter.Predicate;
+import org.joda.time.DateTime;
+import org.joda.time.Interval;
 import org.junit.Test;
 
 import java.text.ParseException;
-import java.util.Date;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -23,9 +24,9 @@ public class LogLinePredicatesTest {
     public void isInDateRange() throws ParseException {
         LogLine info = new StringLogLine(TestLogFile.Line1, TestLogFile.DateFormat);
 
-        Date start = TestLogFile.DateFormat.parse("2009-06-06 13:23:57");
-        Date end = TestLogFile.DateFormat.parse("2009-06-08 13:23:57");
-        DateTimeRange dateRange = new DateTimeRange(start, end);
+        DateTime start = TestLogFile.DateFormat.parseDateTime("2009-06-06 13:23:57");
+        DateTime end = TestLogFile.DateFormat.parseDateTime("2009-06-08 13:23:57");
+        Interval dateRange = new Interval(start, end);
         Predicate<LogLine> isInDateRange = LogLinePredicates.isInDateTimeRange(dateRange);
 
         assertThat(isInDateRange.evaluate(info), is(true));

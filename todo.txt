@@ -1,11 +1,5 @@
--Locator
-    -Use LogFileNamePattern for matching
-    -locator shall return list of files
-    -introduce null LogFileObject for FileSystemLogFileLocator
 
 -Provide http query mechanism
  GET http://localhost:8080/log-crunch/FilteredLines?from=...&to=...&level=ERROR&level=WARN&logger=com.ui.sample.SomeClass
 
-
--use yoda time!
 -provide decorator base class for LogFile. Fix FilterLogFile then

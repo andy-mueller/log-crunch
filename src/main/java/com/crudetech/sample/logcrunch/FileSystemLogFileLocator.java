@@ -4,6 +4,7 @@ import com.crudetech.sample.filter.FilterIterable;
 import com.crudetech.sample.filter.MappingIterable;
 import com.crudetech.sample.filter.Predicate;
 import com.crudetech.sample.filter.UnaryFunction;
+import org.joda.time.Interval;
 
 import java.io.File;
 import java.util.Collections;
@@ -25,16 +26,21 @@ public class FileSystemLogFileLocator implements LogFileLocator {
     }
 
     @Override
-    public Iterable<LogFile> find(LogFileNamePattern fileName, DateTimeRange range) {
-        List<File> allPossibleFiles = asList(logFilePath.listFiles());
-        Collections.sort(allPossibleFiles);
+    public Iterable<LogFile> find(LogFileNamePattern fileName, Interval range) {
+        Iterable<File> allPossibleFiles = allPossibleFilesInDirectory();
         Iterable<File> matchingNameFiles = new FilterIterable<File>(allPossibleFiles, fileNameMatches(fileName));
         Iterable<File> matchingDateFiles = new FilterIterable<File>(matchingNameFiles, fileNameInDateRange(fileName, range));
 
         return new MappingIterable<File, LogFile>(matchingDateFiles, createLogFile());
     }
 
-    private Predicate<File> fileNameInDateRange(final LogFileNamePattern fileName, final DateTimeRange range) {
+    private Iterable<File> allPossibleFilesInDirectory() {
+        List<File> allPossibleFiles = asList(logFilePath.listFiles());
+        Collections.sort(allPossibleFiles);
+        return allPossibleFiles;
+    }
+
+    private Predicate<File> fileNameInDateRange(final LogFileNamePattern fileName, final Interval range) {
         return new Predicate<File>() {
             @Override
             public Boolean evaluate(File argument) {

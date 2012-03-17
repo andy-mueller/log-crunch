@@ -1,11 +1,9 @@
 package com.crudetech.sample.logcrunch;
 
+import org.joda.time.DateTime;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
-import java.util.Calendar;
-import java.util.Date;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -24,12 +22,7 @@ public class LogFileNamePatternTest {
         LogFileNamePattern namePattern = new LogFileNamePattern("logFile.%d{yyyy-MM-dd}.log");
 
 
-        Calendar cal = Calendar.getInstance();
-        cal.clear();
-        cal.set(Calendar.YEAR, 2009);
-        cal.set(Calendar.MONTH, Calendar.AUGUST);
-        cal.set(Calendar.DATE, 21);
-        Date august212009 = cal.getTime();
+        DateTime august212009 = new DateTime(2009, 8, 21, 0, 0);
 
         assertThat(namePattern.dateOf("logFile.2009-08-21.log"), is(august212009));
     }

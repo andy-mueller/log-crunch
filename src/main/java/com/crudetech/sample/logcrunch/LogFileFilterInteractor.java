@@ -2,6 +2,7 @@ package com.crudetech.sample.logcrunch;
 
 import com.crudetech.sample.filter.FilterChain;
 import com.crudetech.sample.filter.UnaryFunction;
+import org.joda.time.Interval;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +17,7 @@ public class LogFileFilterInteractor {
 
     public static class RequestModel{
         String logFileName;
-        List<DateTimeRange> dates = new ArrayList<DateTimeRange>();
+        List<Interval> dates = new ArrayList<Interval>();
         List<LogLevel> levels = new ArrayList<LogLevel>();
         List<Pattern> loggers = new ArrayList<Pattern>();
         List<Pattern> messageRegex = new ArrayList<Pattern>();
