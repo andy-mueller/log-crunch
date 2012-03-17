@@ -9,25 +9,26 @@ import org.junit.rules.ExpectedException;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 
+import static com.crudetech.sample.logcrunch.LogFileMatcher.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 public class FileLogFileTest {
 
     @Rule
-    public TestLogFile testLogFile = new TestLogFile("testLogFile");
+    public FileTestLogFile fileTestLogFile = new FileTestLogFile("fileTestLogFile");
     private LogFile fileLogFile;
 
     @Before
     public void setUp() throws Exception {
         BufferedReaderLogFile.LogLineFactory logLineFactory = new TestLogLineFactory();
-        fileLogFile = new FileLogFile(testLogFile.getFile(), logLineFactory, TestLogFile.Encoding);
+        fileLogFile = new FileLogFile(fileTestLogFile.getFile(), logLineFactory, TestLogFile.Encoding);
 
     }
 
     @Test
     public void logLineIterableReturnsFileContent() throws Exception {
-        testLogFile.assertSameContent(fileLogFile);
+        assertThat(fileTestLogFile, is(equalTo(fileLogFile)));
     }
 
     @Rule

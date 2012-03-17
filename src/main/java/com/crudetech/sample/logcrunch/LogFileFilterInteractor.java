@@ -10,32 +10,31 @@ import java.util.regex.Pattern;
 
 public class LogFileFilterInteractor {
     private final LogFileLocator locator;
-    private final FilterChain<LogLine> infoFilter;
 
 
 
 
     public static class RequestModel{
-        String logFileName;
+        LogFileNamePattern logFileNamePattern;
         List<Interval> dates = new ArrayList<Interval>();
         List<LogLevel> levels = new ArrayList<LogLevel>();
         List<Pattern> loggers = new ArrayList<Pattern>();
         List<Pattern> messageRegex = new ArrayList<Pattern>();
     }
 
-    public LogFileFilterInteractor(LogFileLocator locator, FilterChain<LogLine> infoFilter) {
+    public LogFileFilterInteractor(LogFileLocator locator) {
         this.locator = locator;
-        this.infoFilter = infoFilter;
     }
     public Iterable<LogFile> getFilteredLogFiles(RequestModel model) {
-        throw new UnsupportedOperationException("Implement me!");
+        Iterable<LogFile> logFiles = locator.find(model.logFileNamePattern, model.dates.get(0));
+        return logFiles;
     }
 //    public Iterable<LogFile> getLogFiles(String name, Date date) {
 //        DateTimeRange range = new DateTimeRange(date, new Date(date.getTime() + 1));
 //        return new MappingIterable<LogFile, LogFile>(asList(locator.find(name, range)), filters());
 //    }
 
-    private UnaryFunction<LogFile, LogFile> filters() {
+    private UnaryFunction<LogFile, LogFile> filters(final FilterChain<LogLine> infoFilter) {
         return new UnaryFunction<LogFile, LogFile>() {
             @Override
             public LogFile evaluate(LogFile logFile) {

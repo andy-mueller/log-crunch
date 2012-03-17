@@ -15,6 +15,7 @@ import java.text.ParseException;
 import java.util.List;
 
 import static com.crudetech.sample.Iterables.copy;
+import static com.crudetech.sample.logcrunch.LogFileMatcher.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -40,9 +41,9 @@ public class FileSystemLogFileLocatorTest {
     }
 
     @Rule
-    public TestLogFile testLogFile20070506 = new TestLogFile("machinename101-20070506");
+    public FileTestLogFile fileTestLogFile20070506 = new FileTestLogFile("machinename101-20070506");
     @Rule
-    public TestLogFile testLogFile20070507 = new TestLogFile("machinename101-20070507");
+    public FileTestLogFile fileTestLogFile20070507 = new FileTestLogFile("machinename101-20070507");
 
     private FileSystemLogFileLocator newLocator() {
         final Charset encoding = Charset.forName("UTF-8");
@@ -68,7 +69,7 @@ public class FileSystemLogFileLocatorTest {
     public void locatedFileHasCorrectContent() throws Exception {
         Iterable<LogFile> located = locator.find(namePattern, sixthOfMay2007);
 
-        testLogFile20070506.assertSameContent(Iterables.getFirst(located));
+        assertThat(Iterables.getFirst(located), is(equalTo(fileTestLogFile20070506)));
     }
 
     @Test
@@ -93,7 +94,8 @@ public class FileSystemLogFileLocatorTest {
         Iterable<LogFile> located = locator.find(namePattern, noMatch);
 
         List<LogFile> loc = copy(located);
-        testLogFile20070506.assertSameContent(loc.get(0));
-        testLogFile20070507.assertSameContent(loc.get(1));
+
+        assertThat(loc.get(0), is(equalTo(fileTestLogFile20070506)));
+        assertThat(loc.get(1), is(equalTo(fileTestLogFile20070507)));
     }
 }

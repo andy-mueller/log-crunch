@@ -1,3 +1,9 @@
+-introduce package for logback/slf4j implementation/format
+-interactor for basic query/filter
+-TestLogfile
+    -split in file <->string based
+    -extract Matcher<LogFile>
+    -TestLogfile shall implement logFile
 
 -Provide http query mechanism
  GET http://localhost:8080/log-crunch/FilteredLines?from=...&to=...&level=ERROR&level=WARN&logger=com.ui.sample.SomeClass
