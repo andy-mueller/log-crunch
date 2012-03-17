@@ -33,10 +33,14 @@ public abstract class TestLogFile extends ExternalResource implements LogFile{
     @Override
     protected void before() throws Throwable {
         super.before();
-        line4 = MessageFormat.format("{0} {1} subroutine INFO: {2}", DateFormat.print(new DateTime()), getClass().getName(), UUID.randomUUID());
+        line4 = generateUniqueLogline();
         logLines = Collections.unmodifiableList(asList(
                 Line1, Line2, Line3, line4
         ));
+    }
+
+    private String generateUniqueLogline() {
+        return MessageFormat.format("{0} {1} subroutine INFO: {2}", DateFormat.print(new DateTime()), getClass().getName(), UUID.randomUUID());
     }
 
     @Override
