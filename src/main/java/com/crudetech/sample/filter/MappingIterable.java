@@ -8,6 +8,9 @@ public class MappingIterable<TFrom, TTo> implements Iterable<TTo>{
     private final UnaryFunction<TTo, TFrom> select;
 
     public MappingIterable(Iterable<TFrom> source, UnaryFunction<TTo, TFrom> select) {
+        if(source == null || select == null){
+            throw new IllegalArgumentException();
+        }
         this.source = source;
         this.select = select;
     }

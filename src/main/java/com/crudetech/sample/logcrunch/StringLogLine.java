@@ -44,7 +44,9 @@ public class StringLogLine implements LogLine {
             return LogLevel.Info;
         } else if ("DEBUG".equals(rawLevel)) {
             return LogLevel.Debug;
-        } else {
+        } else if ("ERROR".equals(rawLevel)) {
+            return LogLevel.Error;
+        }else {
             throw new IllegalArgumentException("Unknown loglevel " + rawLevel);
         }
     }

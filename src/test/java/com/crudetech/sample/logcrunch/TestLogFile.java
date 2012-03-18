@@ -30,6 +30,9 @@ public abstract class TestLogFile extends ExternalResource implements LogFile{
         this.name = name;
     }
 
+    public String line4() {
+        return line4;
+    }
     @Override
     protected void before() throws Throwable {
         super.before();
@@ -40,7 +43,7 @@ public abstract class TestLogFile extends ExternalResource implements LogFile{
     }
 
     private String generateUniqueLogline() {
-        return MessageFormat.format("{0} {1} subroutine INFO: {2}", DateFormat.print(new DateTime()), getClass().getName(), UUID.randomUUID());
+        return MessageFormat.format("{0} {1} subroutine ERROR: {2}", DateFormat.print(new DateTime()), getClass().getName(), UUID.randomUUID());
     }
 
     @Override
