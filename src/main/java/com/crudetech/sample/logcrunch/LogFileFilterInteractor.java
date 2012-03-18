@@ -33,8 +33,8 @@ public class LogFileFilterInteractor {
         Iterable<LogFile> logFiles = locator.find(model.logFileNamePattern, model.dates.get(0));
 
         Collection<Predicate<LogLine>> filterPredicates = new ArrayList<Predicate<LogLine>>();
-        for (LogLevel l : model.levels) {
-            filterPredicates.add(hasLogLevel(l));
+        for (LogLevel logLevel : model.levels) {
+            filterPredicates.add(hasLogLevel(logLevel));
         }
         FilterChain<LogLine> lineFilter = new FilterChain<LogLine>(filterPredicates);
 
