@@ -7,11 +7,12 @@ import com.crudetech.sample.filter.UnaryFunction;
 import org.joda.time.Interval;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import static com.crudetech.sample.filter.ConcatIterable.concat;
 import static com.crudetech.sample.logcrunch.LogLinePredicates.hasLogLevel;
+import static java.util.Arrays.asList;
 
 public class LogFileFilterInteractor {
     private final LogFileLocator locator;
@@ -32,14 +33,25 @@ public class LogFileFilterInteractor {
     public Iterable<LogFile> getFilteredLogFiles(RequestModel model) {
         Iterable<LogFile> logFiles = locator.find(model.logFileNamePattern, model.dates.get(0));
 
-        Collection<Predicate<LogLine>> filterPredicates = new ArrayList<Predicate<LogLine>>();
-        for (LogLevel logLevel : model.levels) {
-            filterPredicates.add(hasLogLevel(logLevel));
-        }
+        @SuppressWarnings("unchecked")
+        Iterable<Predicate<LogLine>> filterPredicates = concat(asList(
+                new MappingIterable<LogLevel, Predicate<LogLine>>(model.levels, logLevelFilter())
+        ));
+
         FilterChain<LogLine> lineFilter = new FilterChain<LogLine>(filterPredicates);
 
         return new MappingIterable<LogFile, LogFile>(logFiles, filterFiles(lineFilter));
     }
+
+    private UnaryFunction<Predicate<LogLine>, LogLevel> logLevelFilter() {
+        return new UnaryFunction<Predicate<LogLine>, LogLevel>() {
+            @Override
+            public Predicate<LogLine> evaluate(LogLevel line) {
+                return hasLogLevel(line);
+            }
+        };
+    }
+
 
     private UnaryFunction<LogFile, LogFile> filterFiles(final FilterChain<LogLine> infoFilter) {
         return new UnaryFunction<LogFile, LogFile>() {

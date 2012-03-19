@@ -1,7 +1,6 @@
 package com.crudetech.sample.filter;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import static com.crudetech.sample.filter.Algorithm.accumulate;
@@ -10,8 +9,16 @@ import static com.crudetech.sample.filter.Algorithm.accumulate;
 public class FilterChain<T> {
     private final List<Predicate<T>> filters;
 
-    public FilterChain(Collection<Predicate<T>> predicates) {
-        filters = new ArrayList<Predicate<T>>(predicates);
+    public FilterChain(Iterable<Predicate<T>> predicates) {
+        filters = copy(predicates);
+    }
+
+    private static <T> List<Predicate<T>> copy(Iterable<Predicate<T>> predicates) {
+        List<Predicate<T>> copy = new ArrayList<Predicate<T>>();
+        for (Predicate<T> predicate : predicates) {
+            copy.add(predicate);
+        }
+        return copy;
     }
 
     public Iterable<T> apply(Iterable<? extends T> source) {
