@@ -13,7 +13,7 @@ import static org.hamcrest.Matchers.is;
 public class LogLinePredicatesTest {
     @Test
     public void hasLogLevel() {
-        LogLine info = new StringLogLine(TestLogFile.Line1, TestLogFile.DateFormat);
+        LogLine info = TestLogFile.SampleInfoLine;
 
         Predicate<LogLine> hasLogLevel = LogLinePredicates.hasLogLevel(LogLevel.Info);
 
@@ -22,10 +22,10 @@ public class LogLinePredicatesTest {
 
     @Test
     public void isInDateRange() throws ParseException {
-        LogLine info = new StringLogLine(TestLogFile.Line1, TestLogFile.DateFormat);
+        LogLine info = TestLogFile.SampleInfoLine;
 
-        DateTime start = TestLogFile.DateFormat.parseDateTime("2009-06-06 13:23:57");
-        DateTime end = TestLogFile.DateFormat.parseDateTime("2009-06-08 13:23:57");
+        DateTime start = TestLogFile.SampleInfoLineDate.minusDays(1);
+        DateTime end = TestLogFile.SampleInfoLineDate.plusDays(1);
         Interval dateRange = new Interval(start, end);
         Predicate<LogLine> isInDateRange = LogLinePredicates.isInDateTimeRange(dateRange);
 

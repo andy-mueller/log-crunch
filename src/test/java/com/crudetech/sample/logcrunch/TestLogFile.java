@@ -1,12 +1,12 @@
 package com.crudetech.sample.logcrunch;
 
-import com.crudetech.sample.filter.MappingIterable;
-import com.crudetech.sample.filter.UnaryFunction;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.junit.rules.ExternalResource;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.Collections;
@@ -16,44 +16,49 @@ import java.util.UUID;
 import static java.util.Arrays.asList;
 
 
-public abstract class TestLogFile extends ExternalResource implements LogFile{
-    static final String Line1 = "2009-06-07 13:23:57 demo.ZeroToFour main INFO: This is an informative message";
-    static final String Line2 = "2009-06-07 13:25:57 demo.ZeroToFive subroutine WARN: This is another informative message";
-    static final String Line3 = "2009-06-08 10:11:36 demo.ZeroToFive subroutine DEBUG: This is another informative message";
+public abstract class TestLogFile extends ExternalResource implements LogFile {
     static final Charset Encoding = Charset.forName("UTF-8");
     static DateTimeFormatter DateFormat = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
-    protected List<String> logLines;
-    protected final String name;
-    private String line4;
+    static DateTime SampleInfoLineDate = new DateTime(2009, 6, 7, 13,23, 57);
+    static final LogLine SampleInfoLine = new StringLogLine(MessageFormat.format("{0} demo.ZeroToFour main INFO: This is an informative message", DateFormat.print(SampleInfoLineDate)), DateFormat);
+
+    final String name;
+    List<LogLine> logLines;
+    DateTime baseLine;
+
 
     public TestLogFile(String name) {
         this.name = name;
     }
 
-    public String line4() {
-        return line4;
-    }
     @Override
     protected void before() throws Throwable {
         super.before();
-        line4 = generateUniqueLogline();
+        baseLine = DateTime.now().minusMinutes(1);
+        DateTime line2TimeStamp = baseLine.plusSeconds(1);
+        String line2 = generateUniqueLogline(line2TimeStamp, "ERROR");
+        DateTime line3TimeStamp = baseLine.plusSeconds(2);
+        String line3 = generateUniqueLogline(line3TimeStamp, "WARN");
+        DateTime line4TimeStamp = baseLine.plusSeconds(2);
+        String line4 = generateUniqueLogline(line4TimeStamp, "INFO");
+
+        StringWriter sampleLine = new StringWriter();
+        SampleInfoLine.print(new PrintWriter(sampleLine));
         logLines = Collections.unmodifiableList(asList(
-                Line1, Line2, Line3, line4
+                SampleInfoLine,
+                new StringLogLine(line2, DateFormat),
+                new StringLogLine(line3, DateFormat),
+                new StringLogLine(line4, DateFormat)
         ));
     }
 
-    private String generateUniqueLogline() {
-        return MessageFormat.format("{0} {1} subroutine ERROR: {2}", DateFormat.print(new DateTime()), getClass().getName(), UUID.randomUUID());
+    private String generateUniqueLogline(DateTime timeStamp, String level) {
+        return MessageFormat.format("{0} {1} subroutine {3}: {2}", DateFormat.print(timeStamp), getClass().getName(), UUID.randomUUID(), level);
     }
 
     @Override
     public Iterable<LogLine> getLines() {
-        return new MappingIterable<String, LogLine>(logLines, new UnaryFunction<LogLine, String>() {
-            @Override
-            public LogLine evaluate(String argument) {
-                return new StringLogLine(argument, DateFormat);
-            }
-        });
+        return logLines;
     }
 
     @Override

@@ -24,9 +24,15 @@ class LogFileMatcher extends TypeSafeMatcher<LogFile> {
 
     @Override
     public void describeTo(Description description) {
-        description.appendValue(file);
+        description.appendValue(copy(file.getLines()));
     }
     static Matcher<LogFile> equalTo(final LogFile file) {
         return new LogFileMatcher(file);
+    }
+
+    @Override
+    protected void describeMismatchSafely(LogFile item, Description mismatchDescription) {
+        List<LogLine> lines = copy(item.getLines());
+        mismatchDescription.appendValue(lines);
     }
 }

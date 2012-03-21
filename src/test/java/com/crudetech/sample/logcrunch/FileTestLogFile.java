@@ -25,8 +25,9 @@ class FileTestLogFile extends TestLogFile {
     private void writeLinesToTestLogFile() throws IOException {
         PrintWriter writer = new PrintWriter(new OutputStreamWriter(new FileOutputStream(file), Encoding));
         try {
-            for (String logLine : logLines) {
-                writer.println(logLine);
+            for (LogLine logLine : logLines) {
+                logLine.print(writer);
+                writer.println();
             }
         } finally {
             writer.close();

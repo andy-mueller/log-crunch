@@ -12,15 +12,15 @@ import java.util.regex.Pattern;
 
 import static com.crudetech.sample.filter.ConcatIterable.concat;
 import static com.crudetech.sample.logcrunch.LogLinePredicates.hasLogLevel;
+import static com.crudetech.sample.logcrunch.LogLinePredicates.isInDateTimeRange;
 import static java.util.Arrays.asList;
 
 public class LogFileFilterInteractor {
     private final LogFileLocator locator;
 
-
-    public static class RequestModel {
+    public static class Query {
         LogFileNamePattern logFileNamePattern;
-        List<Interval> dates = new ArrayList<Interval>();
+        List<Interval> searchIntervals = new ArrayList<Interval>();
         List<LogLevel> levels = new ArrayList<LogLevel>();
         List<Pattern> loggers = new ArrayList<Pattern>();
         List<Pattern> messageRegex = new ArrayList<Pattern>();
@@ -30,18 +30,29 @@ public class LogFileFilterInteractor {
         this.locator = locator;
     }
 
-    public Iterable<LogFile> getFilteredLogFiles(RequestModel model) {
-        Iterable<LogFile> logFiles = locator.find(model.logFileNamePattern, model.dates.get(0));
+    public Iterable<LogFile> getFilteredLogFiles(Query model) {
+        Iterable<LogFile> logFiles = locator.find(model.logFileNamePattern, model.searchIntervals.get(0));
 
         @SuppressWarnings("unchecked")
         Iterable<Predicate<LogLine>> filterPredicates = concat(asList(
-                new MappingIterable<LogLevel, Predicate<LogLine>>(model.levels, logLevelFilter())
+                new MappingIterable<LogLevel, Predicate<LogLine>>(model.levels, logLevelFilter()),
+                new MappingIterable<Interval, Predicate<LogLine>>(model.searchIntervals, dateRangeFilters())
         ));
 
         FilterChain<LogLine> lineFilter = new FilterChain<LogLine>(filterPredicates);
 
         return new MappingIterable<LogFile, LogFile>(logFiles, filterFiles(lineFilter));
     }
+
+    private UnaryFunction<Predicate<LogLine>, Interval> dateRangeFilters() {
+        return new UnaryFunction<Predicate<LogLine>, Interval>() {
+            @Override
+            public Predicate<LogLine> evaluate(Interval argument) {
+                return isInDateTimeRange(argument);
+            }
+        };
+    }
+
 
     private UnaryFunction<Predicate<LogLine>, LogLevel> logLevelFilter() {
         return new UnaryFunction<Predicate<LogLine>, LogLevel>() {

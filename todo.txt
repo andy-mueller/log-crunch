@@ -1,9 +1,9 @@
 -introduce package for logback/slf4j implementation/format
     -Include TestLogFile!
--interactor for basic query/filter
-
 
 -Provide http query mechanism
  GET http://localhost:8080/log-crunch/FilteredLines?from=...&to=...&level=ERROR&level=WARN&logger=com.ui.sample.SomeClass
 
 -provide decorator base class for LogFile. Fix FilterLogFile then
+
+-parse multiline log lines
