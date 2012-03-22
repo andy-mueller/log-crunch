@@ -1,5 +1,8 @@
 package com.crudetech.sample.filter;
 
+import java.util.Arrays;
+import java.util.List;
+
 import static java.util.Arrays.asList;
 
 public class Predicates {
@@ -25,7 +28,13 @@ public class Predicates {
         return and(asList(predicates));
     }
 
-    public static <T> Predicate<T> and(final Iterable<Predicate<? super T>> predicates) {
+    @SuppressWarnings("unchecked")
+    public static <T> Predicate<T> and(Predicate<? super T> lhs, Predicate<? super T> rhs) {
+        List<Predicate<? super T>> list = Arrays.<Predicate<? super T>>asList(lhs, rhs);
+        return and(list);
+    }
+
+    public static <T> Predicate<T> and(final Iterable<? extends Predicate<? super T>> predicates) {
         return new Predicate<T>() {
             @Override
             public Boolean evaluate(T argument) {
