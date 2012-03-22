@@ -62,16 +62,29 @@ public class PredicateBuilderTest {
 
     @Test
     public void booleanOpPrecedence() {
-        assertThat(true || true && false, is(true));
-        assertThat((true || true) && false, is(false));
+        assertThat(false || true || true && false, is(true));
+        assertThat(false || (true || true) && false, is(false));
 
-        Predicate<Integer> pred = builder.start(isTrue).or(isTrue).and(isFalse).build();
+        Predicate<Integer> pred = builder.start(isFalse).or(isTrue).or(isTrue).and(isFalse).build();
 
         assertThat(pred.evaluate(AnyInt), is(true));
     }
-    // (x || y) && z
-    // builder.openBrace(x).or(y).closeBrace.and(z).build()
 
-    // builder.and(isTrue).or(isFalse).andOpenBraces().add(isTrue).or(isFalse).closeBraces().orOpenBraces()
+    @Test
+    public void booleanBracesPrecedence() {
+        assertThat(false || (true || true) && false, is(false));
 
+        Predicate<Integer> pred2 = builder.start(isFalse).orOpenBrace(isTrue).or(isTrue).closeBrace().and(isFalse).build();
+        assertThat(pred2.evaluate(AnyInt), is(false));
+    }
+
+    // start 2 times throws
+    //closing braces w/o opening throws
+    //starting brace right away works (builder.openBrace)
+    //openBrace not at start throws
+    //not closing brace throws
+    // stacked braces
+    //andOpenBrace
+
+    // Builder ->StackTail->next->next->(first)builder
 }
