@@ -3,8 +3,6 @@ package com.crudetech.sample.filter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.crudetech.sample.filter.Algorithm.accumulate;
-
 
 public class FilterChain<T> {
     private final List<Predicate<T>> filters;
@@ -22,9 +20,23 @@ public class FilterChain<T> {
     }
 
     public Iterable<T> apply(Iterable<? extends T> source) {
-//   JDK 8     Iterable<T> filtered = accumulate(cast(source), filters, (Iterable<T> source, Predicate<T> select)=> new FilterIterable<T>(source, select));
-        Iterable<T> filtered = accumulate(cast(source), filters, filterIterableBuilder());
-        return filtered;
+        return new FilterIterable<T>(source, orFilter());
+//        Iterable<T> filtered = accumulate(cast(source), filters, filterIterableBuilder());
+//        return filtered;
+    }
+
+    private Predicate<? super T> orFilter() {
+        return new Predicate<T>() {
+            @Override
+            public Boolean evaluate(T argument) {
+                for(Predicate<T> pred : filters){
+                    if(pred.evaluate(argument)){
+                        return true;
+                    }
+                }
+                return false;
+            }
+        };
     }
 
     @SuppressWarnings("unchecked")

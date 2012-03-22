@@ -96,7 +96,7 @@ public class LogFileFilterInteractorTest {
             assertThat(ilhs.next(), equalTo(irhs.next()));
         }
 
-        assertThat(ilhs.hasNext(), is(irhs.hasNext()));
+        assertThat("ranges have same length",ilhs.hasNext(), is(irhs.hasNext()));
     }
 
     @Test

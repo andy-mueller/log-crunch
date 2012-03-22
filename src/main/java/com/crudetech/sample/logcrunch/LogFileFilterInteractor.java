@@ -24,6 +24,27 @@ public class LogFileFilterInteractor {
         List<LogLevel> levels = new ArrayList<LogLevel>();
         List<Pattern> loggers = new ArrayList<Pattern>();
         List<Pattern> messageRegex = new ArrayList<Pattern>();
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            Query query = (Query) o;
+
+            if (levels != null ? !levels.equals(query.levels) : query.levels != null) return false;
+            if (searchIntervals != null ? !searchIntervals.equals(query.searchIntervals) : query.searchIntervals != null)
+                return false;
+
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = searchIntervals != null ? searchIntervals.hashCode() : 0;
+            result = 31 * result + (levels != null ? levels.hashCode() : 0);
+            return result;
+        }
     }
 
     public LogFileFilterInteractor(LogFileLocator locator) {
