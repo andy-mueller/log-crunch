@@ -11,6 +11,9 @@ public class Predicates {
     }
 
     public static <T> Predicate<T> or(final Iterable<Predicate<? super T>> predicates) {
+        if(!predicates.iterator().hasNext()){
+            throw new IllegalArgumentException("Cannot \"||\" together nothing!!");
+        }
         return new Predicate<T>() {
             @Override
             public Boolean evaluate(T argument) {
@@ -35,6 +38,9 @@ public class Predicates {
     }
 
     public static <T> Predicate<T> and(final Iterable<? extends Predicate<? super T>> predicates) {
+        if(!predicates.iterator().hasNext()){
+            throw new IllegalArgumentException("Cannot \"&&\" together nothing!!");
+        }
         return new Predicate<T>() {
             @Override
             public Boolean evaluate(T argument) {

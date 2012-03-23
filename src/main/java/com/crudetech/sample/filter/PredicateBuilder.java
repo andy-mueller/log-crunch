@@ -21,13 +21,26 @@ public abstract class PredicateBuilder<T> {
 
     public abstract PredicateBuilder<T> closeBrace();
 
+    public abstract PredicateBuilder<T> openBrace(Predicate<? super T> predicate);
+
     private static class StackPredicateBuilder<T> extends PredicateBuilder<T> {
         private StackElementPredicateBuilder<T> head;
 
         @Override
         public PredicateBuilder<T> start(Predicate<? super T> predicate) {
+            if (head != null) {
+                throw new IllegalStateException("This builder was already started!");
+            }
             head = new StackElementPredicateBuilder<T>(null);
             head.start(predicate);
+            return this;
+        }
+
+        @Override
+        public PredicateBuilder<T> openBrace(Predicate<? super T> predicate) {
+            start(predicate);
+            head.openBrace = true;
+            openBrace()
             return this;
         }
 
@@ -50,7 +63,7 @@ public abstract class PredicateBuilder<T> {
 
         @Override
         public PredicateBuilder<T> orOpenBrace(Predicate<? super T> predicate) {
-            head = new StackElementPredicateBuilder<T>(ConcatOp.Or, head);
+            head = new StackElementPredicateBuilder<T>(BraceCloseOp.Or, head);
             return this;
         }
 
@@ -62,12 +75,10 @@ public abstract class PredicateBuilder<T> {
         }
     }
 
-    enum ConcatOp {
+    enum BraceCloseOp {
         None {
             @Override
-            public <T> void concat(StackElementPredicateBuilder<T> element, Predicate<T> predicates) {
-                throw new UnsupportedOperationException();
-            }
+            public <T> void concat(StackElementPredicateBuilder<T> element, Predicate<T> predicates) {}
         }, Or {
             @Override
             public <T> void concat(StackElementPredicateBuilder<T> element, Predicate<T> predicates) {
@@ -82,19 +93,23 @@ public abstract class PredicateBuilder<T> {
 
         public abstract <T> void concat(StackElementPredicateBuilder<T> element, Predicate<T> predicates);
     }
+
     private static class StackElementPredicateBuilder<T> extends PredicateBuilder<T> {
         private final List<Predicate<T>> predicates = new ArrayList<Predicate<T>>();
-        private final ConcatOp concatOp;
+        private final BraceCloseOp braceCloseOp;
         private final StackElementPredicateBuilder<T> previous;
+        private boolean openBrace = false;
 
 
         public StackElementPredicateBuilder(StackElementPredicateBuilder<T> previous) {
-            this(ConcatOp.None, previous);
+            this(BraceCloseOp.None, previous);
+            this.openBrace = false;
         }
 
-        public StackElementPredicateBuilder(ConcatOp concatOp, StackElementPredicateBuilder<T> previous) {
-            this.concatOp = concatOp;
+        public StackElementPredicateBuilder(BraceCloseOp braceCloseOp, StackElementPredicateBuilder<T> previous) {
+            this.braceCloseOp = braceCloseOp;
             this.previous = previous;
+            this.openBrace = true;
         }
 
         public PredicateBuilder<T> start(Predicate<? super T> predicate) {
@@ -138,9 +153,17 @@ public abstract class PredicateBuilder<T> {
 
         @Override
         public PredicateBuilder<T> closeBrace() {
+            if(!openBrace){
+                throw new IllegalStateException("The braces were not opened!");
+            }
             Predicate<T> predicates = build();
-            concatOp.concat(previous, predicates);
+            braceCloseOp.concat(previous, predicates);
             return this;
+        }
+
+        @Override
+        public PredicateBuilder<T> openBrace(Predicate<? super T> predicate) {
+            throw new UnsupportedOperationException("Why am I here??");
         }
 
         //Stack ----(head)---->elem-----(prev)----->elem-----(prev)----->elem

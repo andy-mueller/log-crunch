@@ -1,7 +1,9 @@
 package com.crudetech.sample.filter;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -78,8 +80,49 @@ public class PredicateBuilderTest {
         assertThat(pred2.evaluate(AnyInt), is(false));
     }
 
-    // start 2 times throws
-    //closing braces w/o opening throws
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+    @Test
+    public void startingMultipleTimesThrows() {
+        expectedException.expect(IllegalStateException.class);
+        builder.start(isFalse).start(isFalse);
+    }
+
+    @Test
+    public void closingBracesWithoutOpeningThrows() {
+        expectedException.expect(IllegalStateException.class);
+        builder.start(isFalse).closeBrace();
+    }
+    @Test
+    public void multipleBraces(){
+        assertThat(false || (true || (true || false)) && false, is(false));
+        Predicate<Integer> pred = builder.start(isFalse)
+                                            .orOpenBrace(isTrue)
+                                                        .orOpenBrace(isTrue).or(isFalse)
+                                                        .closeBrace()
+                                             .closeBrace().and(isFalse).build();
+
+        assertThat(pred.evaluate(AnyInt), is(false));
+    }
+    @Test
+    public void closingStackedBracesWithoutOpeningThrows() {
+        expectedException.expect(IllegalStateException.class);
+        builder.start(isFalse)
+                .orOpenBrace(isTrue)
+                .orOpenBrace(isTrue).or(isFalse)
+                .closeBrace()
+                .closeBrace().and(isFalse).closeBrace().build();
+    }
+
+    @Test
+    public void canStartWithBrace() {
+        assertThat( (true || true) && false, is(false));
+        assertThat( true || true && false, is(true));
+
+        Predicate<Integer> predicate = builder.openBrace(isTrue).or(isTrue).closeBrace().and(isFalse).build();
+        assertThat(predicate.evaluate(AnyInt), is(false));
+    }
+
     //starting brace right away works (builder.openBrace)
     //openBrace not at start throws
     //not closing brace throws
