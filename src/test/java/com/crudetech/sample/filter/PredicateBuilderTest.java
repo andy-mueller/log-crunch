@@ -43,6 +43,12 @@ public class PredicateBuilderTest {
         Predicate<Integer> pred = builder.start(isFalse).build();
         assertThat(pred.evaluate(AnyInt), is(false));
     }
+    @Test
+    public void emptyBuilderThows() {
+        expectedException.expect(IllegalStateException.class);
+        builder.build();
+    }
+
 
     @Test
     public void twoPredicatesWithAnd() {
