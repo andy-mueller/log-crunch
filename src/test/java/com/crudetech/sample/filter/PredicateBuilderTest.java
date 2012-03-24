@@ -20,9 +20,7 @@ public class PredicateBuilderTest {
 
     @Test
     public void creation() {
-        PredicateBuilder<Integer> builder = PredicateBuilder.forClass(Integer.class);
         assertThat(builder, is(notNullValue()));
-
     }
 
     private static final Predicate<Integer> isTrue = new Predicate<Integer>() {
