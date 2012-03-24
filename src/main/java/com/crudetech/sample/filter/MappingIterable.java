@@ -1,6 +1,7 @@
 package com.crudetech.sample.filter;
 
 
+import java.util.ArrayList;
 import java.util.Iterator;
 
 public class MappingIterable<TFrom, TTo> implements Iterable<TTo>{
@@ -34,5 +35,14 @@ public class MappingIterable<TFrom, TTo> implements Iterable<TTo>{
                 wrapped.remove();
             }
         };
+    }
+
+    @Override
+    public String toString() {
+        ArrayList<TTo> vals = new ArrayList<TTo>();
+        for(TTo t : this){
+            vals.add(t);
+        }
+        return vals.toString();
     }
 }
