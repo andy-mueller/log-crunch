@@ -15,7 +15,7 @@ public class PredicateBuilderTest {
 
     @Before
     public void setUp() throws Exception {
-        builder = PredicateBuilder.forClass(Integer.class);
+        builder = new PredicateBuilder<Integer>();
     }
 
     @Test
@@ -30,11 +30,21 @@ public class PredicateBuilderTest {
         public Boolean evaluate(Integer unused) {
             return true;
         }
+
+        @Override
+        public String toString() {
+            return "isTrue";
+        }
     };
     private static final Predicate<Integer> isFalse = new Predicate<Integer>() {
         @Override
         public Boolean evaluate(Integer unused) {
             return false;
+        }
+
+        @Override
+        public String toString() {
+            return "isFalse";
         }
     };
 
@@ -43,6 +53,7 @@ public class PredicateBuilderTest {
         Predicate<Integer> pred = builder.start(isFalse).build();
         assertThat(pred.evaluate(AnyInt), is(false));
     }
+
     @Test
     public void emptyBuilderThows() {
         expectedException.expect(IllegalStateException.class);
@@ -70,28 +81,24 @@ public class PredicateBuilderTest {
 
     @Test
     public void booleanOpPrecedence() {
-        assertThat(false || true || true && false, is(true));
-        assertThat(false || (true || true) && false, is(false));
-
         Predicate<Integer> pred = builder.start(isFalse).or(isTrue).or(isTrue).and(isFalse).build();
-
-        assertThat(pred.evaluate(AnyInt), is(true));
+        assertThat("false || true || true && false == true vs. false || (true || true) && false == false", pred.evaluate(AnyInt), is(true));
     }
 
     @Test
     public void booleanBracesPrecedence() {
-        assertThat(false || (true || true) && false, is(false));
-
         Predicate<Integer> pred2 = builder.start(isFalse).orOpenBrace(isTrue).or(isTrue).closeBrace().and(isFalse).build();
-        assertThat(pred2.evaluate(AnyInt), is(false));
+        assertThat("false || (true || true) && false==false", pred2.evaluate(AnyInt), is(false));
     }
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
+
     @Test
     public void startingMultipleTimesThrows() {
+        builder.start(isFalse);
         expectedException.expect(IllegalStateException.class);
-        builder.start(isFalse).start(isFalse);
+        builder.start(isFalse);
     }
 
     @Test
@@ -99,17 +106,18 @@ public class PredicateBuilderTest {
         expectedException.expect(IllegalStateException.class);
         builder.start(isFalse).closeBrace();
     }
-    @Test
-    public void multipleBraces(){
-        assertThat(false || (true || (true || false)) && false, is(false));
-        Predicate<Integer> pred = builder.start(isFalse)
-                                            .orOpenBrace(isTrue)
-                                                        .orOpenBrace(isTrue).or(isFalse)
-                                                        .closeBrace()
-                                             .closeBrace().and(isFalse).build();
 
-        assertThat(pred.evaluate(AnyInt), is(false));
+    @Test
+    public void multipleBraces() {
+        Predicate<Integer> pred = builder.start(isFalse)
+                .orOpenBrace(isTrue)
+                .orOpenBrace(isTrue).or(isFalse)
+                .closeBrace()
+                .closeBrace().and(isFalse).build();
+
+        assertThat("false || (true || (true || false)) && false == false", pred.evaluate(AnyInt), is(false));
     }
+
     @Test
     public void closingStackedBracesWithoutOpeningThrows() {
         expectedException.expect(IllegalStateException.class);
@@ -122,18 +130,24 @@ public class PredicateBuilderTest {
 
     @Test
     public void canStartWithBrace() {
-        assertThat( (true || true) && false, is(false));
-        assertThat( true || true && false, is(true));
-
         Predicate<Integer> predicate = builder.openBrace(isTrue).or(isTrue).closeBrace().and(isFalse).build();
-        assertThat(predicate.evaluate(AnyInt), is(false));
+        assertThat("(true || true) && false == false, true || true && false == true", predicate.evaluate(AnyInt), is(false));
     }
 
-    //starting brace right away works (builder.openBrace)
-    //openBrace not at start throws
-    //not closing brace throws
-    // stacked braces
-    //andOpenBrace
+    @Test
+    public void openBraceThrowsWhenNotUsedAsFirstStatement() {
+        expectedException.expect(IllegalStateException.class);
+        builder.start(isTrue).openBrace(isTrue);
+    }
 
-    // Builder ->StackTail->next->next->(first)builder
+    @Test
+    public void notClosingBraceThrows() {
+        expectedException.expect(IllegalStateException.class);
+        builder.openBrace(isTrue).or(isTrue).build();
+    }
+    @Test
+    public void andOpenBrace() {
+        Predicate<Integer> pred = builder.start(isTrue).andOpenBrace(isTrue).or(isFalse).closeBrace().build();
+        assertThat(pred.evaluate(AnyInt), is(true));
+    }
 }

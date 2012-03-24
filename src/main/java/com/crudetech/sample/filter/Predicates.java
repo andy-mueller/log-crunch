@@ -24,9 +24,22 @@ public class Predicates {
                 }
                 return false;
             }
+
+            @Override
+            public String toString() {
+                return Predicates.toString(predicates, "||");
+            }
         };
     }
 
+
+    private static String toString(Iterable<?> predicates, String sym){
+        String s = "";
+        for(Object o : predicates){
+            s += o + " "+sym+" ";
+        }
+        return s.substring(0, s.length() - 4);
+    }
     public static <T> Predicate<T> and(Predicate<? super T>... predicates) {
         return and(asList(predicates));
     }
@@ -50,6 +63,10 @@ public class Predicates {
                     }
                 }
                 return true;
+            }
+            @Override
+            public String toString() {
+                return Predicates.toString(predicates, "&&");
             }
         };
     }
