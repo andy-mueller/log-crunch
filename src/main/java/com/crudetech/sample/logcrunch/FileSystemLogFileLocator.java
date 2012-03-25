@@ -1,5 +1,6 @@
 package com.crudetech.sample.logcrunch;
 
+import com.crudetech.sample.filter.BinaryFunction;
 import com.crudetech.sample.filter.FilterChain;
 import com.crudetech.sample.filter.MappingIterable;
 import com.crudetech.sample.filter.Predicate;
@@ -11,6 +12,7 @@ import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
+import static com.crudetech.sample.filter.Algorithm.accumulate;
 import static java.util.Arrays.asList;
 
 public class FileSystemLogFileLocator implements LogFileLocator {
@@ -35,15 +37,20 @@ public class FileSystemLogFileLocator implements LogFileLocator {
 
         filterBuilder.start(fileNameMatches(fileName));
 
-        filterBuilder.andOpenBrace();
-        for (Interval range : ranges) {
-            filterBuilder.or(fileNameInDateRange(fileName, range));
-        }
-        filterBuilder.closeBrace();
+        accumulate(filterBuilder.andOpenBrace(), ranges, addRangeWithOr(fileName)).closeBrace();
 
         Iterable<File> matchingFiles = fileFilterChain.apply(allPossibleFiles);
 
         return new MappingIterable<File, LogFile>(matchingFiles, createLogFile());
+    }
+
+    private BinaryFunction<PredicateBuilder<File>, PredicateBuilder<File>, Interval> addRangeWithOr(final LogFileNamePattern fileName) {
+        return new BinaryFunction<PredicateBuilder<File>, PredicateBuilder<File>, Interval>() {
+            @Override
+            public PredicateBuilder<File> evaluate(PredicateBuilder<File> builder, Interval range) {
+                return builder.or(fileNameInDateRange(fileName, range));
+            }
+        };
     }
 
     private Iterable<File> allPossibleFilesInDirectory() {
