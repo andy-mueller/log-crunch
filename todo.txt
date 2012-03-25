@@ -1,5 +1,6 @@
 -locator:use accumulate to build chain??
 -PredBuilder
+    builder.or(x) starts builder if not started?
     builder.startWith(x).orOpenBrace()  empty parmater possble??
 -introduce package for logback/slf4j implementation/format
     -Include TestLogFile!

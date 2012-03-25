@@ -24,7 +24,7 @@ public class PredicateBuilder<T> {
     }
 
     public Predicate<T> build() {
-        if(braceCount != 0){
+        if (braceCount != 0) {
             throw new IllegalStateException("There are still open braces!");
         }
         return getHead().build();
@@ -38,23 +38,19 @@ public class PredicateBuilder<T> {
     }
 
     public PredicateBuilder<T> orOpenBrace(Predicate<? super T> predicate) {
-        if(head == null){
+        if (head == null) {
             return openBrace(predicate);
         }
-        head = new StackPredicateBuilderOr(head);
-        head.start(predicate);
-        ++braceCount;
-        return this;
+        return openBrace(new StackPredicateBuilderOr(head), predicate);
     }
-    public PredicateBuilder<T> andOpenBrace(Predicate<T> predicate){
-        if(head == null){
+
+    public PredicateBuilder<T> andOpenBrace(Predicate<T> predicate) {
+        if (head == null) {
             return openBrace(predicate);
         }
-        head = new StackPredicateBuilderAnd(head);
-        head.start(predicate);
-        ++braceCount;
-        return this;
+        return openBrace(new StackPredicateBuilderAnd(head), predicate);
     }
+
     public PredicateBuilder<T> closeBrace() {
         verifyBracesWereOpened();
         --braceCount;
@@ -63,7 +59,7 @@ public class PredicateBuilder<T> {
     }
 
     private void verifyBracesWereOpened() {
-        if(braceCount <= 0){
+        if (braceCount <= 0) {
             throw new IllegalStateException("There were no braces opened");
         }
     }
@@ -72,8 +68,13 @@ public class PredicateBuilder<T> {
         if (head != null) {
             throw new IllegalStateException("This builder was already started!");
         }
+        openBrace(new StackPredicateBuilderNone(), predicate);
+        return this;
+    }
+
+    private PredicateBuilder<T> openBrace(StackPredicateBuilder newHead, Predicate<? super T> predicate) {
+        head = newHead;
         ++braceCount;
-        head = new StackPredicateBuilderNone();
         head.start(predicate);
         return this;
     }
@@ -103,8 +104,9 @@ public class PredicateBuilder<T> {
                 public Boolean evaluate(T argument) {
                     return predicate.evaluate(argument);
                 }
+
                 @Override
-                public String toString(){
+                public String toString() {
                     return predicate.toString();
                 }
             };
@@ -135,6 +137,7 @@ public class PredicateBuilder<T> {
         public Predicate<T> build() {
             return toStringDecorator(Predicates.or(getPredicates()));
         }
+
         private Predicate<T> toStringDecorator(final Predicate<T> predicate) {
             return new Predicate<T>() {
                 @Override
@@ -148,6 +151,7 @@ public class PredicateBuilder<T> {
                 }
             };
         }
+
         private Iterable<Predicate<? super T>> getPredicates() {
             return new ArrayList<Predicate<? super T>>(predicates);
         }
@@ -176,7 +180,6 @@ public class PredicateBuilder<T> {
     }
 
 
-
     private class StackPredicateBuilderOr extends StackPredicateBuilder {
         StackPredicateBuilderOr(StackPredicateBuilder previous) {
             super(previous);
@@ -194,6 +197,7 @@ public class PredicateBuilder<T> {
         StackPredicateBuilderNone() {
             super(null);
         }
+
         @Override
         public void pop() {
             Predicate<T> build = build();

@@ -40,6 +40,8 @@ public class FileSystemLogFileLocator implements LogFileLocator {
             filterBuilder.or(fileNameInDateRange(fileName, ranges.get(i)));
         }
         filterBuilder.closeBrace();
+        //filterBuilder.andOpenBrace().or(x).or(y)....closeBrace()
+        //filterBuilder.andInBracesWithOr(x, y, z)
 
         Iterable<File> matchingFiles = fileFilterChain.apply(allPossibleFiles);
 

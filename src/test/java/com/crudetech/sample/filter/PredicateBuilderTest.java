@@ -159,4 +159,9 @@ public class PredicateBuilderTest {
         Predicate<Integer> pred2 = builder.andOpenBrace(isTrue).or(isTrue).closeBrace().and(isFalse).build();
         assertThat("&& (true || true) && false==false", pred2.evaluate(AnyInt), is(false));
     }
+
+    //builder.openBrace() works on any level
+    //builder.or() works
+    //filterBuilder.orInBracesWithOr(x, y, z)
+    //filterBuilder.andInBracesWithOr(x, y, z)
 }
