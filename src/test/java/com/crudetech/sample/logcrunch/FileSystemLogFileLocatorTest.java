@@ -16,6 +16,7 @@ import java.util.List;
 
 import static com.crudetech.sample.Iterables.copy;
 import static com.crudetech.sample.logcrunch.LogFileMatcher.equalTo;
+import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -24,6 +25,7 @@ public class FileSystemLogFileLocatorTest {
     private LogFileLocator locator;
     private Interval sixthOfMay2007;
     private LogFileNamePattern namePattern;
+    private Interval noMatch;
 
 
     @Before
@@ -33,6 +35,7 @@ public class FileSystemLogFileLocatorTest {
 
         sixthOfMay2007 = new Interval(dateOf("20070506"), dateOf("20070507"));
         namePattern = new LogFileNamePattern("machinename101-%d{yyyyMMdd}");
+        noMatch = new Interval(dateOf("19720815"), dateOf("19730815"));
     }
 
     private DateTime dateOf(String date) throws ParseException {
@@ -59,7 +62,7 @@ public class FileSystemLogFileLocatorTest {
 
     @Test
     public void locationIsSuccessful() throws Exception {
-        Iterable<LogFile> located = locator.find(namePattern, sixthOfMay2007);
+        Iterable<LogFile> located = locator.find(namePattern, asList(sixthOfMay2007));
 
         assertThat(Iterables.getFirst(located), is(notNullValue()));
         assertThat(Iterables.size(located), is(1));
@@ -67,31 +70,29 @@ public class FileSystemLogFileLocatorTest {
 
     @Test
     public void locatedFileHasCorrectContent() throws Exception {
-        Iterable<LogFile> located = locator.find(namePattern, sixthOfMay2007);
+        Iterable<LogFile> located = locator.find(namePattern, asList(sixthOfMay2007));
 
         assertThat(Iterables.getFirst(located), is(equalTo(fileTestLogFile20070506)));
     }
 
     @Test
     public void noLocationGivesNoLogFiles() throws Exception {
-        Interval noMatch = new Interval(dateOf("20070101"), dateOf("20070201"));
-        Iterable<LogFile> located = locator.find(namePattern, noMatch);
-
+        Iterable<LogFile> located = locator.find(namePattern, asList(noMatch));
         assertThat(Iterables.size(located), is(0));
     }
 
     @Test
     public void multipleFilesFound() throws Exception {
-        Interval noMatch = new Interval(dateOf("20070506"), dateOf("20070508"));
-        Iterable<LogFile> located = locator.find(namePattern, noMatch);
+        Interval seventhOfMay2007 = new Interval(dateOf("20070507"), dateOf("20070508"));
+        Iterable<LogFile> located = locator.find(namePattern, asList(sixthOfMay2007, seventhOfMay2007));
 
         assertThat(Iterables.size(located), is(2));
     }
 
     @Test
     public void multipleFilesFoundHaveCorrectContent() throws Exception {
-        Interval noMatch = new Interval(dateOf("20070506"), dateOf("20070508"));
-        Iterable<LogFile> located = locator.find(namePattern, noMatch);
+        Interval seventhOfMay2007 = new Interval(dateOf("20070507"), dateOf("20070508"));
+        Iterable<LogFile> located = locator.find(namePattern, asList(sixthOfMay2007, seventhOfMay2007));
 
         List<LogFile> loc = copy(located);
 

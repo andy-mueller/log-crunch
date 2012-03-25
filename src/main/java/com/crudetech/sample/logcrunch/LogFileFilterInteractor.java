@@ -47,7 +47,7 @@ public class LogFileFilterInteractor {
     }
 
     public Iterable<LogFile> getFilteredLogFiles(Query model) {
-        Iterable<LogFile> logFiles = locator.find(model.logFileNamePattern, model.searchIntervals.get(0));
+        Iterable<LogFile> logFiles = locator.find(model.logFileNamePattern, model.searchIntervals);
 
         FilterChain<LogLine> lineFilter = new FilterChain<LogLine>();
         PredicateBuilder<LogLine> filterBuilder = lineFilter.filterBuilder();

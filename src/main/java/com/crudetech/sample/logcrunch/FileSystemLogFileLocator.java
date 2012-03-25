@@ -1,8 +1,9 @@
 package com.crudetech.sample.logcrunch;
 
-import com.crudetech.sample.filter.FilterIterable;
+import com.crudetech.sample.filter.FilterChain;
 import com.crudetech.sample.filter.MappingIterable;
 import com.crudetech.sample.filter.Predicate;
+import com.crudetech.sample.filter.PredicateBuilder;
 import com.crudetech.sample.filter.UnaryFunction;
 import org.joda.time.Interval;
 
@@ -26,12 +27,23 @@ public class FileSystemLogFileLocator implements LogFileLocator {
     }
 
     @Override
-    public Iterable<LogFile> find(LogFileNamePattern fileName, Interval range) {
+    public Iterable<LogFile> find(LogFileNamePattern fileName, List<Interval> ranges) {
         Iterable<File> allPossibleFiles = allPossibleFilesInDirectory();
-        Iterable<File> matchingNameFiles = new FilterIterable<File>(allPossibleFiles, fileNameMatches(fileName));
-        Iterable<File> matchingDateFiles = new FilterIterable<File>(matchingNameFiles, fileNameInDateRange(fileName, range));
 
-        return new MappingIterable<File, LogFile>(matchingDateFiles, createLogFile());
+        FilterChain<File> fileFilterChain = new FilterChain<File>();
+        PredicateBuilder<File> filterBuilder = fileFilterChain.filterBuilder();
+
+        filterBuilder.start(fileNameMatches(fileName));
+
+        filterBuilder.andOpenBrace(fileNameInDateRange(fileName, ranges.get(0)));
+        for(int i = 1; i < ranges.size(); ++i){
+            filterBuilder.or(fileNameInDateRange(fileName, ranges.get(i)));
+        }
+        filterBuilder.closeBrace();
+
+        Iterable<File> matchingFiles = fileFilterChain.apply(allPossibleFiles);
+
+        return new MappingIterable<File, LogFile>(matchingFiles, createLogFile());
     }
 
     private Iterable<File> allPossibleFilesInDirectory() {

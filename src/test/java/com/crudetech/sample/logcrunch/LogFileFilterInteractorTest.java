@@ -35,7 +35,7 @@ public class LogFileFilterInteractorTest {
     @Test
     public void findFiles() {
         Interval testInterval = new Interval(1, 5);
-        when(locator.find(logFileNamePattern, testInterval)).thenReturn(asList((LogFile) logFileStub1, logFileStub2));
+        when(locator.find(logFileNamePattern, asList(testInterval))).thenReturn(asList((LogFile) logFileStub1, logFileStub2));
         LogFileFilterInteractor interactor = new LogFileFilterInteractor(locator);
 
         LogFileFilterInteractor.Query request = new LogFileFilterInteractor.Query();
@@ -44,7 +44,7 @@ public class LogFileFilterInteractorTest {
 
         interactor.getFilteredLogFiles(request);
 
-        verify(locator).find(logFileNamePattern, testInterval);
+        verify(locator).find(logFileNamePattern, asList(testInterval));
     }
 
 
@@ -67,7 +67,7 @@ public class LogFileFilterInteractorTest {
 
     @Test
     public void levelFiltersAreApplied() {
-        when(locator.find(eq(logFileNamePattern), any(Interval.class))).thenReturn(asList((LogFile) logFileStub1, logFileStub2));
+        when(locator.find(eq(logFileNamePattern), any(List.class))).thenReturn(asList((LogFile) logFileStub1, logFileStub2));
         LogFileFilterInteractor interactor = new LogFileFilterInteractor(locator);
 
         LogFileFilterInteractor.Query request = new LogFileFilterInteractor.Query();
@@ -103,7 +103,7 @@ public class LogFileFilterInteractorTest {
 
     @Test
     public void timeFiltersAreApplied() {
-        when(locator.find(eq(logFileNamePattern), any(Interval.class))).thenReturn(asList((LogFile) logFileStub1));
+        when(locator.find(eq(logFileNamePattern), any(List.class))).thenReturn(asList((LogFile) logFileStub1));
         LogFileFilterInteractor interactor = new LogFileFilterInteractor(locator);
 
         LogFileFilterInteractor.Query request = new LogFileFilterInteractor.Query();
