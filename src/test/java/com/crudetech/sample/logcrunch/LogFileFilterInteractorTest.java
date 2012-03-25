@@ -74,11 +74,12 @@ public class LogFileFilterInteractorTest {
         request.searchIntervals.add(allTimeOfTheWorld());
         request.logFileNamePattern = logFileNamePattern;
         request.levels.add(LogLevel.Info);
+        request.levels.add(LogLevel.Warn);
 
         Iterable<LogFile> logFiles = interactor.getFilteredLogFiles(request);
 
-        LogFile expected1 = new ArrayListLogFile(asList(TestLogFile.SampleInfoLine, logFileStub1.logLines.get(3)));
-        LogFile expected2 = new ArrayListLogFile(asList(TestLogFile.SampleInfoLine, logFileStub2.logLines.get(3)));
+        LogFile expected1 = new ArrayListLogFile(asList(TestLogFile.SampleInfoLine, logFileStub1.logLines.get(2), logFileStub1.logLines.get(3)));
+        LogFile expected2 = new ArrayListLogFile(asList(TestLogFile.SampleInfoLine, logFileStub2.logLines.get(2), logFileStub2.logLines.get(3)));
 
         assertLogFileIterablesEqual(logFiles, asList(expected1, expected2));
     }
@@ -92,8 +93,9 @@ public class LogFileFilterInteractorTest {
         Iterator<LogFile> ilhs = lhs.iterator();
         Iterator<LogFile> irhs = rhs.iterator();
 
+        int count = 0;
         while (ilhs.hasNext() && irhs.hasNext()) {
-            assertThat(ilhs.next(), equalTo(irhs.next()));
+            assertThat(Integer.toString(count++), ilhs.next(), equalTo(irhs.next()));
         }
 
         assertThat("ranges have same length",ilhs.hasNext(), is(irhs.hasNext()));

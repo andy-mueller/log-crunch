@@ -3,6 +3,9 @@
     -starting a predicate builder with an operator like
         && x || y   simply ignores the first lost operator
 
+-locator must handle multiple date ranges
+    -use predicate builder and filter chain here, too
+
 -introduce package for logback/slf4j implementation/format
     -Include TestLogFile!
 

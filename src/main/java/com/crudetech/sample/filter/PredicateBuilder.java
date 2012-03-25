@@ -38,12 +38,18 @@ public class PredicateBuilder<T> {
     }
 
     public PredicateBuilder<T> orOpenBrace(Predicate<? super T> predicate) {
+        if(head == null){
+            return openBrace(predicate);
+        }
         head = new StackPredicateBuilderOr(head);
         head.start(predicate);
         ++braceCount;
         return this;
     }
     public PredicateBuilder<T> andOpenBrace(Predicate<T> predicate){
+        if(head == null){
+            return openBrace(predicate);
+        }
         head = new StackPredicateBuilderAnd(head);
         head.start(predicate);
         ++braceCount;

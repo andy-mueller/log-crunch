@@ -148,4 +148,15 @@ public class PredicateBuilderTest {
         Predicate<Integer> pred = builder.start(isFalse).build();
         assertThat(pred.evaluate(AnyInt), is(false));
     }
+
+    @Test
+    public void orOpenBraceIgnoresOrWhenCalledAsFirstStatement() {
+        Predicate<Integer> pred2 = builder.orOpenBrace(isTrue).or(isTrue).closeBrace().and(isFalse).build();
+        assertThat("|| (true || true) && false==false", pred2.evaluate(AnyInt), is(false));
+    }
+    @Test
+    public void andOpenBraceIgnoresOrWhenCalledAsFirstStatement() {
+        Predicate<Integer> pred2 = builder.andOpenBrace(isTrue).or(isTrue).closeBrace().and(isFalse).build();
+        assertThat("&& (true || true) && false==false", pred2.evaluate(AnyInt), is(false));
+    }
 }

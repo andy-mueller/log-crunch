@@ -2,7 +2,6 @@ package com.crudetech.sample.logcrunch;
 
 import com.crudetech.sample.filter.FilterChain;
 import com.crudetech.sample.filter.MappingIterable;
-import com.crudetech.sample.filter.Predicate;
 import com.crudetech.sample.filter.PredicateBuilder;
 import com.crudetech.sample.filter.UnaryFunction;
 import org.joda.time.Interval;
@@ -31,11 +30,8 @@ public class LogFileFilterInteractor {
 
             Query query = (Query) o;
 
-            if (levels != null ? !levels.equals(query.levels) : query.levels != null) return false;
-            if (searchIntervals != null ? !searchIntervals.equals(query.searchIntervals) : query.searchIntervals != null)
-                return false;
+            return levels.equals(query.levels) && searchIntervals.equals(query.searchIntervals);
 
-            return true;
         }
 
         @Override
@@ -56,55 +52,39 @@ public class LogFileFilterInteractor {
         FilterChain<LogLine> lineFilter = new FilterChain<LogLine>();
         PredicateBuilder<LogLine> filterBuilder = lineFilter.filterBuilder();
 
-        if (!model.levels.isEmpty()) {
-            filterBuilder.openBrace(hasLogLevel(model.levels.get(0)));
-            for (int i = 1; i < model.levels.size(); ++i) {
-                filterBuilder.or(hasLogLevel(model.levels.get(0)));
-            }
-            filterBuilder.closeBrace();
-        }
+        buildLogLevelFilter(model.levels, filterBuilder);
 
-        if (!model.searchIntervals.isEmpty()) {
-            if (model.levels.isEmpty()) {
-                filterBuilder.openBrace(isInDateTimeRange(model.searchIntervals.get(0)));
-            } else {
-                filterBuilder.andOpenBrace(isInDateTimeRange(model.searchIntervals.get(0)));
-            }
-            for (int i = 1; i < model.levels.size(); ++i) {
-                filterBuilder.or(isInDateTimeRange(model.searchIntervals.get(0)));
-            }
-            filterBuilder.closeBrace();
-        }
-
+        buildTimeIntervalFilter(model.searchIntervals, filterBuilder);
 
         return new MappingIterable<LogFile, LogFile>(logFiles, filterFiles(lineFilter));
     }
 
-    private UnaryFunction<Predicate<LogLine>, Interval> dateRangeFilters() {
-        return new UnaryFunction<Predicate<LogLine>, Interval>() {
-            @Override
-            public Predicate<LogLine> evaluate(Interval argument) {
-                return isInDateTimeRange(argument);
+    private void buildTimeIntervalFilter(List<Interval> searchIntervals, PredicateBuilder<LogLine> filterBuilder) {
+        if (!searchIntervals.isEmpty()) {
+            filterBuilder.andOpenBrace(isInDateTimeRange(searchIntervals.get(0)));
+            for (int i = 1; i < searchIntervals.size(); ++i) {
+                filterBuilder.or(isInDateTimeRange(searchIntervals.get(i)));
             }
-        };
+            filterBuilder.closeBrace();
+        }
     }
 
-
-    private UnaryFunction<Predicate<LogLine>, LogLevel> logLevelFilter() {
-        return new UnaryFunction<Predicate<LogLine>, LogLevel>() {
-            @Override
-            public Predicate<LogLine> evaluate(LogLevel line) {
-                return hasLogLevel(line);
-            }
-        };
+    private static void buildLogLevelFilter(List<LogLevel> levels, PredicateBuilder<LogLine> filterBuilder) {
+        if (levels.isEmpty()) {
+            return;
+        }
+        filterBuilder.openBrace(hasLogLevel(levels.get(0)));
+        for (int i = 1; i < levels.size(); ++i) {
+            filterBuilder.or(hasLogLevel(levels.get(i)));
+        }
+        filterBuilder.closeBrace();
     }
 
-
-    private UnaryFunction<LogFile, LogFile> filterFiles(final FilterChain<LogLine> infoFilter) {
+    private UnaryFunction<LogFile, LogFile> filterFiles(final FilterChain<LogLine> filters) {
         return new UnaryFunction<LogFile, LogFile>() {
             @Override
             public LogFile evaluate(LogFile logFile) {
-                return new FilterLogFile(logFile, infoFilter);
+                return new FilterLogFile(logFile, filters);
             }
         };
     }
