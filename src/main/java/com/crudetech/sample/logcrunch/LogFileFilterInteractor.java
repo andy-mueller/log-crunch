@@ -59,23 +59,24 @@ public class LogFileFilterInteractor {
         return new MappingIterable<LogFile, LogFile>(logFiles, filterFiles(lineFilter));
     }
 
-    private void buildTimeIntervalFilter(List<Interval> searchIntervals, PredicateBuilder<LogLine> filterBuilder) {
-        if (!searchIntervals.isEmpty()) {
-            filterBuilder.andOpenBrace(isInDateTimeRange(searchIntervals.get(0)));
-            for (int i = 1; i < searchIntervals.size(); ++i) {
-                filterBuilder.or(isInDateTimeRange(searchIntervals.get(i)));
-            }
-            filterBuilder.closeBrace();
-        }
-    }
-
-    private static void buildLogLevelFilter(List<LogLevel> levels, PredicateBuilder<LogLine> filterBuilder) {
-        if (levels.isEmpty()) {
+    private void buildTimeIntervalFilter(Iterable<Interval> searchIntervals, PredicateBuilder<LogLine> filterBuilder) {
+        if (!searchIntervals.iterator().hasNext()) {
             return;
         }
-        filterBuilder.openBrace(hasLogLevel(levels.get(0)));
-        for (int i = 1; i < levels.size(); ++i) {
-            filterBuilder.or(hasLogLevel(levels.get(i)));
+        filterBuilder.andOpenBrace();
+        for (Interval searchInterval : searchIntervals) {
+            filterBuilder.or(isInDateTimeRange(searchInterval));
+        }
+        filterBuilder.closeBrace();
+    }
+
+    private static void buildLogLevelFilter(Iterable<LogLevel> levels, PredicateBuilder<LogLine> filterBuilder) {
+        if (!levels.iterator().hasNext()) {
+            return;
+        }
+        filterBuilder.openBrace();
+        for(LogLevel level : levels){
+            filterBuilder.or(hasLogLevel(level));
         }
         filterBuilder.closeBrace();
     }

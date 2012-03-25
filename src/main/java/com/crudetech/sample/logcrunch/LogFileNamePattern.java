@@ -18,8 +18,10 @@ public class LogFileNamePattern {
     private final String[] parts;
     private final DateTimeFormatter dateFormat;
     private final int dateFormatPatternLength;
+    private final String pattern;
 
     public LogFileNamePattern(String pattern) {
+        this.pattern = pattern;
         if (pattern == null) {
             throw new IllegalArgumentException();
         }
@@ -52,5 +54,10 @@ public class LogFileNamePattern {
         String dateString = fileName.substring(start, end);
 
         return dateFormat.parseDateTime(dateString);
+    }
+
+    @Override
+    public String toString() {
+        return pattern;
     }
 }

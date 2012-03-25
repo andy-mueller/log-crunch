@@ -27,7 +27,7 @@ public class FileSystemLogFileLocator implements LogFileLocator {
     }
 
     @Override
-    public Iterable<LogFile> find(LogFileNamePattern fileName, List<Interval> ranges) {
+    public Iterable<LogFile> find(LogFileNamePattern fileName, Iterable<Interval> ranges) {
         Iterable<File> allPossibleFiles = allPossibleFilesInDirectory();
 
         FilterChain<File> fileFilterChain = new FilterChain<File>();
@@ -35,13 +35,11 @@ public class FileSystemLogFileLocator implements LogFileLocator {
 
         filterBuilder.start(fileNameMatches(fileName));
 
-        filterBuilder.andOpenBrace(fileNameInDateRange(fileName, ranges.get(0)));
-        for(int i = 1; i < ranges.size(); ++i){
-            filterBuilder.or(fileNameInDateRange(fileName, ranges.get(i)));
+        filterBuilder.andOpenBrace();
+        for (Interval range : ranges) {
+            filterBuilder.or(fileNameInDateRange(fileName, range));
         }
         filterBuilder.closeBrace();
-        //filterBuilder.andOpenBrace().or(x).or(y)....closeBrace()
-        //filterBuilder.andInBracesWithOr(x, y, z)
 
         Iterable<File> matchingFiles = fileFilterChain.apply(allPossibleFiles);
 
@@ -60,6 +58,11 @@ public class FileSystemLogFileLocator implements LogFileLocator {
             public Boolean evaluate(File argument) {
                 return range.contains(fileName.dateOf(argument.getName()));
             }
+
+            @Override
+            public String toString() {
+                return range.toString();
+            }
         };
     }
 
@@ -77,6 +80,11 @@ public class FileSystemLogFileLocator implements LogFileLocator {
             @Override
             public Boolean evaluate(File argument) {
                 return fileName.matches(argument.getName());
+            }
+
+            @Override
+            public String toString() {
+                return "==" + fileName;
             }
         };
     }

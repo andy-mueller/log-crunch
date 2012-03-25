@@ -30,7 +30,7 @@ public class PredicateBuilder<T> {
         return getHead().build();
     }
 
-    private PredicateBuilder<T> getHead() {
+    private StackPredicateBuilder getHead() {
         if (head == null) {
             throw new IllegalStateException("Head was not set. this builder was not started correctly!");
         }
@@ -65,18 +65,38 @@ public class PredicateBuilder<T> {
     }
 
     public PredicateBuilder<T> openBrace(Predicate<? super T> predicate) {
+        verifyNotStarted();
+        openBrace(new StackPredicateBuilderNone(), predicate);
+        return this;
+    }
+
+    private void verifyNotStarted() {
         if (head != null) {
             throw new IllegalStateException("This builder was already started!");
         }
-        openBrace(new StackPredicateBuilderNone(), predicate);
-        return this;
     }
 
     private PredicateBuilder<T> openBrace(StackPredicateBuilder newHead, Predicate<? super T> predicate) {
         head = newHead;
         ++braceCount;
-        head.start(predicate);
+        if (predicate != null) {
+            head.start(predicate);
+        }
         return this;
+    }
+
+    public PredicateBuilder<T> openBrace() {
+        verifyNotStarted();
+        openBrace(new StackPredicateBuilderNone(), null);
+        return this;
+    }
+
+    public PredicateBuilder<T> andOpenBrace() {
+        return andOpenBrace(null);
+    }
+
+    public PredicateBuilder<T> orOpenBrace() {
+        return orOpenBrace(null);
     }
 
 
@@ -120,8 +140,12 @@ public class PredicateBuilder<T> {
 
         @Override
         public PredicateBuilder<T> and(Predicate<? super T> predicate) {
-            Predicate<T> and = Predicates.and(lastPredicate(), predicate);
-            replaceLastPredicate(and);
+            if (!predicates.isEmpty()) {
+                Predicate<T> and = Predicates.and(lastPredicate(), predicate);
+                replaceLastPredicate(and);
+            } else {
+                predicates.add(super_away(predicate));
+            }
             return owner();
         }
 
