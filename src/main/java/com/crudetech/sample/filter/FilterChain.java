@@ -5,10 +5,11 @@ import java.util.List;
 
 
 public class FilterChain<T> {
-    private final List<Predicate<T>> filters;
-
+    private final PredicateBuilder<T> filterBuilder = new PredicateBuilder<T>();
     public FilterChain(Iterable<Predicate<T>> predicates) {
-        filters = copy(predicates);
+    }
+
+    public FilterChain() {
     }
 
     private static <T> List<Predicate<T>> copy(Iterable<Predicate<T>> predicates) {
@@ -20,36 +21,11 @@ public class FilterChain<T> {
     }
 
     public Iterable<T> apply(Iterable<? extends T> source) {
-        return new FilterIterable<T>(source, orFilter());
-//        Iterable<T> filtered = accumulate(cast(source), filters, filterIterableBuilder());
-//        return filtered;
+        Predicate<T> filter = filterBuilder.build();
+        return new FilterIterable<T>(source, filter);
     }
 
-    private Predicate<? super T> orFilter() {
-        return new Predicate<T>() {
-            @Override
-            public Boolean evaluate(T argument) {
-                for(Predicate<T> pred : filters){
-                    if(pred.evaluate(argument)){
-                        return true;
-                    }
-                }
-                return false;
-            }
-        };
-    }
-
-    @SuppressWarnings("unchecked")
-    private Iterable<T> cast(Iterable<? extends T> source) {
-        return (Iterable<T>) source;
-    }
-
-    private BinaryFunction<Iterable<T>, Iterable<T>, Predicate<T>> filterIterableBuilder() {
-        return new BinaryFunction<Iterable<T>, Iterable<T>, Predicate<T>>() {
-            @Override
-            public Iterable<T> evaluate(Iterable<T> source, Predicate<T> select) {
-                return new FilterIterable<T>(source, select);
-            }
-        };
+    public PredicateBuilder<T> filterBuilder() {
+        return filterBuilder;
     }
 }

@@ -8,9 +8,6 @@ public class PredicateBuilder<T> {
     private int braceCount = 0;
 
     public PredicateBuilder<T> start(Predicate<? super T> predicate) {
-        if (head != null) {
-            throw new IllegalStateException("This builder was already started!");
-        }
         head = new StackPredicateBuilderNone();
         head.start(predicate);
         return this;

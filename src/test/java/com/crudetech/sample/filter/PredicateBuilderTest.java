@@ -93,13 +93,6 @@ public class PredicateBuilderTest {
     public ExpectedException expectedException = ExpectedException.none();
 
     @Test
-    public void startingMultipleTimesThrows() {
-        builder.start(isFalse);
-        expectedException.expect(IllegalStateException.class);
-        builder.start(isFalse);
-    }
-
-    @Test
     public void closingBracesWithoutOpeningThrows() {
         expectedException.expect(IllegalStateException.class);
         builder.start(isFalse).closeBrace();
@@ -147,5 +140,12 @@ public class PredicateBuilderTest {
     public void andOpenBrace() {
         Predicate<Integer> pred = builder.start(isTrue).andOpenBrace(isTrue).or(isFalse).closeBrace().build();
         assertThat(pred.evaluate(AnyInt), is(true));
+    }
+    @Test
+    public void builderCanBeReused() {
+        assertThat(builder.start(isTrue).build().evaluate(AnyInt), is(true));
+
+        Predicate<Integer> pred = builder.start(isFalse).build();
+        assertThat(pred.evaluate(AnyInt), is(false));
     }
 }

@@ -1,3 +1,5 @@
+-make predicatebuilder restartable
+
 -introduce package for logback/slf4j implementation/format
     -Include TestLogFile!
 
