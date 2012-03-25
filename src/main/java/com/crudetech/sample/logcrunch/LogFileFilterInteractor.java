@@ -3,6 +3,7 @@ package com.crudetech.sample.logcrunch;
 import com.crudetech.sample.filter.FilterChain;
 import com.crudetech.sample.filter.MappingIterable;
 import com.crudetech.sample.filter.Predicate;
+import com.crudetech.sample.filter.PredicateBuilder;
 import com.crudetech.sample.filter.UnaryFunction;
 import org.joda.time.Interval;
 
@@ -10,10 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import static com.crudetech.sample.filter.ConcatIterable.concat;
 import static com.crudetech.sample.logcrunch.LogLinePredicates.hasLogLevel;
 import static com.crudetech.sample.logcrunch.LogLinePredicates.isInDateTimeRange;
-import static java.util.Arrays.asList;
 
 public class LogFileFilterInteractor {
     private final LogFileLocator locator;
@@ -54,13 +53,29 @@ public class LogFileFilterInteractor {
     public Iterable<LogFile> getFilteredLogFiles(Query model) {
         Iterable<LogFile> logFiles = locator.find(model.logFileNamePattern, model.searchIntervals.get(0));
 
-        @SuppressWarnings("unchecked")
-        Iterable<Predicate<LogLine>> filterPredicates = concat(asList(
-                new MappingIterable<LogLevel, Predicate<LogLine>>(model.levels, logLevelFilter()),
-                new MappingIterable<Interval, Predicate<LogLine>>(model.searchIntervals, dateRangeFilters())
-        ));
+        FilterChain<LogLine> lineFilter = new FilterChain<LogLine>();
+        PredicateBuilder<LogLine> filterBuilder = lineFilter.filterBuilder();
 
-        FilterChain<LogLine> lineFilter = new FilterChain<LogLine>(filterPredicates);
+        if (!model.levels.isEmpty()) {
+            filterBuilder.openBrace(hasLogLevel(model.levels.get(0)));
+            for (int i = 1; i < model.levels.size(); ++i) {
+                filterBuilder.or(hasLogLevel(model.levels.get(0)));
+            }
+            filterBuilder.closeBrace();
+        }
+
+        if (!model.searchIntervals.isEmpty()) {
+            if (model.levels.isEmpty()) {
+                filterBuilder.openBrace(isInDateTimeRange(model.searchIntervals.get(0)));
+            } else {
+                filterBuilder.andOpenBrace(isInDateTimeRange(model.searchIntervals.get(0)));
+            }
+            for (int i = 1; i < model.levels.size(); ++i) {
+                filterBuilder.or(isInDateTimeRange(model.searchIntervals.get(0)));
+            }
+            filterBuilder.closeBrace();
+        }
+
 
         return new MappingIterable<LogFile, LogFile>(logFiles, filterFiles(lineFilter));
     }

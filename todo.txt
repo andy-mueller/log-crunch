@@ -1,4 +1,7 @@
--make predicatebuilder restartable
+-PredBuilder
+    -and/or OpenBrace Throw when calles w/ leftside
+    -starting a predicate builder with an operator like
+        && x || y   simply ignores the first lost operator
 
 -introduce package for logback/slf4j implementation/format
     -Include TestLogFile!
