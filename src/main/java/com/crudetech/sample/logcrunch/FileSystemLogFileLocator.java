@@ -36,12 +36,15 @@ public class FileSystemLogFileLocator implements LogFileLocator {
         PredicateBuilder<File> filterBuilder = fileFilterChain.filterBuilder();
 
         filterBuilder.start(fileNameMatches(fileName));
+        //JDK8: filterBuilder.start( (File f)=>fileName.matches(f.getName()); );
 
         accumulate(filterBuilder.andOpenBrace(), ranges, addRangeWithOr(fileName)).closeBrace();
+        // JDK8: accumulate(filterBuilder.andOpenBrace(), ranges, (File f)=>builder.or(range.contains(fileName.dateOf(f.getName());).closeBrace();
 
         Iterable<File> matchingFiles = fileFilterChain.apply(allPossibleFiles);
 
         return new MappingIterable<File, LogFile>(matchingFiles, createLogFile());
+        //JDK8: new MappingIterable<File, LogFile>(matchingFiles, (File f) => logFileFactory.create(f); );
     }
 
     private BinaryFunction<PredicateBuilder<File>, PredicateBuilder<File>, Interval> addRangeWithOr(final LogFileNamePattern fileName) {

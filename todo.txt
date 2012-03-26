@@ -1,4 +1,3 @@
--locator:use accumulate to build chain??
 
 -introduce package for logback/slf4j implementation/format
     -Include TestLogFile!

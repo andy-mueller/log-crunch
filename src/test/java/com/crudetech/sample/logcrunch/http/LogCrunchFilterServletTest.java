@@ -1,7 +1,7 @@
 package com.crudetech.sample.logcrunch.http;
 
 import com.crudetech.sample.logcrunch.LogFileFilterInteractor;
-import org.junit.Ignore;
+import com.crudetech.sample.logcrunch.LogLevel;
 import org.junit.Test;
 
 import javax.servlet.http.HttpServletRequest;
@@ -12,7 +12,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class LogCrunchFilterServletTest {
-    @Test @Ignore
+    @Test
     public void logLevelsAreExtractedToQuery() throws Exception {
         final HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getParameterValues("level")).thenReturn(new String[]{"Info", "Debug"});
@@ -27,7 +27,9 @@ public class LogCrunchFilterServletTest {
         };
         servlet.doGet(request, response);
 
-        LogFileFilterInteractor.Query expecetdQuery = new LogFileFilterInteractor.Query();
-        verify(interactorStub).getFilteredLogFiles(expecetdQuery);
+        LogFileFilterInteractor.Query expectedQuery = new LogFileFilterInteractor.Query();
+        expectedQuery.levels.add(LogLevel.Info);
+        expectedQuery.levels.add(LogLevel.Debug);
+        verify(interactorStub).getFilteredLogFiles(expectedQuery);
     }
 }
