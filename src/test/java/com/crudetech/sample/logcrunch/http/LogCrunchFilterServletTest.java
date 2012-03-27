@@ -20,8 +20,7 @@ public class LogCrunchFilterServletTest {
     private HttpServletResponse response;
     private LogFileFilterInteractor interactorStub;
     private LogCrunchFilterServlet logCrunchFilterServlet;
-    private static final String[] AllTimeInTheWorldParameter = new String[]{"1970-01-01/29000-01-01"};
-    private static final Interval AllTimeInTheWorld = Interval.parse(AllTimeInTheWorldParameter[0]);
+    private static final Interval AllTimeInTheWorld = new Interval(0, Long.MAX_VALUE/2);
 
     @Before
     public void setUp() throws Exception {
@@ -39,7 +38,7 @@ public class LogCrunchFilterServletTest {
     @Test
     public void logLevelsAreExtractedToQuery() throws Exception {
         when(request.getParameterValues(LogCrunchFilterServlet.RequestParameters.Level)).thenReturn(new String[]{"Info", "Debug"});
-        when(request.getParameterValues(LogCrunchFilterServlet.RequestParameters.SearchRange)).thenReturn(AllTimeInTheWorldParameter);
+        when(request.getParameterValues(LogCrunchFilterServlet.RequestParameters.SearchRange)).thenReturn(new String[]{AllTimeInTheWorld.toString()});
 
         logCrunchFilterServlet.doGet(request, response);
 
@@ -53,7 +52,7 @@ public class LogCrunchFilterServletTest {
     @Test
     public void noLogLevelsAllowed() throws Exception {
         when(request.getParameterValues(LogCrunchFilterServlet.RequestParameters.Level)).thenReturn(null);
-        when(request.getParameterValues(LogCrunchFilterServlet.RequestParameters.SearchRange)).thenReturn(AllTimeInTheWorldParameter);
+        when(request.getParameterValues(LogCrunchFilterServlet.RequestParameters.SearchRange)).thenReturn(new String[]{AllTimeInTheWorld.toString()});
 
         logCrunchFilterServlet.doGet(request, response);
 
