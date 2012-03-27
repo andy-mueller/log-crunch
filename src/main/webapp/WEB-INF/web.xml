@@ -4,4 +4,14 @@
 
 <web-app>
   <display-name>Archetype Created Web Application</display-name>
+
+    <servlet>
+        <servlet-name>filter</servlet-name>
+        <servlet-class>com.crudetech.sample.logcrunch.http.LogCrunchFilterServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>filter</servlet-name>
+        <url-pattern>/logcrunch/filter</url-pattern>
+    </servlet-mapping>
+
 </web-app>
