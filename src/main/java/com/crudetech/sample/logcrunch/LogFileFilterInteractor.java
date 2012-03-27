@@ -40,6 +40,17 @@ public class LogFileFilterInteractor {
             result = 31 * result + (levels != null ? levels.hashCode() : 0);
             return result;
         }
+
+        @Override
+        public String toString() {
+            return "Query{" +
+                    "logFileNamePattern=" + logFileNamePattern +
+                    ", searchIntervals=" + searchIntervals +
+                    ", levels=" + levels +
+                    ", loggers=" + loggers +
+                    ", messageRegex=" + messageRegex +
+                    '}';
+        }
     }
 
     public LogFileFilterInteractor(LogFileLocator locator) {

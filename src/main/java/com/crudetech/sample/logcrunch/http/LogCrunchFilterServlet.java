@@ -28,6 +28,10 @@ public class LogCrunchFilterServlet extends HttpServlet {
         }
         
         String[] searchIntervals = getRequestParameters(req, RequestParameters.SearchRange);
+        if(searchIntervals.length == 0){
+            resp.sendError(404, "There must be at least one search interval specified!");
+            return;
+        }
         for (String interval : searchIntervals) {
             query.searchIntervals.add(Interval.parse(interval));
         }
