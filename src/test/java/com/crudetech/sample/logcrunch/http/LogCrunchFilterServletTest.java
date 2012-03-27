@@ -2,6 +2,8 @@ package com.crudetech.sample.logcrunch.http;
 
 import com.crudetech.sample.logcrunch.LogFileFilterInteractor;
 import com.crudetech.sample.logcrunch.LogLevel;
+import org.joda.time.DateTime;
+import org.joda.time.Interval;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -53,4 +55,18 @@ public class LogCrunchFilterServletTest {
         LogFileFilterInteractor.Query expectedQuery = new LogFileFilterInteractor.Query();
         verify(interactorStub).getFilteredLogFiles(expectedQuery);
     }
+
+    @Test
+    public void searchIntervalsAreExtractedToQuery() throws Exception {
+        when(request.getParameterValues(LogCrunchFilterServlet.RequestParameters.SearchRange))
+                .thenReturn(new String[]{"20070507135522100/20090702"});
+
+        logCrunchFilterServlet.doGet(request, response);
+
+        LogFileFilterInteractor.Query expectedQuery = new LogFileFilterInteractor.Query();
+        Interval expectedInterval = new Interval(new DateTime(2007,05,07,13,55,22, 100), new DateTime(2009, 07, 02, 0, 0));
+        expectedQuery.searchIntervals.add(new Interval(1, 2));
+        verify(interactorStub).getFilteredLogFiles(expectedQuery);
+    }
+
 }

@@ -18,7 +18,7 @@ public class LogFileFilterInteractor {
 
     public static class Query {
         public LogFileNamePattern logFileNamePattern;
-        List<Interval> searchIntervals = new ArrayList<Interval>();
+        public List<Interval> searchIntervals = new ArrayList<Interval>();
         public List<LogLevel> levels = new ArrayList<LogLevel>();
         List<Pattern> loggers = new ArrayList<Pattern>();
         List<Pattern> messageRegex = new ArrayList<Pattern>();
