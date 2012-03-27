@@ -2,6 +2,7 @@ package com.crudetech.sample.logcrunch.http;
 
 import com.crudetech.sample.logcrunch.LogFileFilterInteractor;
 import com.crudetech.sample.logcrunch.LogLevel;
+import org.junit.Before;
 import org.junit.Test;
 
 import javax.servlet.http.HttpServletRequest;
@@ -12,20 +13,30 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class LogCrunchFilterServletTest {
-    @Test
-    public void logLevelsAreExtractedToQuery() throws Exception {
-        final HttpServletRequest request = mock(HttpServletRequest.class);
-        when(request.getParameterValues(LogCrunchFilterServlet.RequestParameters.Level)).thenReturn(new String[]{"Info", "Debug"});
-        final HttpServletResponse response = mock(HttpServletResponse.class);
-        final LogFileFilterInteractor interactorStub = mock(LogFileFilterInteractor.class);
 
-        final LogCrunchFilterServlet servlet = new LogCrunchFilterServlet(){
+    private HttpServletRequest request;
+    private HttpServletResponse response;
+    private LogFileFilterInteractor interactorStub;
+    private LogCrunchFilterServlet logCrunchFilterServlet;
+
+    @Before
+    public void setUp() throws Exception {
+        request = mock(HttpServletRequest.class);
+        response = mock(HttpServletResponse.class);
+        interactorStub = mock(LogFileFilterInteractor.class);
+        logCrunchFilterServlet = new LogCrunchFilterServlet(){
             @Override
             LogFileFilterInteractor newInteractor() {
                 return interactorStub;
             }
         };
-        servlet.doGet(request, response);
+    }
+
+    @Test
+    public void logLevelsAreExtractedToQuery() throws Exception {
+        when(request.getParameterValues(LogCrunchFilterServlet.RequestParameters.Level)).thenReturn(new String[]{"Info", "Debug"});
+
+        logCrunchFilterServlet.doGet(request, response);
 
         LogFileFilterInteractor.Query expectedQuery = new LogFileFilterInteractor.Query();
         expectedQuery.levels.add(LogLevel.Info);
@@ -35,18 +46,9 @@ public class LogCrunchFilterServletTest {
 
     @Test
     public void noLogLevelsAllowed() throws Exception {
-        final HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getParameterValues(LogCrunchFilterServlet.RequestParameters.Level)).thenReturn(null);
-        final HttpServletResponse response = mock(HttpServletResponse.class);
-        final LogFileFilterInteractor interactorStub = mock(LogFileFilterInteractor.class);
 
-        final LogCrunchFilterServlet servlet = new LogCrunchFilterServlet(){
-            @Override
-            LogFileFilterInteractor newInteractor() {
-                return interactorStub;
-            }
-        };
-        servlet.doGet(request, response);
+        logCrunchFilterServlet.doGet(request, response);
 
         LogFileFilterInteractor.Query expectedQuery = new LogFileFilterInteractor.Query();
         verify(interactorStub).getFilteredLogFiles(expectedQuery);
