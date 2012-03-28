@@ -79,7 +79,7 @@ public class LogCrunchFilterServletTest {
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
     @Test
-    public void nonIsoDateTimeThrows() throws Exception {
+    public void nonIsoDateTimeReturnsBadFormat() throws Exception {
         when(request.getParameterValues(LogCrunchFilterServlet.RequestParameters.SearchRange))
                 .thenReturn(new String[]{"200705071355,100/2009-07-02"});
 
