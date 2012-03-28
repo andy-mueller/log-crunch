@@ -5,7 +5,9 @@ import com.crudetech.sample.logcrunch.LogLevel;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -74,6 +76,19 @@ public class LogCrunchFilterServletTest {
         verify(interactorStub).getFilteredLogFiles(expectedQuery);
     }
 
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+    @Test
+    public void nonIsoDateTimeThrows() throws Exception {
+        when(request.getParameterValues(LogCrunchFilterServlet.RequestParameters.SearchRange))
+                .thenReturn(new String[]{"200705071355,100/2009-07-02"});
+
+
+        logCrunchFilterServlet.doGet(request, response);
+
+        verify(response).sendError(LogCrunchFilterServlet.HttpStatusCode.BadFormat.Code, LogCrunchFilterServlet.HttpStatusCode.BadFormat.Message);
+    }
+
     @Test
     public void atLeastOneTimeIntervalIsRequired() throws Exception {
         when(request.getParameterValues(LogCrunchFilterServlet.RequestParameters.SearchRange))
@@ -82,6 +97,6 @@ public class LogCrunchFilterServletTest {
 
         logCrunchFilterServlet.doGet(request, response);
 
-        verify(response).sendError(404, "There must be at least one search interval specified!");
+        verify(response).sendError(LogCrunchFilterServlet.HttpStatusCode.BadFormat.Code, LogCrunchFilterServlet.HttpStatusCode.BadFormat.Message);
     }
 }

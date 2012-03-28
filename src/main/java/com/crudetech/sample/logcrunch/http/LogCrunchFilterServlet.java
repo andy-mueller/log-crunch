@@ -11,10 +11,22 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public class LogCrunchFilterServlet extends HttpServlet {
-    class RequestParameters{
+    class RequestParameters {
         static final String Level = "request";
         static final String SearchRange = "seachRange";
     }
+
+    static enum HttpStatusCode {
+        Ok(200, ""), BadFormat(404, "Bad format!");
+        final String Message;
+        final int Code;
+
+        HttpStatusCode(int code, String message) {
+            this.Code = code;
+            Message = message;
+        }
+    }
+
 
     // GET http://localhost:8080/logcrunch/filter?fileName=machine01&searchRange=[20070507,20090702)&level=Info&level=Warn
     // GET http://localhost:8080/logcrunch/filter?fileName=machine01&searchRange=20070507/20090702&level=Info&level=Warn
@@ -26,14 +38,20 @@ public class LogCrunchFilterServlet extends HttpServlet {
         for (String level : levels) {
             query.levels.add(LogLevel.valueOf(level));
         }
-        
+
+
         String[] searchIntervals = getRequestParameters(req, RequestParameters.SearchRange);
-        if(searchIntervals.length == 0){
-            resp.sendError(404, "There must be at least one search interval specified!");
+        if (searchIntervals.length == 0) {
+            resp.sendError(LogCrunchFilterServlet.HttpStatusCode.BadFormat.Code, HttpStatusCode.BadFormat.Message);
             return;
         }
-        for (String interval : searchIntervals) {
-            query.searchIntervals.add(Interval.parse(interval));
+        try {
+            for (String interval : searchIntervals) {
+                query.searchIntervals.add(Interval.parse(interval));
+            }
+        } catch (IllegalArgumentException e) {
+            resp.sendError(LogCrunchFilterServlet.HttpStatusCode.BadFormat.Code, HttpStatusCode.BadFormat.Message);
+            return;
         }
 
         LogFileFilterInteractor logFileFilterInteractor = newInteractor();
