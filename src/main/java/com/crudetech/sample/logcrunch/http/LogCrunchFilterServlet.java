@@ -28,8 +28,7 @@ public class LogCrunchFilterServlet extends HttpServlet {
     }
 
 
-    // GET http://localhost:8080/logcrunch/filter?fileName=machine01&searchRange=[20070507,20090702)&level=Info&level=Warn
-    // GET http://localhost:8080/logcrunch/filter?fileName=machine01&searchRange=20070507/20090702&level=Info&level=Warn
+    // GET http://localhost:8080/logcrunch/filter?fileName=machine01&searchRange=2007-05-07T13:55:22,100/2009-07-02&level=Info&level=Warn
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         LogFileFilterInteractor.Query query = new LogFileFilterInteractor.Query();
