@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PredicateBuilder<T> {
-    private StackPredicateBuilder head;
+    private StackPredicateBuilder<T> head;
     private int braceCount = 0;
 
     public PredicateBuilder<T> start(Predicate<? super T> predicate) {
-        head = new StackPredicateBuilderNone();
+        head = new StackPredicateBuilderNone<T>(this);
         head.start(predicate);
         return this;
     }
@@ -30,7 +30,7 @@ public class PredicateBuilder<T> {
         return getHead().build();
     }
 
-    private StackPredicateBuilder getHead() {
+    private StackPredicateBuilder<T> getHead() {
         if (head == null) {
             throw new IllegalStateException("Head was not set. this builder was not started correctly!");
         }
@@ -41,14 +41,14 @@ public class PredicateBuilder<T> {
         if (head == null) {
             return openBrace(predicate);
         }
-        return openBrace(new StackPredicateBuilderOr(head), predicate);
+        return openBrace(new StackPredicateBuilderOr<T>(this, head), predicate);
     }
 
     public PredicateBuilder<T> andOpenBrace(Predicate<T> predicate) {
         if (head == null) {
             return openBrace(predicate);
         }
-        return openBrace(new StackPredicateBuilderAnd(head), predicate);
+        return openBrace(new StackPredicateBuilderAnd<T>(this, head), predicate);
     }
 
     public PredicateBuilder<T> closeBrace() {
@@ -66,7 +66,7 @@ public class PredicateBuilder<T> {
 
     public PredicateBuilder<T> openBrace(Predicate<? super T> predicate) {
         verifyNotStarted();
-        openBrace(new StackPredicateBuilderNone(), predicate);
+        openBrace(new StackPredicateBuilderNone<T>(this), predicate);
         return this;
     }
 
@@ -76,7 +76,7 @@ public class PredicateBuilder<T> {
         }
     }
 
-    private PredicateBuilder<T> openBrace(StackPredicateBuilder newHead, Predicate<? super T> predicate) {
+    private PredicateBuilder<T> openBrace(StackPredicateBuilder<T> newHead, Predicate<? super T> predicate) {
         head = newHead;
         ++braceCount;
         if (predicate != null) {
@@ -87,7 +87,7 @@ public class PredicateBuilder<T> {
 
     public PredicateBuilder<T> openBrace() {
         verifyNotStarted();
-        openBrace(new StackPredicateBuilderNone(), null);
+        openBrace(new StackPredicateBuilderNone<T>(this), null);
         return this;
     }
 
@@ -100,12 +100,14 @@ public class PredicateBuilder<T> {
     }
 
 
-    private abstract class StackPredicateBuilder extends PredicateBuilder<T> {
+    private abstract static class StackPredicateBuilder<T> extends PredicateBuilder<T> {
         final List<Predicate<T>> predicates = new ArrayList<Predicate<T>>();
-        final StackPredicateBuilder previous;
+        final StackPredicateBuilder<T> previous;
+        private final PredicateBuilder<T> outerThis;
 
-        StackPredicateBuilder(StackPredicateBuilder previous) {
+        StackPredicateBuilder(PredicateBuilder<T> outerThis, StackPredicateBuilder<T> previous) {
             this.previous = previous;
+            this.outerThis = outerThis;
         }
 
         @Override
@@ -115,7 +117,7 @@ public class PredicateBuilder<T> {
         }
 
         PredicateBuilder<T> owner() {
-            return PredicateBuilder.this;
+            return outerThis;
         }
 
         private Predicate<T> super_away(final Predicate<? super T> predicate) {
@@ -204,9 +206,10 @@ public class PredicateBuilder<T> {
     }
 
 
-    private class StackPredicateBuilderOr extends StackPredicateBuilder {
-        StackPredicateBuilderOr(StackPredicateBuilder previous) {
-            super(previous);
+    private static class StackPredicateBuilderOr<T> extends StackPredicateBuilder<T> {
+
+        StackPredicateBuilderOr(PredicateBuilder<T> outerThis, StackPredicateBuilder<T> previous) {
+            super(outerThis, previous);
         }
 
         @Override
@@ -217,9 +220,9 @@ public class PredicateBuilder<T> {
     }
 
 
-    private class StackPredicateBuilderNone extends StackPredicateBuilder {
-        StackPredicateBuilderNone() {
-            super(null);
+    private static class StackPredicateBuilderNone<T> extends StackPredicateBuilder<T> {
+        StackPredicateBuilderNone(PredicateBuilder<T> outerThis) {
+            super(outerThis, null);
         }
 
         @Override
@@ -230,9 +233,9 @@ public class PredicateBuilder<T> {
         }
     }
 
-    private class StackPredicateBuilderAnd extends StackPredicateBuilder {
-        public StackPredicateBuilderAnd(StackPredicateBuilder head) {
-            super(head);
+    private static class StackPredicateBuilderAnd<T> extends StackPredicateBuilder<T> {
+        public StackPredicateBuilderAnd(PredicateBuilder<T> outerThis, StackPredicateBuilder<T> head) {
+            super(outerThis, head);
         }
 
         @Override
