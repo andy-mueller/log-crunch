@@ -46,7 +46,7 @@ public class ParameterMapper {
     private void mapOnAnnotatedMethod(Object mappingTarget, Method annotatedMethod) {
         Parameter parameterAnnotation = annotatedMethod.getAnnotation(Parameter.class);
         Class<?> parameterType = getParameterType(annotatedMethod);
-        Method factory = getFactory(parameterType);
+        Method factory = getFactoryMethod(parameterType);
         String parameterName = parameterAnnotation.value();
         String[] parameterValues = gerParameterValues(parameterName);
 
@@ -121,7 +121,7 @@ public class ParameterMapper {
             new AbstractMap.SimpleEntry<String, Class<?>>("parse", String.class)
     );
 
-    private Method getFactory(Class<?> type) {
+    private Method getFactoryMethod(Class<?> type) {
         for (Map.Entry<String, Class<?>> possibleFactory : possibleFactories) {
             Method factoryMethod = getFactoryMethod(type, possibleFactory.getKey(), possibleFactory.getValue());
             if (factoryMethod != null) {
@@ -131,9 +131,9 @@ public class ParameterMapper {
         throw new IllegalArgumentException();
     }
 
-    private Method getFactoryMethod(Class<?> parameterType, String key, Class<?> value) {
+    private Method getFactoryMethod(Class<?> factoryType, String factoryMethodName, Class<?> factoryMethodParameter) {
         try {
-            return parameterType.getMethod(key, value);
+            return factoryType.getMethod(factoryMethodName, factoryMethodParameter);
         } catch (NoSuchMethodException e) {
             return null;
         }
