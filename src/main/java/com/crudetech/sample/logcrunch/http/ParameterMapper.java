@@ -1,6 +1,8 @@
 package com.crudetech.sample.logcrunch.http;
 
 import java.lang.reflect.Method;
+import java.util.AbstractMap;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -86,16 +88,32 @@ public class ParameterMapper {
         return primitiveToWrapper.get(parameterType);
     }
 
-    private Method getFactory(Class<?> parameterType) {
-        Class<?> parameter = parameterType.equals(String.class)
-                             ? Object.class
-                             : String.class;
+    private Method getFactory(Class<?> type) {
+
+        Iterable<Map.Entry<String, Class<?>>> possibleFactories = Arrays.<Map.Entry<String, Class<?>>>asList(
+                new AbstractMap.SimpleEntry<String, Class<?>>("valueOf", String.class),
+                new AbstractMap.SimpleEntry<String, Class<?>>("valueOf", Object.class),
+                new AbstractMap.SimpleEntry<String, Class<?>>("parse", String.class)
+        );
+
+
+        for (Map.Entry<String, Class<?>> possibleFactory : possibleFactories) {
+            Method factoryMethod = getFactoryMethod(type, possibleFactory.getKey(), possibleFactory.getValue());
+            if(factoryMethod != null){
+                return factoryMethod;
+            }
+        }
+        throw new IllegalArgumentException();
+    }
+
+    private Method getFactoryMethod(Class<?> parameterType, String key, Class<?> value) {
         try {
-            return parameterType.getMethod("valueOf", parameter);
+            return parameterType.getMethod(key, value);
         } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
+            return null;
         }
     }
+
 
     private String[] gerParameterValues(String parameterName) {
         String[] values = parameters.get(parameterName);

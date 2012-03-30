@@ -1,5 +1,6 @@
 package com.crudetech.sample.logcrunch.http;
 
+import org.joda.time.Interval;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -126,5 +127,27 @@ public class ParameterMapperTest {
         mapper.mapTo(instance);
 
         assertThat(instance.item, is("Some Text"));
+    }
+
+    @Test
+    public void otherFactoryMethods(){
+
+        class TestClass{
+            private Interval intervalWithParseMethod;
+            @Parameter("aInterval")
+            public void setItem(Interval i){
+                this.intervalWithParseMethod = i;
+            }
+        }
+
+        TestClass instance = new TestClass();
+        Map<String, String[]> parameters = new HashMap<String, String[]>();
+        parameters.put("aInterval", new String[]{"2007-05-07T13:55:22,100/2009-07-02"});
+
+        ParameterMapper mapper = new ParameterMapper(parameters);
+
+        mapper.mapTo(instance);
+
+        assertThat(instance.intervalWithParseMethod, is(Interval.parse("2007-05-07T13:55:22,100/2009-07-02")));
     }
 }
