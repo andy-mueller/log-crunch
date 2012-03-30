@@ -1,11 +1,16 @@
 package com.crudetech.sample.logcrunch.http;
 
+import com.crudetech.sample.filter.FilterIterable;
+import com.crudetech.sample.filter.Predicate;
+
 import java.lang.reflect.Method;
 import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import static java.util.Arrays.asList;
 
 public class ParameterMapper {
     private final Map<String, String[]> parameters;
@@ -14,26 +19,47 @@ public class ParameterMapper {
         this.parameters = parameters;
     }
 
-    public void mapTo(Object o) {
-        Method[] methods = o.getClass().getMethods();
-        for (Method method : methods) {
-            Parameter par = method.getAnnotation(Parameter.class);
-            if (par == null) {
-                continue;
-            }
-
-            Class<?> parameterType = getParameterType(method);
-            Method factory = getFactory(parameterType);
-            String parameterName = par.value();
-            String[] parameterValues = gerParameterValues(parameterName);
-            for (String parameterValue : parameterValues) {
-                Object parameter = newInstance(factory, parameterValue);
-                setValue(method, o, parameter);
-            }
+    public class BadFormatException extends RuntimeException {
+        private BadFormatException(Throwable e) {
+            super(e);
         }
     }
 
-    private Object setValue(Method method, Object o, Object parameter) {
+    public class NoParameterException extends RuntimeException {
+    }
+
+    public void mapTo(Object mappingTarget) {
+        for (Method method : allAnnotatedMethods(mappingTarget)) {
+            mapOnAnnotatedMethod(mappingTarget, method);
+        }
+    }
+
+    private static Iterable<Method> allAnnotatedMethods(Object o) {
+        return new FilterIterable<Method>(asList(o.getClass().getMethods()), new Predicate<Method>() {
+            @Override
+            public Boolean evaluate(Method argument) {
+                return argument.isAnnotationPresent(Parameter.class);
+            }
+        });
+    }
+
+    private void mapOnAnnotatedMethod(Object mappingTarget, Method annotatedMethod) {
+        Parameter parameterAnnotation = annotatedMethod.getAnnotation(Parameter.class);
+        Class<?> parameterType = getParameterType(annotatedMethod);
+        Method factory = getFactory(parameterType);
+        String parameterName = parameterAnnotation.value();
+        String[] parameterValues = gerParameterValues(parameterName);
+
+        if (parameterValues.length == 0 && parameterAnnotation.required()) {
+            throw new NoParameterException();
+        }
+        for (String parameterValue : parameterValues) {
+            Object parameter = newInstance(factory, parameterValue);
+            invoke(annotatedMethod, mappingTarget, parameter);
+        }
+    }
+
+    private Object invoke(Method method, Object o, Object parameter) {
         method.setAccessible(true);
         try {
             return method.invoke(o, parameter);
@@ -42,11 +68,11 @@ public class ParameterMapper {
         }
     }
 
-    private Object newInstance(Method factory, String parameterValue) {
+    private Object newInstance(Method factoryMethod, String parameter) {
         try {
-            return setValue(factory, null, parameterValue);
+            return invoke(factoryMethod, null, parameter);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new BadFormatException(e);
         }
     }
 
@@ -88,18 +114,19 @@ public class ParameterMapper {
         return primitiveToWrapper.get(parameterType);
     }
 
-    private Method getFactory(Class<?> type) {
+    @SuppressWarnings("unchecked")
+    private static final Iterable<Map.Entry<String, Class<?>>> possibleFactories = Arrays.<Map.Entry<String, Class<?>>>asList(
+            new AbstractMap.SimpleEntry<String, Class<?>>("valueOf", String.class),
+            new AbstractMap.SimpleEntry<String, Class<?>>("valueOf", Object.class),
+            new AbstractMap.SimpleEntry<String, Class<?>>("parse", String.class)
+    );
 
-        Iterable<Map.Entry<String, Class<?>>> possibleFactories = Arrays.<Map.Entry<String, Class<?>>>asList(
-                new AbstractMap.SimpleEntry<String, Class<?>>("valueOf", String.class),
-                new AbstractMap.SimpleEntry<String, Class<?>>("valueOf", Object.class),
-                new AbstractMap.SimpleEntry<String, Class<?>>("parse", String.class)
-        );
+    private Method getFactory(Class<?> type) {
 
 
         for (Map.Entry<String, Class<?>> possibleFactory : possibleFactories) {
             Method factoryMethod = getFactoryMethod(type, possibleFactory.getKey(), possibleFactory.getValue());
-            if(factoryMethod != null){
+            if (factoryMethod != null) {
                 return factoryMethod;
             }
         }

@@ -40,8 +40,8 @@ public class LogFileFilterInteractorTest {
         LogFileFilterInteractor interactor = new LogFileFilterInteractor(locator);
 
         LogFileFilterInteractor.Query request = new LogFileFilterInteractor.Query();
-        request.logFileNamePattern = logFileNamePattern;
-        request.searchIntervals.add(testInterval);
+        request.setLogFileNamePattern(logFileNamePattern);
+        request.addSearchInterval(testInterval);
 
         interactor.getFilteredLogFiles(request);
 
@@ -80,10 +80,10 @@ public class LogFileFilterInteractorTest {
         LogFileFilterInteractor interactor = new LogFileFilterInteractor(locator);
 
         LogFileFilterInteractor.Query request = new LogFileFilterInteractor.Query();
-        request.searchIntervals.add(allTimeOfTheWorld());
-        request.logFileNamePattern = logFileNamePattern;
-        request.levels.add(LogLevel.Info);
-        request.levels.add(LogLevel.Warn);
+        request.addSearchInterval(allTimeOfTheWorld());
+        request.setLogFileNamePattern(logFileNamePattern);
+        request.addLevel(LogLevel.Info);
+        request.addLevel(LogLevel.Warn);
 
         Iterable<LogFile> logFiles = interactor.getFilteredLogFiles(request);
 
@@ -116,8 +116,8 @@ public class LogFileFilterInteractorTest {
         LogFileFilterInteractor interactor = new LogFileFilterInteractor(locator);
 
         LogFileFilterInteractor.Query request = new LogFileFilterInteractor.Query();
-        request.logFileNamePattern = logFileNamePattern;
-        request.searchIntervals.add(new Interval(TestLogFile.SampleInfoLineDate, TestLogFile.SampleInfoLineDate.plusSeconds(1)));
+        request.setLogFileNamePattern(logFileNamePattern);
+        request.addSearchInterval(new Interval(TestLogFile.SampleInfoLineDate, TestLogFile.SampleInfoLineDate.plusSeconds(1)));
 
 
         Iterable<LogFile> logFiles = interactor.getFilteredLogFiles(request);

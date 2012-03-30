@@ -1,23 +1,22 @@
 package com.crudetech.sample.logcrunch.http;
 
 import com.crudetech.sample.logcrunch.LogFileFilterInteractor;
-import com.crudetech.sample.logcrunch.LogLevel;
-import org.joda.time.Interval;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Map;
 
 public class LogCrunchFilterServlet extends HttpServlet {
     class RequestParameters {
-        static final String Level = "request";
-        static final String SearchRange = "seachRange";
+        static final String Level = "level";
+        static final String SearchRange = "searchRange";
     }
 
     static enum HttpStatusCode {
-        Ok(200, ""), BadFormat(404, "Bad format!");
+        Ok(200, ""), BadFormat(400, "Bad format!");
         final String Message;
         final int Code;
 
@@ -33,32 +32,26 @@ public class LogCrunchFilterServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         LogFileFilterInteractor.Query query = new LogFileFilterInteractor.Query();
 
-        String[] levels = getRequestParameters(req, RequestParameters.Level);
-        for (String level : levels) {
-            query.levels.add(LogLevel.valueOf(level));
+        ParameterMapper mapper = new ParameterMapper(getParametersMap(req));
+
+        try {
+            mapper.mapTo(query);
+        } catch (ParameterMapper.BadFormatException e) {
+            resp.sendError(HttpStatusCode.BadFormat.Code, HttpStatusCode.BadFormat.Message);
+            return;
+        } catch (ParameterMapper.NoParameterException e) {
+            resp.sendError(HttpStatusCode.BadFormat.Code, HttpStatusCode.BadFormat.Message);
+            return;
         }
 
-        String[] searchIntervals = getRequestParameters(req, RequestParameters.SearchRange);
-        if (searchIntervals.length == 0) {
-            resp.sendError(LogCrunchFilterServlet.HttpStatusCode.BadFormat.Code, HttpStatusCode.BadFormat.Message);
-            return;
-        }
-        try {
-            for (String interval : searchIntervals) {
-                query.searchIntervals.add(Interval.parse(interval));
-            }
-        } catch (IllegalArgumentException e) {
-            resp.sendError(LogCrunchFilterServlet.HttpStatusCode.BadFormat.Code, HttpStatusCode.BadFormat.Message);
-            return;
-        }
 
         LogFileFilterInteractor logFileFilterInteractor = newInteractor();
         logFileFilterInteractor.getFilteredLogFiles(query);
     }
 
-    private String[] getRequestParameters(HttpServletRequest req, String param) {
-        String[] params = req.getParameterValues(param);
-        return params != null ? params : new String[]{};
+    @SuppressWarnings("unchecked")
+    private Map<String, String[]> getParametersMap(HttpServletRequest req) {
+        return req.getParameterMap();
     }
 
     LogFileFilterInteractor newInteractor() {

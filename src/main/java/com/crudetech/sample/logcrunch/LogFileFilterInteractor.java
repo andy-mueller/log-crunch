@@ -4,6 +4,7 @@ import com.crudetech.sample.filter.FilterChain;
 import com.crudetech.sample.filter.MappingIterable;
 import com.crudetech.sample.filter.PredicateBuilder;
 import com.crudetech.sample.filter.UnaryFunction;
+import com.crudetech.sample.logcrunch.http.Parameter;
 import org.joda.time.Interval;
 
 import java.util.ArrayList;
@@ -17,11 +18,23 @@ public class LogFileFilterInteractor {
     private final LogFileLocator locator;
 
     public static class Query {
-        public LogFileNamePattern logFileNamePattern;
-        public List<Interval> searchIntervals = new ArrayList<Interval>();
-        public List<LogLevel> levels = new ArrayList<LogLevel>();
-        List<Pattern> loggers = new ArrayList<Pattern>();
-        List<Pattern> messageRegex = new ArrayList<Pattern>();
+        private LogFileNamePattern logFileNamePattern;
+        private List<Interval> searchIntervals = new ArrayList<Interval>();
+        private List<LogLevel> levels = new ArrayList<LogLevel>();
+        private List<Pattern> loggers = new ArrayList<Pattern>();
+        private List<Pattern> messageRegex = new ArrayList<Pattern>();
+
+        public void setLogFileNamePattern (LogFileNamePattern logFileNamePattern){
+            this.logFileNamePattern = logFileNamePattern;
+        }
+        @Parameter("searchRange")
+        public void addSearchInterval(Interval searchInterval){
+            searchIntervals.add(searchInterval);
+        }
+        @Parameter(value = "level", required = false)
+        public void addLevel(LogLevel level){
+            levels.add(level);
+        }
 
         @Override
         public boolean equals(Object o) {

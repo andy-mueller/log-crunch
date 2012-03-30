@@ -1,7 +1,9 @@
 package com.crudetech.sample.logcrunch.http;
 
 import org.joda.time.Interval;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -129,18 +131,16 @@ public class ParameterMapperTest {
         assertThat(instance.item, is("Some Text"));
     }
 
+    class IntervalData {
+        private Interval intervalWithParseMethod;
+        @Parameter("aInterval")
+        public void setItem(Interval i){
+            this.intervalWithParseMethod = i;
+        }
+    }
     @Test
     public void otherFactoryMethods(){
-
-        class TestClass{
-            private Interval intervalWithParseMethod;
-            @Parameter("aInterval")
-            public void setItem(Interval i){
-                this.intervalWithParseMethod = i;
-            }
-        }
-
-        TestClass instance = new TestClass();
+        IntervalData instance = new IntervalData();
         Map<String, String[]> parameters = new HashMap<String, String[]>();
         parameters.put("aInterval", new String[]{"2007-05-07T13:55:22,100/2009-07-02"});
 
@@ -149,5 +149,57 @@ public class ParameterMapperTest {
         mapper.mapTo(instance);
 
         assertThat(instance.intervalWithParseMethod, is(Interval.parse("2007-05-07T13:55:22,100/2009-07-02")));
+    }
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+
+    @Test
+    public void badParametersThrow(){
+
+        IntervalData instance = new IntervalData();
+        Map<String, String[]> parameters = new HashMap<String, String[]>();
+        parameters.put("aInterval", new String[]{"Invalid stuff that cannot be parsed!"});
+
+        ParameterMapper mapper = new ParameterMapper(parameters);
+
+        expectedException.expect(ParameterMapper.BadFormatException.class);
+        mapper.mapTo(instance);
+    }
+
+    @Test
+    public void allParametersAreRequiredByDefault(){
+        class TestClass{
+            private int item = 42;
+            @Parameter("unused")
+            public void setItem(int item){
+                this.item = item;
+            }
+        }
+        TestClass instance = new TestClass();
+        Map<String, String[]> parameters = new HashMap<String, String[]>();
+
+        ParameterMapper mapper = new ParameterMapper(parameters);
+
+        expectedException.expect(ParameterMapper.NoParameterException.class);
+        mapper.mapTo(instance);
+    }
+    @Test
+    public void parametersCanBeNotRequired(){
+        class TestClass{
+            private int item = 42;
+            @Parameter(value= "unused", required = false)
+            public void setItem(int item){
+                this.item = item;
+            }
+        }
+        TestClass instance = new TestClass();
+        Map<String, String[]> parameters = new HashMap<String, String[]>();
+
+        ParameterMapper mapper = new ParameterMapper(parameters);
+
+        mapper.mapTo(instance);
+
+        assertThat(instance.item, is(42));
     }
 }

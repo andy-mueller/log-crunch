@@ -10,15 +10,17 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 public class LogCrunchFilterServletTest {
 
-    private HttpServletRequest request;
+    private HttpServletRequestStub request;
     private HttpServletResponse response;
     private LogFileFilterInteractor interactorStub;
     private LogCrunchFilterServlet logCrunchFilterServlet;
@@ -26,7 +28,7 @@ public class LogCrunchFilterServletTest {
 
     @Before
     public void setUp() throws Exception {
-        request = mock(HttpServletRequest.class);
+        request = new HttpServletRequestStub();
         response = mock(HttpServletResponse.class);
         interactorStub = mock(LogFileFilterInteractor.class);
         logCrunchFilterServlet = new LogCrunchFilterServlet() {
@@ -37,42 +39,55 @@ public class LogCrunchFilterServletTest {
         };
     }
 
+    static class HttpServletRequestStub extends HttpServletRequestWrapper {
+        private Map<String, String[]> parameters = new HashMap<String, String[]>();
+        HttpServletRequestStub() {
+            super(mock(HttpServletRequest.class));
+        }
+        void putParameter(String name, String... value){
+            parameters.put(name, value);
+        }
+
+        @Override
+        public Map getParameterMap() {
+            return parameters;
+        }
+    }
+
     @Test
     public void logLevelsAreExtractedToQuery() throws Exception {
-        when(request.getParameterValues(LogCrunchFilterServlet.RequestParameters.Level)).thenReturn(new String[]{"Info", "Debug"});
-        when(request.getParameterValues(LogCrunchFilterServlet.RequestParameters.SearchRange)).thenReturn(new String[]{AllTimeInTheWorld.toString()});
+        request.putParameter(LogCrunchFilterServlet.RequestParameters.Level, "Info", "Debug");
+        request.putParameter(LogCrunchFilterServlet.RequestParameters.SearchRange, AllTimeInTheWorld.toString());
 
         logCrunchFilterServlet.doGet(request, response);
 
         LogFileFilterInteractor.Query expectedQuery = new LogFileFilterInteractor.Query();
-        expectedQuery.levels.add(LogLevel.Info);
-        expectedQuery.levels.add(LogLevel.Debug);
-        expectedQuery.searchIntervals.add(AllTimeInTheWorld);
+        expectedQuery.addLevel(LogLevel.Info);
+        expectedQuery.addLevel(LogLevel.Debug);
+        expectedQuery.addSearchInterval(AllTimeInTheWorld);
         verify(interactorStub).getFilteredLogFiles(expectedQuery);
     }
 
     @Test
     public void noLogLevelsAllowed() throws Exception {
-        when(request.getParameterValues(LogCrunchFilterServlet.RequestParameters.Level)).thenReturn(null);
-        when(request.getParameterValues(LogCrunchFilterServlet.RequestParameters.SearchRange)).thenReturn(new String[]{AllTimeInTheWorld.toString()});
+        request.putParameter(LogCrunchFilterServlet.RequestParameters.SearchRange, AllTimeInTheWorld.toString());
 
         logCrunchFilterServlet.doGet(request, response);
 
         LogFileFilterInteractor.Query expectedQuery = new LogFileFilterInteractor.Query();
-        expectedQuery.searchIntervals.add(AllTimeInTheWorld);
+        expectedQuery.addSearchInterval(AllTimeInTheWorld);
         verify(interactorStub).getFilteredLogFiles(expectedQuery);
     }
 
     @Test
     public void searchIntervalsAreExtractedToQuery() throws Exception {
-        when(request.getParameterValues(LogCrunchFilterServlet.RequestParameters.SearchRange))
-                .thenReturn(new String[]{"2007-05-07T13:55:22,100/2009-07-02"});
+        request.putParameter(LogCrunchFilterServlet.RequestParameters.SearchRange, "2007-05-07T13:55:22,100/2009-07-02");
 
         logCrunchFilterServlet.doGet(request, response);
 
         LogFileFilterInteractor.Query expectedQuery = new LogFileFilterInteractor.Query();
         Interval expectedInterval = new Interval(new DateTime(2007, 5, 7, 13, 55, 22, 100), new DateTime(2009, 7, 2, 0, 0));
-        expectedQuery.searchIntervals.add(expectedInterval);
+        expectedQuery.addSearchInterval(expectedInterval);
         verify(interactorStub).getFilteredLogFiles(expectedQuery);
     }
 
@@ -80,9 +95,7 @@ public class LogCrunchFilterServletTest {
     public ExpectedException expectedException = ExpectedException.none();
     @Test
     public void nonIsoDateTimeReturnsBadFormat() throws Exception {
-        when(request.getParameterValues(LogCrunchFilterServlet.RequestParameters.SearchRange))
-                .thenReturn(new String[]{"200705071355,100/2009-07-02"});
-
+        request.putParameter(LogCrunchFilterServlet.RequestParameters.SearchRange, "200705071355,100/2009-07-02");
 
         logCrunchFilterServlet.doGet(request, response);
 
@@ -91,9 +104,7 @@ public class LogCrunchFilterServletTest {
 
     @Test
     public void atLeastOneTimeIntervalIsRequired() throws Exception {
-        when(request.getParameterValues(LogCrunchFilterServlet.RequestParameters.SearchRange))
-                .thenReturn(null);
-
+        request.putParameter(LogCrunchFilterServlet.RequestParameters.SearchRange);
 
         logCrunchFilterServlet.doGet(request, response);
 
