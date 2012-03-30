@@ -38,7 +38,6 @@ public class LogCrunchFilterServlet extends HttpServlet {
             query.levels.add(LogLevel.valueOf(level));
         }
 
-
         String[] searchIntervals = getRequestParameters(req, RequestParameters.SearchRange);
         if (searchIntervals.length == 0) {
             resp.sendError(LogCrunchFilterServlet.HttpStatusCode.BadFormat.Code, HttpStatusCode.BadFormat.Message);
