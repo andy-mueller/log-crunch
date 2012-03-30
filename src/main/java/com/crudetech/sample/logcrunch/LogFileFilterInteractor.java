@@ -4,7 +4,6 @@ import com.crudetech.sample.filter.FilterChain;
 import com.crudetech.sample.filter.MappingIterable;
 import com.crudetech.sample.filter.PredicateBuilder;
 import com.crudetech.sample.filter.UnaryFunction;
-import com.crudetech.sample.logcrunch.http.Parameter;
 import org.joda.time.Interval;
 
 import java.util.ArrayList;

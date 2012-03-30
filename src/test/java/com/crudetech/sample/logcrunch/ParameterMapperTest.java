@@ -1,4 +1,4 @@
-package com.crudetech.sample.logcrunch.http;
+package com.crudetech.sample.logcrunch;
 
 import org.joda.time.Interval;
 import org.junit.Rule;

@@ -1,6 +1,7 @@
 package com.crudetech.sample.logcrunch.http;
 
 import com.crudetech.sample.logcrunch.LogFileFilterInteractor;
+import com.crudetech.sample.logcrunch.ParameterMapper;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
