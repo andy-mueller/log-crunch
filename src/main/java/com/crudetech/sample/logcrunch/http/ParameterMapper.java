@@ -123,7 +123,7 @@ public class ParameterMapper {
 
     private Method getFactoryMethod(Class<?> type) {
         for (Map.Entry<String, Class<?>> possibleFactory : possibleFactories) {
-            Method factoryMethod = getFactoryMethod(type, possibleFactory.getKey(), possibleFactory.getValue());
+            Method factoryMethod = getFactoryMethodIfPresent(type, possibleFactory.getKey(), possibleFactory.getValue());
             if (factoryMethod != null) {
                 return factoryMethod;
             }
@@ -131,7 +131,7 @@ public class ParameterMapper {
         throw new IllegalArgumentException();
     }
 
-    private Method getFactoryMethod(Class<?> factoryType, String factoryMethodName, Class<?> factoryMethodParameter) {
+    private Method getFactoryMethodIfPresent(Class<?> factoryType, String factoryMethodName, Class<?> factoryMethodParameter) {
         try {
             return factoryType.getMethod(factoryMethodName, factoryMethodParameter);
         } catch (NoSuchMethodException e) {
