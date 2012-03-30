@@ -122,8 +122,6 @@ public class ParameterMapper {
     );
 
     private Method getFactory(Class<?> type) {
-
-
         for (Map.Entry<String, Class<?>> possibleFactory : possibleFactories) {
             Method factoryMethod = getFactoryMethod(type, possibleFactory.getKey(), possibleFactory.getValue());
             if (factoryMethod != null) {
