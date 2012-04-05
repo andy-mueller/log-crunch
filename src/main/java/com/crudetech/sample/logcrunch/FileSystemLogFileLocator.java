@@ -24,6 +24,9 @@ public class FileSystemLogFileLocator implements LogFileLocator {
     }
 
     public FileSystemLogFileLocator(File logFilePath, LogFileFactory logFileFactory) {
+        if(!logFilePath.isDirectory()){
+            throw new IllegalArgumentException(String.format("\"%s\" is not a directory", logFilePath));
+        }
         this.logFilePath = logFilePath;
         this.logFileFactory = logFileFactory;
     }
@@ -57,6 +60,7 @@ public class FileSystemLogFileLocator implements LogFileLocator {
     }
 
     private Iterable<File> allPossibleFilesInDirectory() {
+        @SuppressWarnings("ConstantConditions")
         List<File> allPossibleFiles = asList(logFilePath.listFiles());
         Collections.sort(allPossibleFiles);
         return allPossibleFiles;

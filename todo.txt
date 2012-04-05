@@ -8,7 +8,7 @@
     -Include TestLogFile!
 
 -Provide http query mechanism
- GET http://localhost:8080/log-crunch/FilteredLines?from=...&to=...&level=ERROR&level=WARN&logger=com.ui.sample.SomeClass
+GET http://localhost:8080/logcrunch/filter?fileName=machine01-%d{yyyMMdd}.log&searchRange=2007-05-07T13:55:22,100/2009-07-02&level=Info&level=Warn
 
 -provide decorator base class for LogFile. Fix FilterLogFile then
 

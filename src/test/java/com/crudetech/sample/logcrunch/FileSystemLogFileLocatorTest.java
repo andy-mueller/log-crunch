@@ -8,6 +8,7 @@ import org.joda.time.format.DateTimeFormatter;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.io.File;
 import java.nio.charset.Charset;
@@ -26,6 +27,8 @@ public class FileSystemLogFileLocatorTest {
     private Interval sixthOfMay2007;
     private LogFileNamePattern namePattern;
     private Interval noMatch;
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
 
     @Before
@@ -49,6 +52,9 @@ public class FileSystemLogFileLocatorTest {
     public FileTestLogFile fileTestLogFile20070507 = new FileTestLogFile("machinename101-20070507");
 
     private FileSystemLogFileLocator newLocator() {
+        return newLocator(new TempDir());
+    }
+    private FileSystemLogFileLocator newLocator(File directory) {
         final Charset encoding = Charset.forName("UTF-8");
         final BufferedReaderLogFile.LogLineFactory logLineFactory = new TestLogLineFactory();
         FileSystemLogFileLocator.LogFileFactory logFileFactory = new FileSystemLogFileLocator.LogFileFactory() {
@@ -57,7 +63,7 @@ public class FileSystemLogFileLocatorTest {
                 return new FileLogFile(logFile, logLineFactory, encoding);
             }
         };
-        return new FileSystemLogFileLocator(new TempDir(), logFileFactory);
+        return new FileSystemLogFileLocator(directory, logFileFactory);
     }
 
     @Test
@@ -98,5 +104,17 @@ public class FileSystemLogFileLocatorTest {
 
         assertThat(loc.get(0), is(equalTo(fileTestLogFile20070506)));
         assertThat(loc.get(1), is(equalTo(fileTestLogFile20070507)));
+    }
+    @Test
+    public void ctorThrowsWhenFileOsNoDirectory(){
+        File noDirectory = new File("/tmp/dummy"){
+            @Override
+            public boolean isDirectory() {
+                return false;
+            }
+        };
+
+        expectedException.expect(IllegalArgumentException.class);
+        newLocator(noDirectory);
     }
 }

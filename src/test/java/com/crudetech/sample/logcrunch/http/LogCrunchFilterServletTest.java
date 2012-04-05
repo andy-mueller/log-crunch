@@ -12,6 +12,7 @@ import org.junit.rules.ExpectedException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -99,7 +100,11 @@ public class LogCrunchFilterServletTest {
 
         logCrunchFilterServlet.doGet(request, response);
 
-        verify(response).sendError(LogCrunchFilterServlet.HttpStatusCode.BadFormat.Code, LogCrunchFilterServlet.HttpStatusCode.BadFormat.Message);
+        verifyErrorResponse(response, LogCrunchFilterServlet.HttpStatusCode.BadFormat);
+    }
+
+    private void verifyErrorResponse(HttpServletResponse response, LogCrunchFilterServlet.HttpStatusCode code) throws IOException {
+        verify(response).sendError(code.Code, code.Message);
     }
 
     @Test
@@ -108,6 +113,6 @@ public class LogCrunchFilterServletTest {
 
         logCrunchFilterServlet.doGet(request, response);
 
-        verify(response).sendError(LogCrunchFilterServlet.HttpStatusCode.BadFormat.Code, LogCrunchFilterServlet.HttpStatusCode.BadFormat.Message);
+        verifyErrorResponse(response, LogCrunchFilterServlet.HttpStatusCode.BadFormat);
     }
 }
