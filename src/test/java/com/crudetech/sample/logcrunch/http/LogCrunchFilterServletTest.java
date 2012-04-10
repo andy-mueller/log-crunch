@@ -139,6 +139,10 @@ public class LogCrunchFilterServletTest {
 
         logCrunchFilterServlet.doGet(request, response);
 
+        assertLogLinesAreInOutput();
+    }
+
+    private void assertLogLinesAreInOutput() {
         for(String line : logfile.getLinesAsString()){
             verify(responseWriter).print(line);
         }

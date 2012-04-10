@@ -51,12 +51,19 @@ public class LogCrunchFilterServlet extends HttpServlet {
 
         LogFileFilterInteractor logFileFilterInteractor = newInteractor();
         Iterable<LogFile> filteredLogFiles = logFileFilterInteractor.getFilteredLogFiles(query);
-        PrintWriter responseWriter = resp.getWriter();
+        writeFilteredLogFilesToOutputStream(resp.getWriter(), filteredLogFiles);
+    }
+
+    private void writeFilteredLogFilesToOutputStream(PrintWriter responseWriter, Iterable<LogFile> filteredLogFiles) throws IOException {
         for (LogFile filteredLogFile : filteredLogFiles) {
-            for (LogLine logLine : filteredLogFile.getLines()) {
-                logLine.print(responseWriter);
-                responseWriter.println();
-            }
+            writeFilteredLogLineToOutputStream(responseWriter, filteredLogFile);
+        }
+    }
+
+    private void writeFilteredLogLineToOutputStream(PrintWriter responseWriter, LogFile filteredLogFile) {
+        for (LogLine logLine : filteredLogFile.getLines()) {
+            logLine.print(responseWriter);
+            responseWriter.println();
         }
     }
 
