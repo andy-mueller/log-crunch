@@ -1,5 +1,7 @@
 package com.crudetech.sample.logcrunch;
 
+import com.crudetech.sample.filter.MappingIterable;
+import com.crudetech.sample.filter.UnaryFunction;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -59,6 +61,21 @@ public abstract class TestLogFile extends ExternalResource implements LogFile {
     @Override
     public Iterable<LogLine> getLines() {
         return logLines;
+    }
+
+    public Iterable<String> getLinesAsString() {
+        return new MappingIterable<LogLine, String>(getLines(), lineToString());
+    }
+
+    private UnaryFunction<String, LogLine> lineToString() {
+        return new UnaryFunction<String, LogLine>() {
+            @Override
+            public String evaluate(LogLine argument) {
+                StringWriter sw = new StringWriter();
+                argument.print(new PrintWriter(sw));
+                return sw.toString();
+            }
+        };
     }
 
     @Override

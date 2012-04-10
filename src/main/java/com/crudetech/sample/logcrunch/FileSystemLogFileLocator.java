@@ -24,7 +24,7 @@ public class FileSystemLogFileLocator implements LogFileLocator {
     }
 
     public FileSystemLogFileLocator(File logFilePath, LogFileFactory logFileFactory) {
-        if(!logFilePath.isDirectory()){
+        if (!logFilePath.isDirectory()) {
             throw new IllegalArgumentException(String.format("\"%s\" is not a directory", logFilePath));
         }
         this.logFilePath = logFilePath;

@@ -1,6 +1,8 @@
 package com.crudetech.sample.logcrunch.http;
 
+import com.crudetech.sample.logcrunch.LogFile;
 import com.crudetech.sample.logcrunch.LogFileFilterInteractor;
+import com.crudetech.sample.logcrunch.LogLine;
 import com.crudetech.sample.logcrunch.ParameterMapper;
 
 import javax.servlet.ServletException;
@@ -8,6 +10,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Map;
 
 public class LogCrunchFilterServlet extends HttpServlet {
@@ -47,7 +50,14 @@ public class LogCrunchFilterServlet extends HttpServlet {
 
 
         LogFileFilterInteractor logFileFilterInteractor = newInteractor();
-        logFileFilterInteractor.getFilteredLogFiles(query);
+        Iterable<LogFile> filteredLogFiles = logFileFilterInteractor.getFilteredLogFiles(query);
+        PrintWriter responseWriter = resp.getWriter();
+        for (LogFile filteredLogFile : filteredLogFiles) {
+            for (LogLine logLine : filteredLogFile.getLines()) {
+                logLine.print(responseWriter);
+                responseWriter.println();
+            }
+        }
     }
 
     @SuppressWarnings("unchecked")

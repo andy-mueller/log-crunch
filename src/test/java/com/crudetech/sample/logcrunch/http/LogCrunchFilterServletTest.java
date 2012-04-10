@@ -1,5 +1,7 @@
 package com.crudetech.sample.logcrunch.http;
 
+import com.crudetech.sample.logcrunch.InMemoryTestLogFile;
+import com.crudetech.sample.logcrunch.LogFile;
 import com.crudetech.sample.logcrunch.LogFileFilterInteractor;
 import com.crudetech.sample.logcrunch.LogLevel;
 import org.joda.time.DateTime;
@@ -13,11 +15,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class LogCrunchFilterServletTest {
 
@@ -25,13 +32,20 @@ public class LogCrunchFilterServletTest {
     private HttpServletResponse response;
     private LogFileFilterInteractor interactorStub;
     private LogCrunchFilterServlet logCrunchFilterServlet;
-    private static final Interval AllTimeInTheWorld = new Interval(0, Long.MAX_VALUE/2);
+    private static final Interval AllTimeInTheWorld = new Interval(0, Long.MAX_VALUE / 2);
+    private PrintWriter responseWriter;
+
+    @Rule
+    public InMemoryTestLogFile logfile = new InMemoryTestLogFile("foobo.log");
 
     @Before
     public void setUp() throws Exception {
         request = new HttpServletRequestStub();
         response = mock(HttpServletResponse.class);
+        responseWriter = mock(PrintWriter.class);
+        when(response.getWriter()).thenReturn(responseWriter);
         interactorStub = mock(LogFileFilterInteractor.class);
+        when(interactorStub.getFilteredLogFiles(any(LogFileFilterInteractor.Query.class))).thenReturn(Arrays.<LogFile>asList(logfile));
         logCrunchFilterServlet = new LogCrunchFilterServlet() {
             @Override
             LogFileFilterInteractor newInteractor() {
@@ -42,10 +56,12 @@ public class LogCrunchFilterServletTest {
 
     static class HttpServletRequestStub extends HttpServletRequestWrapper {
         private Map<String, String[]> parameters = new HashMap<String, String[]>();
+
         HttpServletRequestStub() {
             super(mock(HttpServletRequest.class));
         }
-        void putParameter(String name, String... value){
+
+        void putParameter(String name, String... value) {
             parameters.put(name, value);
         }
 
@@ -94,6 +110,7 @@ public class LogCrunchFilterServletTest {
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
+
     @Test
     public void nonIsoDateTimeReturnsBadFormat() throws Exception {
         request.putParameter(LogCrunchFilterServlet.RequestParameters.SearchRange, "200705071355,100/2009-07-02");
@@ -114,5 +131,17 @@ public class LogCrunchFilterServletTest {
         logCrunchFilterServlet.doGet(request, response);
 
         verifyErrorResponse(response, LogCrunchFilterServlet.HttpStatusCode.BadFormat);
+    }
+
+    @Test
+    public void filteredLogLinesAreWrittenToResponse() throws Exception {
+        request.putParameter(LogCrunchFilterServlet.RequestParameters.SearchRange, AllTimeInTheWorld.toString());
+
+        logCrunchFilterServlet.doGet(request, response);
+
+        for(String line : logfile.getLinesAsString()){
+            verify(responseWriter).print(line);
+        }
+        verify(responseWriter, times(4)).println();
     }
 }
