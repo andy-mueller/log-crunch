@@ -1,6 +1,8 @@
-package com.crudetech.sample.logcrunch;
+package com.crudetech.sample.logcrunch.logback;
 
 
+import com.crudetech.sample.logcrunch.LogLevel;
+import com.crudetech.sample.logcrunch.LogLine;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.joda.time.format.DateTimeFormat;
@@ -16,7 +18,7 @@ import java.util.regex.Pattern;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-public class StringLogLineTest {
+public class LogbackLogLineTest {
 
     public static final String LogLineText = "2009-06-07 13:23:57 com.demo.ZeroToFour main INFO: This is an informative message";
     private LogLine line;
@@ -27,7 +29,7 @@ public class StringLogLineTest {
     public void setUp() throws Exception {
         dateFormat = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
         lineDate = dateFormat.parseDateTime("2009-06-07 13:23:57");
-        line = new StringLogLine(LogLineText, dateFormat);
+        line = new LogbackLogLine(LogLineText, dateFormat);
     }
 
     @Test
@@ -37,7 +39,7 @@ public class StringLogLineTest {
 
     @Test
     public void ctorParsesWarnLevel() {
-        line = new StringLogLine("2009-06-07 13:23:57 demo.ZeroToFour main WARN: This is an informative message", dateFormat);
+        line = new LogbackLogLine("2009-06-07 13:23:57 demo.ZeroToFour main WARN: This is an informative message", dateFormat);
         assertThat(line.hasLogLevel(LogLevel.Warn), is(true));
     }
 

@@ -2,6 +2,7 @@ package com.crudetech.sample.logcrunch;
 
 import com.crudetech.sample.filter.MappingIterable;
 import com.crudetech.sample.filter.UnaryFunction;
+import com.crudetech.sample.logcrunch.logback.LogbackLogLine;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -22,7 +23,7 @@ public abstract class TestLogFile extends ExternalResource implements LogFile {
     static final Charset Encoding = Charset.forName("UTF-8");
     static DateTimeFormatter DateFormat = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
     static DateTime SampleInfoLineDate = new DateTime(2009, 6, 7, 13,23, 57);
-    static final LogLine SampleInfoLine = new StringLogLine(MessageFormat.format("{0} demo.ZeroToFour main INFO: This is an informative message", DateFormat.print(SampleInfoLineDate)), DateFormat);
+    static final LogLine SampleInfoLine = new LogbackLogLine(MessageFormat.format("{0} demo.ZeroToFour main INFO: This is an informative message", DateFormat.print(SampleInfoLineDate)), DateFormat);
 
     final String name;
     List<LogLine> logLines;
@@ -48,9 +49,9 @@ public abstract class TestLogFile extends ExternalResource implements LogFile {
         SampleInfoLine.print(new PrintWriter(sampleLine));
         logLines = Collections.unmodifiableList(asList(
                 SampleInfoLine,
-                new StringLogLine(line2, DateFormat),
-                new StringLogLine(line3, DateFormat),
-                new StringLogLine(line4, DateFormat)
+                new LogbackLogLine(line2, DateFormat),
+                new LogbackLogLine(line3, DateFormat),
+                new LogbackLogLine(line4, DateFormat)
         ));
     }
 
