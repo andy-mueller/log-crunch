@@ -1,7 +1,6 @@
 package com.crudetech.sample.logcrunch.logback;
 
 import com.crudetech.sample.logcrunch.LogFileNamePattern;
-import com.crudetech.sample.logcrunch.LogbackLogFileNamePattern;
 import org.joda.time.DateTime;
 import org.junit.Rule;
 import org.junit.Test;

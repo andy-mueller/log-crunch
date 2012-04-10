@@ -1,6 +1,7 @@
-package com.crudetech.sample.logcrunch;
+package com.crudetech.sample.logcrunch.logback;
 
 import com.crudetech.sample.filter.MappingIterable;
+import com.crudetech.sample.logcrunch.LogFileNamePattern;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
