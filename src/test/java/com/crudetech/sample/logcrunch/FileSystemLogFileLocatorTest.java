@@ -57,7 +57,7 @@ public class FileSystemLogFileLocatorTest {
     }
     private FileSystemLogFileLocator newLocator(File directory) {
         final Charset encoding = Charset.forName("UTF-8");
-        final BufferedReaderLogFile.LogLineFactory logLineFactory = new TestLogLineFactory();
+        final BufferedReaderLogFile.LogLineFactory logLineFactory = TestLogFile.logLineFactory();
         FileSystemLogFileLocator.LogFileFactory logFileFactory = new FileSystemLogFileLocator.LogFileFactory() {
             @Override
             public LogFile create(File logFile) {

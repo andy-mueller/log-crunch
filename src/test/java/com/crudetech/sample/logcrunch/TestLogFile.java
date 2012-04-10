@@ -82,4 +82,13 @@ public abstract class TestLogFile extends ExternalResource implements LogFile {
     @Override
     public void close() {
     }
+
+    static BufferedReaderLogFile.LogLineFactory logLineFactory(){
+        return new BufferedReaderLogFile.LogLineFactory() {
+            @Override
+            public LogLine newLogLine(String lineContent) {
+                return new LogbackLogLine(lineContent, DateFormat);
+            }
+        };
+    }
 }

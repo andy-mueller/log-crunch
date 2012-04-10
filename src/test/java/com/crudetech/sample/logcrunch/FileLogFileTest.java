@@ -21,7 +21,7 @@ public class FileLogFileTest {
 
     @Before
     public void setUp() throws Exception {
-        BufferedReaderLogFile.LogLineFactory logLineFactory = new TestLogLineFactory();
+        BufferedReaderLogFile.LogLineFactory logLineFactory = TestLogFile.logLineFactory();
         fileLogFile = new FileLogFile(fileTestLogFile.getFile(), logLineFactory, TestLogFile.Encoding);
 
     }
