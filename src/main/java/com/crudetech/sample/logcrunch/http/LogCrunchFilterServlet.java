@@ -68,7 +68,7 @@ public class LogCrunchFilterServlet extends HttpServlet {
     }
 
     @SuppressWarnings("unchecked")
-    private Map<String, String[]> getParametersMap(HttpServletRequest req) {
+    private static Map<String, String[]> getParametersMap(HttpServletRequest req) {
         return req.getParameterMap();
     }
 
