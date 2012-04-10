@@ -32,16 +32,16 @@ public class FileSystemLogFileLocator implements LogFileLocator {
     }
 
     @Override
-    public Iterable<LogFile> find(LogFileNamePattern fileName, Iterable<Interval> ranges) {
+    public Iterable<LogFile> find(LogFileNamePattern fileNamePattern, Iterable<Interval> ranges) {
         Iterable<File> allPossibleFiles = allPossibleFilesInDirectory();
 
         FilterChain<File> fileFilterChain = new FilterChain<File>();
         PredicateBuilder<File> filterBuilder = fileFilterChain.filterBuilder();
 
-        filterBuilder.start(fileNameMatches(fileName));
+        filterBuilder.start(fileNameMatches(fileNamePattern));
         //JDK8: filterBuilder.start( (File f)=>fileName.matches(f.getName()); );
 
-        accumulate(filterBuilder.andOpenBrace(), ranges, addRangeWithOr(fileName)).closeBrace();
+        accumulate(filterBuilder.andOpenBrace(), ranges, addRangeWithOr(fileNamePattern)).closeBrace();
         // JDK8: accumulate(filterBuilder.andOpenBrace(), ranges, (File f)=>builder.or(range.contains(fileName.dateOf(f.getName());).closeBrace();
 
         Iterable<File> matchingFiles = fileFilterChain.apply(allPossibleFiles);
