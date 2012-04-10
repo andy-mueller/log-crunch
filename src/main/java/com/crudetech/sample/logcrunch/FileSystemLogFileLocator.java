@@ -32,7 +32,7 @@ public class FileSystemLogFileLocator implements LogFileLocator {
     }
 
     @Override
-    public Iterable<LogFile> find(LogbackLogFileNamePattern fileName, Iterable<Interval> ranges) {
+    public Iterable<LogFile> find(LogFileNamePattern fileName, Iterable<Interval> ranges) {
         Iterable<File> allPossibleFiles = allPossibleFilesInDirectory();
 
         FilterChain<File> fileFilterChain = new FilterChain<File>();
@@ -50,7 +50,7 @@ public class FileSystemLogFileLocator implements LogFileLocator {
         //JDK8: new MappingIterable<File, LogFile>(matchingFiles, (File f) => logFileFactory.create(f); );
     }
 
-    private BinaryFunction<PredicateBuilder<File>, PredicateBuilder<File>, Interval> addRangeWithOr(final LogbackLogFileNamePattern fileName) {
+    private BinaryFunction<PredicateBuilder<File>, PredicateBuilder<File>, Interval> addRangeWithOr(final LogFileNamePattern fileName) {
         return new BinaryFunction<PredicateBuilder<File>, PredicateBuilder<File>, Interval>() {
             @Override
             public PredicateBuilder<File> evaluate(PredicateBuilder<File> builder, Interval range) {
@@ -66,7 +66,7 @@ public class FileSystemLogFileLocator implements LogFileLocator {
         return allPossibleFiles;
     }
 
-    private Predicate<File> fileNameInDateRange(final LogbackLogFileNamePattern fileName, final Interval range) {
+    private Predicate<File> fileNameInDateRange(final LogFileNamePattern fileName, final Interval range) {
         return new Predicate<File>() {
             @Override
             public Boolean evaluate(File argument) {
@@ -89,7 +89,7 @@ public class FileSystemLogFileLocator implements LogFileLocator {
         };
     }
 
-    private Predicate<File> fileNameMatches(final LogbackLogFileNamePattern fileName) {
+    private Predicate<File> fileNameMatches(final LogFileNamePattern fileName) {
         return new Predicate<File>() {
             @Override
             public Boolean evaluate(File argument) {

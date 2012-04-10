@@ -25,7 +25,7 @@ import static org.hamcrest.Matchers.notNullValue;
 public class FileSystemLogFileLocatorTest {
     private LogFileLocator locator;
     private Interval sixthOfMay2007;
-    private LogbackLogFileNamePattern namePattern;
+    private LogFileNamePattern namePattern;
     private Interval noMatch;
     @Rule
     public ExpectedException expectedException = ExpectedException.none();

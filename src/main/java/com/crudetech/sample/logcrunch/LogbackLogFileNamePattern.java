@@ -13,7 +13,7 @@ import static com.crudetech.sample.filter.Strings.concat;
 import static com.crudetech.sample.filter.Strings.regexQuote;
 import static java.util.Arrays.asList;
 
-public class LogbackLogFileNamePattern {
+public class LogbackLogFileNamePattern implements LogFileNamePattern {
     private static final Pattern datePattern = Pattern.compile("%d\\{.*\\}");
     private final String[] parts;
     private final DateTimeFormatter dateFormat;
@@ -29,6 +29,7 @@ public class LogbackLogFileNamePattern {
         dateFormat = DateTimeFormat.forPattern(dateFormatPattern);
     }
 
+    @Override
     public boolean matches(String fileName) {
         Iterable<String> quotedParts = new MappingIterable<String, String>(asList(parts), regexQuote());
         String comparePattern = accumulate(".*", quotedParts, concat());
@@ -46,6 +47,7 @@ public class LogbackLogFileNamePattern {
         return fileNamePattern.substring(start + 3, end - 1);
     }
 
+    @Override
     public DateTime dateOf(String fileName) {
         int start = fileName.indexOf(parts[0]) + parts[0].length();
         int end = start + dateFormatPatternLength;

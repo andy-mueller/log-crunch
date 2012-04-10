@@ -24,7 +24,7 @@ public class LogFileFilterInteractorTest {
     @Rule
     public InMemoryTestLogFile logFileStub2 = new InMemoryTestLogFile("machine101-20090611");
     private LogFileLocator locator;
-    private LogbackLogFileNamePattern logFileNamePattern;
+    private LogFileNamePattern logFileNamePattern;
 
     @Before
     public void setUp() throws Exception {

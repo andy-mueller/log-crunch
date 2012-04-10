@@ -1,5 +1,7 @@
-package com.crudetech.sample.logcrunch;
+package com.crudetech.sample.logcrunch.logback;
 
+import com.crudetech.sample.logcrunch.LogFileNamePattern;
+import com.crudetech.sample.logcrunch.LogbackLogFileNamePattern;
 import org.joda.time.DateTime;
 import org.junit.Rule;
 import org.junit.Test;
@@ -11,7 +13,7 @@ import static org.hamcrest.Matchers.is;
 public class LogbackLogFileNamePatternTest {
     @Test
     public void matchesName() throws Exception {
-        LogbackLogFileNamePattern namePattern = new LogbackLogFileNamePattern("logFile.%d{yyyy-MM-dd}.log");
+        LogFileNamePattern namePattern = new LogbackLogFileNamePattern("logFile.%d{yyyy-MM-dd}.log");
 
         String fileName = "logFile.2009-08-21.log";
         assertThat(namePattern.matches(fileName), is(true));
@@ -19,7 +21,7 @@ public class LogbackLogFileNamePatternTest {
 
     @Test
     public void extractsDate() throws Exception {
-        LogbackLogFileNamePattern namePattern = new LogbackLogFileNamePattern("logFile.%d{yyyy-MM-dd}.log");
+        LogFileNamePattern namePattern = new LogbackLogFileNamePattern("logFile.%d{yyyy-MM-dd}.log");
 
 
         DateTime august212009 = new DateTime(2009, 8, 21, 0, 0);
