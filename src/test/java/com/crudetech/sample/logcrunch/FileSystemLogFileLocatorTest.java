@@ -25,7 +25,7 @@ import static org.hamcrest.Matchers.notNullValue;
 public class FileSystemLogFileLocatorTest {
     private LogFileLocator locator;
     private Interval sixthOfMay2007;
-    private LogFileNamePattern namePattern;
+    private LogbackLogFileNamePattern namePattern;
     private Interval noMatch;
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -37,7 +37,7 @@ public class FileSystemLogFileLocatorTest {
 
 
         sixthOfMay2007 = new Interval(dateOf("20070506"), dateOf("20070507"));
-        namePattern = new LogFileNamePattern("machinename101-%d{yyyyMMdd}");
+        namePattern = new LogbackLogFileNamePattern("machinename101-%d{yyyyMMdd}");
         noMatch = new Interval(dateOf("19720815"), dateOf("19730815"));
     }
 

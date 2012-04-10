@@ -17,13 +17,13 @@ public class LogFileFilterInteractor {
     private final LogFileLocator locator;
 
     public static class Query {
-        private LogFileNamePattern logFileNamePattern;
+        private LogbackLogFileNamePattern logFileNamePattern;
         private List<Interval> searchIntervals = new ArrayList<Interval>();
         private List<LogLevel> levels = new ArrayList<LogLevel>();
         private List<Pattern> loggers = new ArrayList<Pattern>();
         private List<Pattern> messageRegex = new ArrayList<Pattern>();
 
-        public void setLogFileNamePattern (LogFileNamePattern logFileNamePattern){
+        public void setLogFileNamePattern (LogbackLogFileNamePattern logFileNamePattern){
             this.logFileNamePattern = logFileNamePattern;
         }
         @Parameter("searchRange")

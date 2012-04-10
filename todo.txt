@@ -5,6 +5,7 @@
     -configure all log framework specifc stuff
     -file encoding?? or better via request?
     -search path(s)
+    -how to build file name patterns
 
 -introduce package for logback/slf4j implementation/format
     -Include TestLogFile!

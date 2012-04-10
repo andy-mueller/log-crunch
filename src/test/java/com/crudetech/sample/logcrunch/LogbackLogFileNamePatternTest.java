@@ -8,10 +8,10 @@ import org.junit.rules.ExpectedException;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-public class LogFileNamePatternTest {
+public class LogbackLogFileNamePatternTest {
     @Test
     public void matchesName() throws Exception {
-        LogFileNamePattern namePattern = new LogFileNamePattern("logFile.%d{yyyy-MM-dd}.log");
+        LogbackLogFileNamePattern namePattern = new LogbackLogFileNamePattern("logFile.%d{yyyy-MM-dd}.log");
 
         String fileName = "logFile.2009-08-21.log";
         assertThat(namePattern.matches(fileName), is(true));
@@ -19,7 +19,7 @@ public class LogFileNamePatternTest {
 
     @Test
     public void extractsDate() throws Exception {
-        LogFileNamePattern namePattern = new LogFileNamePattern("logFile.%d{yyyy-MM-dd}.log");
+        LogbackLogFileNamePattern namePattern = new LogbackLogFileNamePattern("logFile.%d{yyyy-MM-dd}.log");
 
 
         DateTime august212009 = new DateTime(2009, 8, 21, 0, 0);
@@ -33,16 +33,16 @@ public class LogFileNamePatternTest {
     @Test
     public void patternWithoutDateThrows() throws Exception {
         expectedException.expect(IllegalArgumentException.class);
-        new LogFileNamePattern("logFile.log");
+        new LogbackLogFileNamePattern("logFile.log");
     }
     @Test
     public void nullInCtorThrows() throws Exception {
         expectedException.expect(IllegalArgumentException.class);
-        new LogFileNamePattern(null);
+        new LogbackLogFileNamePattern(null);
     }
     @Test
     public void patternWithMultipleDatesThrows() throws Exception {
         expectedException.expect(IllegalArgumentException.class);
-        new LogFileNamePattern("logFile.%d{yyyy-MM-dd}.log.%d{yyyy-MM-dd}");
+        new LogbackLogFileNamePattern("logFile.%d{yyyy-MM-dd}.log.%d{yyyy-MM-dd}");
     }
 }

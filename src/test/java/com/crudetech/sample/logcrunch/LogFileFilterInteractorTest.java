@@ -24,11 +24,11 @@ public class LogFileFilterInteractorTest {
     @Rule
     public InMemoryTestLogFile logFileStub2 = new InMemoryTestLogFile("machine101-20090611");
     private LogFileLocator locator;
-    private LogFileNamePattern logFileNamePattern;
+    private LogbackLogFileNamePattern logFileNamePattern;
 
     @Before
     public void setUp() throws Exception {
-        logFileNamePattern = new LogFileNamePattern("machine101-%d{yyyyMMdd}");
+        logFileNamePattern = new LogbackLogFileNamePattern("machine101-%d{yyyyMMdd}");
         locator = mock(LogFileLocator.class);
     }
 

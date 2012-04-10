@@ -13,13 +13,13 @@ import static com.crudetech.sample.filter.Strings.concat;
 import static com.crudetech.sample.filter.Strings.regexQuote;
 import static java.util.Arrays.asList;
 
-public class LogFileNamePattern {
+public class LogbackLogFileNamePattern {
     private static final Pattern datePattern = Pattern.compile("%d\\{.*\\}");
     private final String[] parts;
     private final DateTimeFormatter dateFormat;
     private final int dateFormatPatternLength;
 
-    public LogFileNamePattern(String pattern) {
+    public LogbackLogFileNamePattern(String pattern) {
         if (pattern == null) {
             throw new IllegalArgumentException();
         }
