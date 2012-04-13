@@ -1,5 +1,7 @@
 package com.crudetech.sample.logcrunch;
 
+import com.crudetech.sample.TempDir;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;

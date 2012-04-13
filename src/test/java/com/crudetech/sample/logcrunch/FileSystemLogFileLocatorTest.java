@@ -1,6 +1,7 @@
 package com.crudetech.sample.logcrunch;
 
 import com.crudetech.sample.Iterables;
+import com.crudetech.sample.TempDir;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.junit.Before;

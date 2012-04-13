@@ -11,6 +11,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
@@ -20,6 +21,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -147,5 +151,17 @@ public class LogCrunchFilterServletTest {
             verify(responseWriter).print(line);
         }
         verify(responseWriter, times(4)).println();
+    }
+
+    @Test
+    public void servletInitCreatesFilterInteractorFactory() throws Exception {
+        ServletConfig config = mock(ServletConfig.class);
+        when(config.getInitParameter("searchPath")).thenReturn("/some/path");
+        when(config.getInitParameter("encoding")).thenReturn("UTF-8");
+        // will be: %-4relative [%thread] %-5level %logger{35} - %msg %n
+        when(config.getInitParameter("logLineFormat")).thenReturn("yyyyMMdd");
+        logCrunchFilterServlet.init(config);
+
+        assertThat(logCrunchFilterServlet.logFileInteractorFactory, is(notNullValue()));
     }
 }

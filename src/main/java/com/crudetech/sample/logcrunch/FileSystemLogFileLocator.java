@@ -19,7 +19,7 @@ public class FileSystemLogFileLocator implements LogFileLocator {
     private final File logFilePath;
     private final LogFileFactory logFileFactory;
 
-    interface LogFileFactory {
+    public interface LogFileFactory {
         LogFile create(File logFile);
     }
 

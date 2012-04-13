@@ -2,14 +2,16 @@
  GET http://localhost:8080/logcrunch/filter?fileName=machine01-%d{yyyMMdd}.log&searchRange=2007-05-07T13:55:22,100/2009-07-02&level=Info&level=Warn
 
 -load interactor via configuration
-    -configure all log framework specifc stuff
+    -configure all log framework specific stuff
     -file encoding?? or better via request?
     -search path(s)
     -how to build file name patterns
 
--introduce package for logback/slf4j implementation/format
-    -Include TestLogFile!
+-make interactor factory config generic
+    -interface for factory
 
+-LogbackLogLine: pass format string as second ctor parameter
+    -eliminate date time formatter
 
 -provide decorator base class for LogFile. Fix FilterLogFile then
 

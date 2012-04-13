@@ -5,15 +5,20 @@ import com.crudetech.sample.logcrunch.LogFileFilterInteractor;
 import com.crudetech.sample.logcrunch.LogLine;
 import com.crudetech.sample.logcrunch.ParameterMapper;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.Charset;
 import java.util.Map;
 
 public class LogCrunchFilterServlet extends HttpServlet {
+    public LogbackLogFileInteractorFactory logFileInteractorFactory;
+
     class RequestParameters {
         static final String Level = "level";
         static final String SearchRange = "searchRange";
@@ -74,5 +79,16 @@ public class LogCrunchFilterServlet extends HttpServlet {
 
     LogFileFilterInteractor newInteractor() {
         return null;
+    }
+
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+
+        File searchPath = new File(config.getInitParameter("searchPath"));
+        Charset encoding = Charset.forName(config.getInitParameter("encoding"));
+        String logLineFormat = config.getInitParameter("logLineFormat");
+
+        this.logFileInteractorFactory = new LogbackLogFileInteractorFactory(searchPath, encoding, logLineFormat);
     }
 }
