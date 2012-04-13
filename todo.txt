@@ -9,6 +9,8 @@
 
 -make interactor factory config generic
     -interface for factory
+    -just configure xml document
+
 
 -LogbackLogLine: pass format string as second ctor parameter
     -eliminate date time formatter

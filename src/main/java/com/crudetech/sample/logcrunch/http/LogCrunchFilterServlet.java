@@ -35,6 +35,12 @@ public class LogCrunchFilterServlet extends HttpServlet {
         }
     }
 
+    static class InitParameters {
+        static final String SearchPath = "searchPath";
+        static final String Encoding = "encoding";
+        static final String LogLineFormat = "logLineFormat";
+    }
+
 
     // GET http://localhost:8080/logcrunch/filter?fileName=machine01-%d{yyyMMdd}.log&searchRange=2007-05-07T13:55:22,100/2009-07-02&level=Info&level=Warn
     @Override
@@ -78,16 +84,16 @@ public class LogCrunchFilterServlet extends HttpServlet {
     }
 
     LogFileFilterInteractor newInteractor() {
-        return null;
+        return logFileInteractorFactory.createInteractor();
     }
 
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
 
-        File searchPath = new File(config.getInitParameter("searchPath"));
-        Charset encoding = Charset.forName(config.getInitParameter("encoding"));
-        String logLineFormat = config.getInitParameter("logLineFormat");
+        File searchPath = new File(config.getInitParameter(InitParameters.SearchPath));
+        Charset encoding = Charset.forName(config.getInitParameter(InitParameters.Encoding));
+        String logLineFormat = config.getInitParameter(InitParameters.LogLineFormat);
 
         this.logFileInteractorFactory = new LogbackLogFileInteractorFactory(searchPath, encoding, logLineFormat);
     }

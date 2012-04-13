@@ -156,12 +156,21 @@ public class LogCrunchFilterServletTest {
     @Test
     public void servletInitCreatesFilterInteractorFactory() throws Exception {
         ServletConfig config = mock(ServletConfig.class);
-        when(config.getInitParameter("searchPath")).thenReturn("/some/path");
-        when(config.getInitParameter("encoding")).thenReturn("UTF-8");
+        when(config.getInitParameter(LogCrunchFilterServlet.InitParameters.SearchPath)).thenReturn("/some/path");
+        when(config.getInitParameter(LogCrunchFilterServlet.InitParameters.Encoding)).thenReturn("UTF-8");
         // will be: %-4relative [%thread] %-5level %logger{35} - %msg %n
-        when(config.getInitParameter("logLineFormat")).thenReturn("yyyyMMdd");
+        when(config.getInitParameter(LogCrunchFilterServlet.InitParameters.LogLineFormat)).thenReturn("yyyyMMdd");
         logCrunchFilterServlet.init(config);
 
         assertThat(logCrunchFilterServlet.logFileInteractorFactory, is(notNullValue()));
+    }
+    @Test
+    public void newInteractorUsesFactory() throws Exception {
+        LogCrunchFilterServlet servlet = new LogCrunchFilterServlet();
+        servlet.logFileInteractorFactory = mock(LogbackLogFileInteractorFactory.class);
+        LogFileFilterInteractor interactor = mock(LogFileFilterInteractor.class);
+        when(servlet.logFileInteractorFactory.createInteractor()).thenReturn(interactor);
+
+        assertThat(servlet.newInteractor(), is(interactor));
     }
 }
