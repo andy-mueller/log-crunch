@@ -18,7 +18,7 @@ import java.nio.charset.Charset;
 import java.util.Map;
 
 public class LogCrunchFilterServlet extends HttpServlet {
-    public LogFileFilterInteractorFactory logFileFilterInteractorFactory;
+    LogFileFilterInteractorFactory logFileFilterInteractorFactory;
 
     class RequestParameters {
         static final String Level = "level";
