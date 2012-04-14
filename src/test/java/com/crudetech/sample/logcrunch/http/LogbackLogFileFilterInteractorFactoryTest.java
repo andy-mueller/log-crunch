@@ -9,11 +9,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
-public class LogbackLogFileInteractorFactoryTest {
+public class LogbackLogFileFilterInteractorFactoryTest {
     @Test
     public void factoryCratesWiredInteractor(){
-        LogbackLogFileInteractorFactory factory =
-                new LogbackLogFileInteractorFactory(new TempDir(), Charset.forName("UTF-8"), "yyyyMMdd");
+        LogbackLogFileFilterInteractorFactory factory =
+                new LogbackLogFileFilterInteractorFactory(new TempDir(), Charset.forName("UTF-8"), "yyyyMMdd");
 
         assertThat(factory.createInteractor(), is(notNullValue()));
     }

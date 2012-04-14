@@ -2,6 +2,7 @@ package com.crudetech.sample.logcrunch.http;
 
 import com.crudetech.sample.logcrunch.LogFile;
 import com.crudetech.sample.logcrunch.LogFileFilterInteractor;
+import com.crudetech.sample.logcrunch.LogFileFilterInteractorFactory;
 import com.crudetech.sample.logcrunch.LogLine;
 import com.crudetech.sample.logcrunch.ParameterMapper;
 
@@ -17,7 +18,7 @@ import java.nio.charset.Charset;
 import java.util.Map;
 
 public class LogCrunchFilterServlet extends HttpServlet {
-    public LogbackLogFileInteractorFactory logFileInteractorFactory;
+    public LogFileFilterInteractorFactory logFileFilterInteractorFactory;
 
     class RequestParameters {
         static final String Level = "level";
@@ -84,7 +85,7 @@ public class LogCrunchFilterServlet extends HttpServlet {
     }
 
     LogFileFilterInteractor newInteractor() {
-        return logFileInteractorFactory.createInteractor();
+        return logFileFilterInteractorFactory.createInteractor();
     }
 
     @Override
@@ -99,6 +100,6 @@ public class LogCrunchFilterServlet extends HttpServlet {
         Charset encoding = Charset.forName(config.getInitParameter(InitParameters.Encoding));
         String logLineFormat = config.getInitParameter(InitParameters.LogLineFormat);
 
-        this.logFileInteractorFactory = new LogbackLogFileInteractorFactory(searchPath, encoding, logLineFormat);
+        this.logFileFilterInteractorFactory = new LogbackLogFileFilterInteractorFactory(searchPath, encoding, logLineFormat);
     }
 }

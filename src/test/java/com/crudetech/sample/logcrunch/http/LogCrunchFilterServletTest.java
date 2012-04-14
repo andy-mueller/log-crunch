@@ -162,14 +162,14 @@ public class LogCrunchFilterServletTest {
         when(config.getInitParameter(LogCrunchFilterServlet.InitParameters.LogLineFormat)).thenReturn("yyyyMMdd");
         logCrunchFilterServlet.init(config);
 
-        assertThat(logCrunchFilterServlet.logFileInteractorFactory, is(notNullValue()));
+        assertThat(logCrunchFilterServlet.logFileFilterInteractorFactory, is(notNullValue()));
     }
     @Test
     public void newInteractorUsesFactory() throws Exception {
         LogCrunchFilterServlet servlet = new LogCrunchFilterServlet();
-        servlet.logFileInteractorFactory = mock(LogbackLogFileInteractorFactory.class);
+        servlet.logFileFilterInteractorFactory = mock(LogbackLogFileFilterInteractorFactory.class);
         LogFileFilterInteractor interactor = mock(LogFileFilterInteractor.class);
-        when(servlet.logFileInteractorFactory.createInteractor()).thenReturn(interactor);
+        when(servlet.logFileFilterInteractorFactory.createInteractor()).thenReturn(interactor);
 
         assertThat(servlet.newInteractor(), is(interactor));
     }
