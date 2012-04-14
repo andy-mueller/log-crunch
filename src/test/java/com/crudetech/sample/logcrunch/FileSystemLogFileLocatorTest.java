@@ -1,7 +1,6 @@
 package com.crudetech.sample.logcrunch;
 
 import com.crudetech.sample.Iterables;
-import com.crudetech.sample.TempDir;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.junit.Before;
@@ -60,7 +59,7 @@ public class FileSystemLogFileLocatorTest {
     public FileTestLogFile fileTestLogFile20070507 = new FileTestLogFile("machinename101-20070507");
 
     private FileSystemLogFileLocator newLocator() {
-        return newLocator(new TempDir());
+        return newLocator(FileTestLogFile.Directory);
     }
 
     private FileSystemLogFileLocator newLocator(File directory) {

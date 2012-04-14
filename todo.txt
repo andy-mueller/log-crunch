@@ -9,11 +9,16 @@
 
 -make interactor factory config generic
     -interface for factory
-    -just configure xml document
+    -just configure factory in xml document  and use jaxb to load it?
+    -dependency:
+        servlet ->logcrunch
+        logback->logcrunch
+        servlet loads logback only via xml??
 
 
 -LogbackLogLine: pass format string as second ctor parameter
     -eliminate date time formatter
+    -use logback itself for parsing??
 
 -provide decorator base class for LogFile. Fix FilterLogFile then
 

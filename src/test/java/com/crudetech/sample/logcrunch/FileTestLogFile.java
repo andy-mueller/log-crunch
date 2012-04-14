@@ -9,18 +9,23 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 
 class FileTestLogFile extends TestLogFile {
-    private static final TempDir tempDir = new TempDir();
+    static final File Directory = new File(new TempDir(), "testLogFiles");
 
     private File file;
 
-    FileTestLogFile(String name){
+    FileTestLogFile(String name) {
         super(name);
     }
 
     @Override
     protected void before() throws Throwable {
         super.before();
-        file = new File(FileTestLogFile.tempDir, name);
+        if (!Directory.exists()) {
+            if(!Directory.mkdir()){
+                throw new RuntimeException("Could not create directory " + Directory);
+            }
+        }
+        file = new File(Directory, name);
         writeLinesToTestLogFile();
     }
 
