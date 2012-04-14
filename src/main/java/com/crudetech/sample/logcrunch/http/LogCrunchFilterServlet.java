@@ -91,6 +91,10 @@ public class LogCrunchFilterServlet extends HttpServlet {
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
 
+        loadLodFileFilterFromConfig(config);
+    }
+
+    private void loadLodFileFilterFromConfig(ServletConfig config) {
         File searchPath = new File(config.getInitParameter(InitParameters.SearchPath));
         Charset encoding = Charset.forName(config.getInitParameter(InitParameters.Encoding));
         String logLineFormat = config.getInitParameter(InitParameters.LogLineFormat);

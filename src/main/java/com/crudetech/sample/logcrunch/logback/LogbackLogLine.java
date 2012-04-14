@@ -18,7 +18,8 @@ public class LogbackLogLine implements LogLine {
     private final DateTimeFormatter dateFormat;
     private final String logger;
 
-    // %-4relative [%thread] %-5level %logger{35} - %msg %n
+    // %date{HH:mm:ss.SSS} %-4relative [%thread] %-5level %logger{35} - %msg %n
+    // see: http://logback.qos.ch/manual/layouts.html
 
     public LogbackLogLine(String line, DateTimeFormatter dateFormat) {
         this.line = line;
@@ -53,14 +54,6 @@ public class LogbackLogLine implements LogLine {
         }
     }
 
-    private LogLevel getLogLevel() {
-        return level;
-    }
-
-    private DateTime getDate() {
-        return date;
-    }
-
     @Override
     public void print(PrintWriter writer) {
         writer.print(line);
@@ -90,17 +83,17 @@ public class LogbackLogLine implements LogLine {
 
     @Override
     public boolean hasDate(DateTime expected) {
-        return getDate().equals(expected);
+        return date.equals(expected);
     }
 
     @Override
     public boolean hasLogLevel(LogLevel level) {
-        return getLogLevel().equals(level);
+        return this.level.equals(level);
     }
 
     @Override
     public boolean isInRange(Interval range) {
-        return range.contains(getDate());
+        return range.contains(date);
     }
 
     @Override

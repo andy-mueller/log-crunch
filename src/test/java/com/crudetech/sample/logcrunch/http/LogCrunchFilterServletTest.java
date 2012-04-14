@@ -158,7 +158,7 @@ public class LogCrunchFilterServletTest {
         ServletConfig config = mock(ServletConfig.class);
         when(config.getInitParameter(LogCrunchFilterServlet.InitParameters.SearchPath)).thenReturn("/some/path");
         when(config.getInitParameter(LogCrunchFilterServlet.InitParameters.Encoding)).thenReturn("UTF-8");
-        // will be: %-4relative [%thread] %-5level %logger{35} - %msg %n
+        // will be: %date{HH:mm:ss.SSS} %-4relative [%thread] %-5level %logger{35} - %msg %n
         when(config.getInitParameter(LogCrunchFilterServlet.InitParameters.LogLineFormat)).thenReturn("yyyyMMdd");
         logCrunchFilterServlet.init(config);
 
