@@ -48,7 +48,7 @@ public class ParameterMapper {
     private void mapOnAnnotatedMethod(Object mappingTarget, Method annotatedMethod) {
         Iterable<String> parameterValues = getParameterValuesForMethod(annotatedMethod);
 
-        ParameterFactory factory = new ParameterFactory();
+        ParameterFactory factory = new ReflectionParameterFactory();
         ParameterConsumer parameterTarget = new ParameterConsumer(mappingTarget, annotatedMethod);
 
         accumulate(parameterTarget, parameterValues, applyParameter(annotatedMethod, factory)).validate();
@@ -71,7 +71,12 @@ public class ParameterMapper {
         return asList(values != null ? values : new String[0]);
     }
 
-    private static class ParameterFactory {
+
+    public interface ParameterFactory {
+        Object create(Method parameterMethod, String parameterValue);
+    }
+
+    private static class ReflectionParameterFactory implements ParameterFactory {
 
         @SuppressWarnings("unchecked")
         private static final Iterable<Map.Entry<String, Class<?>>> possibleFactories = Arrays.<Map.Entry<String, Class<?>>>asList(
@@ -79,9 +84,6 @@ public class ParameterMapper {
                 new AbstractMap.SimpleEntry<String, Class<?>>("valueOf", Object.class),
                 new AbstractMap.SimpleEntry<String, Class<?>>("parse", String.class)
         );
-
-        ParameterFactory() {
-        }
 
         private Method getFactoryMethod(Class<?> type) {
             for (Map.Entry<String, Class<?>> possibleFactory : possibleFactories) {
@@ -135,6 +137,7 @@ public class ParameterMapper {
             return primitiveToWrapper.get(parameterType);
         }
 
+        @Override
         public Object create(Method parameterMethod, String parameterValue) {
             Method factoryMethod = getFactoryMethod(getParameterType(parameterMethod));
             try {
@@ -168,6 +171,7 @@ public class ParameterMapper {
                 throw new RuntimeException(e);
             }
         }
+
         public void validate() {
             Parameter paramAnnotation = annotatedMethod.getAnnotation(Parameter.class);
             if (called == 0 && paramAnnotation.required()) {
