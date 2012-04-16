@@ -3,10 +3,9 @@ package com.crudetech.sample.logcrunch;
 import com.crudetech.sample.filter.BinaryFunction;
 import com.crudetech.sample.filter.FilterIterable;
 import com.crudetech.sample.filter.Predicate;
+import org.joda.time.Interval;
 
 import java.lang.reflect.Method;
-import java.util.AbstractMap;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,8 +16,61 @@ import static java.util.Arrays.asList;
 public class ParameterMapper {
     private final Map<String, String[]> parameters;
 
+    private final Map<Class<?>, ParameterFactory> factories = new HashMap<Class<?>, ParameterFactory>() {{
+        put(Number.class, new ReflectionParameterFactory("valueOf", String.class));
+        put(String.class, new ReflectionParameterFactory("valueOf", Object.class));
+        put(Enum.class, new ReflectionParameterFactory("valueOf", String.class));
+    }};
+
+    private ParameterFactory getFactoryFor(Class<?> type) {
+        for (Map.Entry<Class<?>, ParameterFactory> entry : factories.entrySet()) {
+            if (entry.getKey().isAssignableFrom(type)) {
+                return entry.getValue();
+            }
+        }
+        throw new IllegalStateException("Could not find entry for " + type);
+    }
+
+    private Class<?> getParameterType(Method method) {
+        return convertPrimitives(method.getParameterTypes()[0]);
+    }
+
+    private static final Map<Class<?>, Class<?>> primitiveToWrapper = Collections.unmodifiableMap(new HashMap<Class<?>, Class<?>>() {
+        {
+            put(Boolean.TYPE, Boolean.class);
+            put(Integer.TYPE, Integer.class);
+            put(Short.TYPE, Short.class);
+            put(Long.TYPE, Long.class);
+            put(Character.TYPE, Character.class);
+            put(Byte.TYPE, Byte.class);
+            put(Double.TYPE, Double.class);
+            put(Float.TYPE, Float.class);
+        }
+
+        @Override
+        public Class<?> get(Object key) {
+            Class<?> nonNull = super.get(key);
+            if (nonNull == null) {
+                throw new IllegalArgumentException();
+            }
+            return nonNull;
+        }
+    });
+
+    private Class<?> convertPrimitives(Class<?> parameterType) {
+        if (!parameterType.isPrimitive()) {
+            return parameterType;
+        }
+
+        return primitiveToWrapper.get(parameterType);
+    }
+
     public ParameterMapper(Map<String, String[]> parameters) {
         this.parameters = parameters;
+    }
+
+    public void registerParameterFactory(Class<Interval> type, ParameterFactory factory) {
+        factories.put(type, factory);
     }
 
     public static class BadFormatException extends RuntimeException {
@@ -48,17 +100,19 @@ public class ParameterMapper {
     private void mapOnAnnotatedMethod(Object mappingTarget, Method annotatedMethod) {
         Iterable<String> parameterValues = getParameterValuesForMethod(annotatedMethod);
 
-        ParameterFactory factory = new ReflectionParameterFactory();
+        Class<?> parameterType = getParameterType(annotatedMethod);
+        ParameterFactory factory = getFactoryFor(parameterType);
+
         ParameterConsumer parameterTarget = new ParameterConsumer(mappingTarget, annotatedMethod);
 
-        accumulate(parameterTarget, parameterValues, applyParameter(annotatedMethod, factory)).validate();
+        accumulate(parameterTarget, parameterValues, applyParameter(parameterType, factory)).validate();
     }
 
-    private BinaryFunction<ParameterConsumer, ParameterConsumer, String> applyParameter(final Method annotatedMethod, final ParameterFactory factory) {
+    private BinaryFunction<ParameterConsumer, ParameterConsumer, String> applyParameter(final Class<?> parameterType, final ParameterFactory factory) {
         return new BinaryFunction<ParameterConsumer, ParameterConsumer, String>() {
             @Override
             public ParameterConsumer evaluate(ParameterConsumer parameterTarget, String parameterValue) {
-                Object value = factory.create(annotatedMethod, parameterValue);
+                Object value = factory.create(parameterType, parameterValue);
                 parameterTarget.setParameter(value);
                 return parameterTarget;
             }
@@ -73,77 +127,37 @@ public class ParameterMapper {
 
 
     public interface ParameterFactory {
-        Object create(Method parameterMethod, String parameterValue);
+        Object create(Class<?> parameterType, String parameterValue);
     }
 
-    private static class ReflectionParameterFactory implements ParameterFactory {
+    public static class ReflectionParameterFactory implements ParameterFactory {
+        private final String factoryMethodName;
+        private final Class<?> factoryParameterType;
 
-        @SuppressWarnings("unchecked")
-        private static final Iterable<Map.Entry<String, Class<?>>> possibleFactories = Arrays.<Map.Entry<String, Class<?>>>asList(
-                new AbstractMap.SimpleEntry<String, Class<?>>("valueOf", String.class),
-                new AbstractMap.SimpleEntry<String, Class<?>>("valueOf", Object.class),
-                new AbstractMap.SimpleEntry<String, Class<?>>("parse", String.class)
-        );
-
-        private Method getFactoryMethod(Class<?> type) {
-            for (Map.Entry<String, Class<?>> possibleFactory : possibleFactories) {
-                Method factoryMethod = getFactoryMethodIfPresent(type, possibleFactory.getKey(), possibleFactory.getValue());
-                if (factoryMethod != null) {
-                    return factoryMethod;
-                }
-            }
-            throw new IllegalArgumentException("No factory method on type " + type);
-        }
-
-        private Method getFactoryMethodIfPresent(Class<?> factoryType, String factoryMethodName, Class<?> factoryMethodParameter) {
-            try {
-                return factoryType.getMethod(factoryMethodName, factoryMethodParameter);
-            } catch (NoSuchMethodException e) {
-                return null;
-            }
-        }
-
-        private Class<?> getParameterType(Method method) {
-            return convertPrimitives(method.getParameterTypes()[0]);
-        }
-
-        private static final Map<Class<?>, Class<?>> primitiveToWrapper = Collections.unmodifiableMap(new HashMap<Class<?>, Class<?>>() {
-            {
-                put(Boolean.TYPE, Boolean.class);
-                put(Integer.TYPE, Integer.class);
-                put(Short.TYPE, Short.class);
-                put(Long.TYPE, Long.class);
-                put(Character.TYPE, Character.class);
-                put(Byte.TYPE, Byte.class);
-                put(Double.TYPE, Double.class);
-                put(Float.TYPE, Float.class);
-            }
-
-            @Override
-            public Class<?> get(Object key) {
-                Class<?> nonNull = super.get(key);
-                if (nonNull == null) {
-                    throw new IllegalArgumentException();
-                }
-                return nonNull;
-            }
-        });
-
-        private Class<?> convertPrimitives(Class<?> parameterType) {
-            if (!parameterType.isPrimitive()) {
-                return parameterType;
-            }
-
-            return primitiveToWrapper.get(parameterType);
+        public ReflectionParameterFactory(String factoryMethodName, Class<?> factoryParameterType) {
+            this.factoryMethodName = factoryMethodName;
+            this.factoryParameterType = factoryParameterType;
         }
 
         @Override
-        public Object create(Method parameterMethod, String parameterValue) {
-            Method factoryMethod = getFactoryMethod(getParameterType(parameterMethod));
+        public Object create(Class<?> parameterType, String parameterValue) {
+            Method factoryMethod = getFactoryMethod(parameterType);
             try {
                 return factoryMethod.invoke(null, parameterValue);
             } catch (Exception e) {
                 throw new BadFormatException(e);
+            }
+        }
+
+        private Method getFactoryMethod(Class<?> type) {
+            return getFactoryMethod(type, factoryMethodName, factoryParameterType);
+        }
+
+        private Method getFactoryMethod(Class<?> factoryType, String factoryMethodName, Class<?> factoryMethodParameter) {
+            try {
+                return factoryType.getMethod(factoryMethodName, factoryMethodParameter);
+            } catch (NoSuchMethodException e) {
+                throw new RuntimeException(e.getMessage(), e);
             }
         }
     }

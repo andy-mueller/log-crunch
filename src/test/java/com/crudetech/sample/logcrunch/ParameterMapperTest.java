@@ -145,6 +145,8 @@ public class ParameterMapperTest {
         parameters.put("aInterval", new String[]{"2007-05-07T13:55:22,100/2009-07-02"});
 
         ParameterMapper mapper = new ParameterMapper(parameters);
+        mapper.registerParameterFactory(Interval.class, new ParameterMapper.ReflectionParameterFactory("parse", String.class));
+
 
         mapper.mapTo(instance);
 
@@ -162,6 +164,7 @@ public class ParameterMapperTest {
         parameters.put("aInterval", new String[]{"Invalid stuff that cannot be parsed!"});
 
         ParameterMapper mapper = new ParameterMapper(parameters);
+        mapper.registerParameterFactory(Interval.class, new ParameterMapper.ReflectionParameterFactory("parse", String.class));
 
         expectedException.expect(ParameterMapper.BadFormatException.class);
         mapper.mapTo(instance);

@@ -5,6 +5,7 @@ import com.crudetech.sample.logcrunch.LogFileFilterInteractor;
 import com.crudetech.sample.logcrunch.LogFileFilterInteractorFactory;
 import com.crudetech.sample.logcrunch.LogLine;
 import com.crudetech.sample.logcrunch.ParameterMapper;
+import org.joda.time.Interval;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -50,6 +51,7 @@ public class LogCrunchFilterServlet extends HttpServlet {
         LogFileFilterInteractor.Query query = new LogFileFilterInteractor.Query();
 
         ParameterMapper mapper = new ParameterMapper(getParametersMap(req));
+        mapper.registerParameterFactory(Interval.class, new ParameterMapper.ReflectionParameterFactory("parse", String.class));
 
         try {
             mapper.mapTo(query);
