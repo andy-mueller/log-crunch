@@ -92,7 +92,7 @@ public class ParameterMapper {
                     return factoryMethod;
                 }
             }
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("No factory method on type " + type);
         }
 
         private Method getFactoryMethodIfPresent(Class<?> factoryType, String factoryMethodName, Class<?> factoryMethodParameter) {

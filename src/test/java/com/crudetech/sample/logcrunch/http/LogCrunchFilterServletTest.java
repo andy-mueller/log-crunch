@@ -4,6 +4,7 @@ import com.crudetech.sample.logcrunch.InMemoryTestLogFile;
 import com.crudetech.sample.logcrunch.LogFile;
 import com.crudetech.sample.logcrunch.LogFileFilterInteractor;
 import com.crudetech.sample.logcrunch.LogLevel;
+import com.crudetech.sample.logcrunch.logback.LogbackLogFileNamePattern;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.junit.Before;
@@ -109,6 +110,18 @@ public class LogCrunchFilterServletTest {
         LogFileFilterInteractor.Query expectedQuery = new LogFileFilterInteractor.Query();
         Interval expectedInterval = new Interval(new DateTime(2007, 5, 7, 13, 55, 22, 100), new DateTime(2009, 7, 2, 0, 0));
         expectedQuery.addSearchInterval(expectedInterval);
+        verify(interactorStub).getFilteredLogFiles(expectedQuery);
+    }
+//    @Test
+    public void logFileNamePatternisExtractedToQuery() throws Exception {
+        request.putParameter(LogCrunchFilterServlet.RequestParameters.SearchRange, AllTimeInTheWorld.toString());
+        request.putParameter(LogCrunchFilterServlet.RequestParameters.LogFileNamePattern, "xyz-%d{yyyMMdd}.log");
+
+        logCrunchFilterServlet.doGet(request, response);
+
+        LogFileFilterInteractor.Query expectedQuery = new LogFileFilterInteractor.Query();
+        expectedQuery.addSearchInterval(AllTimeInTheWorld);
+        expectedQuery.setLogFileNamePattern(new LogbackLogFileNamePattern("xyz-%d{yyyMMdd}.log"));
         verify(interactorStub).getFilteredLogFiles(expectedQuery);
     }
 

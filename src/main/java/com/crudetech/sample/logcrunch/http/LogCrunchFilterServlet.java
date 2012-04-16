@@ -23,6 +23,7 @@ public class LogCrunchFilterServlet extends HttpServlet {
     class RequestParameters {
         static final String Level = "level";
         static final String SearchRange = "searchRange";
+        static final String LogFileNamePattern = "logFileNamePattern";
     }
 
     static enum HttpStatusCode {
@@ -43,7 +44,7 @@ public class LogCrunchFilterServlet extends HttpServlet {
     }
 
 
-    // GET http://localhost:8080/logcrunch/filter?fileName=machine01-%d{yyyMMdd}.log&searchRange=2007-05-07T13:55:22,100/2009-07-02&level=Info&level=Warn
+    // GET http://localhost:8080/logcrunch/filter?logFileNamePattern=machine101-%d{yyyMMdd}.log&searchRange=2007-05-07T13:55:22,100/2009-07-02&level=Info&level=Warn
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         LogFileFilterInteractor.Query query = new LogFileFilterInteractor.Query();

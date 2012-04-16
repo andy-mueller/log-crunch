@@ -23,15 +23,18 @@ public class LogFileFilterInteractor {
         private List<Pattern> loggers = new ArrayList<Pattern>();
         private List<Pattern> messageRegex = new ArrayList<Pattern>();
 
-        public void setLogFileNamePattern (LogFileNamePattern logFileNamePattern){
+//        @Parameter("logFileNamePattern")
+        public void setLogFileNamePattern(LogFileNamePattern logFileNamePattern) {
             this.logFileNamePattern = logFileNamePattern;
         }
+
         @Parameter("searchRange")
-        public void addSearchInterval(Interval searchInterval){
+        public void addSearchInterval(Interval searchInterval) {
             searchIntervals.add(searchInterval);
         }
+
         @Parameter(value = "level", required = false)
-        public void addLevel(LogLevel level){
+        public void addLevel(LogLevel level) {
             levels.add(level);
         }
 
@@ -42,10 +45,14 @@ public class LogFileFilterInteractor {
 
             Query query = (Query) o;
 
-            return levels.equals(query.levels) && searchIntervals.equals(query.searchIntervals);
+            return equals(logFileNamePattern, query.logFileNamePattern)
+                    && levels.equals(query.levels)
+                    && searchIntervals.equals(query.searchIntervals);
 
         }
-
+         private static boolean equals(Object lhs, Object rhs){
+             return lhs != null ? lhs.equals(rhs) : lhs == rhs;
+         }
         @Override
         public int hashCode() {
             int result = searchIntervals != null ? searchIntervals.hashCode() : 0;
@@ -98,7 +105,7 @@ public class LogFileFilterInteractor {
             return;
         }
         filterBuilder.openBrace();
-        for(LogLevel level : levels){
+        for (LogLevel level : levels) {
             filterBuilder.or(hasLogLevel(level));
         }
         filterBuilder.closeBrace();

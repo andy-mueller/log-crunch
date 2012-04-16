@@ -6,6 +6,7 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -55,5 +56,21 @@ public class LogbackLogFileNamePattern implements LogFileNamePattern {
         String dateString = fileName.substring(start, end);
 
         return dateFormat.parseDateTime(dateString);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        LogbackLogFileNamePattern that = (LogbackLogFileNamePattern) o;
+
+        return Arrays.equals(parts, that.parts);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(parts);
     }
 }
