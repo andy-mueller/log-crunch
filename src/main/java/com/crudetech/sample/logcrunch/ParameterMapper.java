@@ -6,9 +6,7 @@ import com.crudetech.sample.filter.Predicate;
 import org.joda.time.Interval;
 
 import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static com.crudetech.sample.filter.Algorithm.accumulate;
 import static java.util.Arrays.asList;
@@ -16,19 +14,48 @@ import static java.util.Arrays.asList;
 public class ParameterMapper {
     private final Map<String, String[]> parameters;
 
-    private final Map<Class<?>, ParameterFactory> factories = new HashMap<Class<?>, ParameterFactory>() {{
+    private final Map<Class<?>, ParameterFactory> factories = new ClassHierarchyMap<ParameterFactory>(){{
         put(Number.class, new ReflectionParameterFactory("valueOf", String.class));
         put(String.class, new ReflectionParameterFactory("valueOf", Object.class));
         put(Enum.class, new ReflectionParameterFactory("valueOf", String.class));
     }};
 
-    private ParameterFactory getFactoryFor(Class<?> type) {
-        for (Map.Entry<Class<?>, ParameterFactory> entry : factories.entrySet()) {
-            if (entry.getKey().isAssignableFrom(type)) {
-                return entry.getValue();
-            }
+    static class ClassHierarchyMap<T> extends AbstractMap<Class<?>, T> {
+        private final List<Entry<Class<?>, T>> entrySet = new ArrayList<Entry<Class<?>, T>>();
+
+        @Override
+        public Set<Entry<Class<?>, T>> entrySet() {
+            return new AbstractSet<Entry<Class<?>, T>>() {
+                @Override
+                public Iterator<Entry<Class<?>, T>> iterator() {
+                    return entrySet.iterator();
+                }
+
+                @Override
+                public int size() {
+                    return entrySet.size();
+                }
+            };
         }
-        throw new IllegalStateException("Could not find entry for " + type);
+
+        @Override
+        public T put(Class<?> key, T value) {
+            if(!containsKey(key)){
+                entrySet.add(new SimpleImmutableEntry<Class<?>, T>(key, value));
+                return value;
+            }
+            return null;
+        }
+
+        @Override
+        public T get(Object key) {
+            for (Entry<Class<?>, T> entry : entrySet) {
+                if(entry.getKey().isAssignableFrom((Class<?>) key)) {
+                    return entry.getValue();
+                }
+            }
+            return null;
+        }
     }
 
     private Class<?> getParameterType(Method method) {
@@ -101,7 +128,7 @@ public class ParameterMapper {
         Iterable<String> parameterValues = getParameterValuesForMethod(annotatedMethod);
 
         Class<?> parameterType = getParameterType(annotatedMethod);
-        ParameterFactory factory = getFactoryFor(parameterType);
+        ParameterFactory factory = factories.get(parameterType);
 
         ParameterConsumer parameterTarget = new ParameterConsumer(mappingTarget, annotatedMethod);
 
