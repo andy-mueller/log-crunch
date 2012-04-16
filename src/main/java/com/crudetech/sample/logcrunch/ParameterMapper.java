@@ -48,17 +48,17 @@ public class ParameterMapper {
     private void mapOnAnnotatedMethod(Object mappingTarget, Method annotatedMethod) {
         Iterable<String> parameterValues = getParameterValuesForMethod(annotatedMethod);
 
-        ParameterFactory factory = new ParameterFactory(annotatedMethod);
+        ParameterFactory factory = new ParameterFactory();
         ParameterConsumer parameterTarget = new ParameterConsumer(mappingTarget, annotatedMethod);
 
-        accumulate(parameterTarget, parameterValues, applyParameter(factory)).validate();
+        accumulate(parameterTarget, parameterValues, applyParameter(annotatedMethod, factory)).validate();
     }
 
-    private BinaryFunction<ParameterConsumer, ParameterConsumer, String> applyParameter(final ParameterFactory factory) {
+    private BinaryFunction<ParameterConsumer, ParameterConsumer, String> applyParameter(final Method annotatedMethod, final ParameterFactory factory) {
         return new BinaryFunction<ParameterConsumer, ParameterConsumer, String>() {
             @Override
             public ParameterConsumer evaluate(ParameterConsumer parameterTarget, String parameterValue) {
-                Object value = factory.create(parameterValue);
+                Object value = factory.create(annotatedMethod, parameterValue);
                 parameterTarget.setParameter(value);
                 return parameterTarget;
             }
@@ -72,7 +72,6 @@ public class ParameterMapper {
     }
 
     private static class ParameterFactory {
-        private final Method factoryMethod;
 
         @SuppressWarnings("unchecked")
         private static final Iterable<Map.Entry<String, Class<?>>> possibleFactories = Arrays.<Map.Entry<String, Class<?>>>asList(
@@ -81,8 +80,7 @@ public class ParameterMapper {
                 new AbstractMap.SimpleEntry<String, Class<?>>("parse", String.class)
         );
 
-        ParameterFactory(Method annotatedMethod) {
-            factoryMethod = getFactoryMethod(getParameterType(annotatedMethod));
+        ParameterFactory() {
         }
 
         private Method getFactoryMethod(Class<?> type) {
@@ -137,7 +135,8 @@ public class ParameterMapper {
             return primitiveToWrapper.get(parameterType);
         }
 
-        Object create(String parameterValue) {
+        public Object create(Method parameterMethod, String parameterValue) {
+            Method factoryMethod = getFactoryMethod(getParameterType(parameterMethod));
             try {
                 return factoryMethod.invoke(null, parameterValue);
             } catch (Exception e) {
