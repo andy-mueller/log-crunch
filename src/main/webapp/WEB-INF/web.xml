@@ -20,7 +20,7 @@
         </init-param>
         <init-param>
             <param-name>logLineFormat</param-name>
-            <param-value>yyyy-MM-ss hh:mm:ss</param-value>
+            <param-value>yyyy-MM-dd HH:mm:ss</param-value>
         </init-param>
     </servlet>
 
