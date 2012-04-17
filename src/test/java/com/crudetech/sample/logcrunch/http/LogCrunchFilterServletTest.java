@@ -80,40 +80,45 @@ public class LogCrunchFilterServletTest {
     public void logLevelsAreExtractedToQuery() throws Exception {
         request.putParameter(LogCrunchFilterServlet.RequestParameters.Level, "Info", "Debug");
         request.putParameter(LogCrunchFilterServlet.RequestParameters.SearchRange, AllTimeInTheWorld.toString());
-
+        request.putParameter(LogCrunchFilterServlet.RequestParameters.LogFileNamePattern, "machine101-%d{yyyMMdd}.log");
         logCrunchFilterServlet.doGet(request, response);
 
         LogFileFilterInteractor.Query expectedQuery = new LogFileFilterInteractor.Query();
         expectedQuery.addLevel(LogLevel.Info);
         expectedQuery.addLevel(LogLevel.Debug);
         expectedQuery.addSearchInterval(AllTimeInTheWorld);
+        expectedQuery.setLogFileNamePattern(new LogbackLogFileNamePattern("machine101-%d{yyyMMdd}.log"));
         verify(interactorStub).getFilteredLogFiles(expectedQuery);
     }
 
     @Test
     public void noLogLevelsAllowed() throws Exception {
         request.putParameter(LogCrunchFilterServlet.RequestParameters.SearchRange, AllTimeInTheWorld.toString());
+        request.putParameter(LogCrunchFilterServlet.RequestParameters.LogFileNamePattern, "machine101-%d{yyyMMdd}.log");
 
         logCrunchFilterServlet.doGet(request, response);
 
         LogFileFilterInteractor.Query expectedQuery = new LogFileFilterInteractor.Query();
         expectedQuery.addSearchInterval(AllTimeInTheWorld);
+        expectedQuery.setLogFileNamePattern(new LogbackLogFileNamePattern("machine101-%d{yyyMMdd}.log"));
         verify(interactorStub).getFilteredLogFiles(expectedQuery);
     }
 
     @Test
     public void searchIntervalsAreExtractedToQuery() throws Exception {
         request.putParameter(LogCrunchFilterServlet.RequestParameters.SearchRange, "2007-05-07T13:55:22,100/2009-07-02");
+        request.putParameter(LogCrunchFilterServlet.RequestParameters.LogFileNamePattern, "machine101-%d{yyyMMdd}.log");
 
         logCrunchFilterServlet.doGet(request, response);
 
         LogFileFilterInteractor.Query expectedQuery = new LogFileFilterInteractor.Query();
         Interval expectedInterval = new Interval(new DateTime(2007, 5, 7, 13, 55, 22, 100), new DateTime(2009, 7, 2, 0, 0));
         expectedQuery.addSearchInterval(expectedInterval);
+        expectedQuery.setLogFileNamePattern(new LogbackLogFileNamePattern("machine101-%d{yyyMMdd}.log"));
         verify(interactorStub).getFilteredLogFiles(expectedQuery);
     }
-//    @Test
-    public void logFileNamePatternisExtractedToQuery() throws Exception {
+    @Test
+    public void logFileNamePatternIsExtractedToQuery() throws Exception {
         request.putParameter(LogCrunchFilterServlet.RequestParameters.SearchRange, AllTimeInTheWorld.toString());
         request.putParameter(LogCrunchFilterServlet.RequestParameters.LogFileNamePattern, "xyz-%d{yyyMMdd}.log");
 
@@ -131,6 +136,7 @@ public class LogCrunchFilterServletTest {
     @Test
     public void nonIsoDateTimeReturnsBadFormat() throws Exception {
         request.putParameter(LogCrunchFilterServlet.RequestParameters.SearchRange, "200705071355,100/2009-07-02");
+        request.putParameter(LogCrunchFilterServlet.RequestParameters.LogFileNamePattern, "xyz-%d{yyyMMdd}.log");
 
         logCrunchFilterServlet.doGet(request, response);
 
@@ -144,6 +150,16 @@ public class LogCrunchFilterServletTest {
     @Test
     public void atLeastOneTimeIntervalIsRequired() throws Exception {
         request.putParameter(LogCrunchFilterServlet.RequestParameters.SearchRange);
+        request.putParameter(LogCrunchFilterServlet.RequestParameters.LogFileNamePattern, "xyz-%d{yyyMMdd}.log");
+
+        logCrunchFilterServlet.doGet(request, response);
+
+        verifyErrorResponse(response, LogCrunchFilterServlet.HttpStatusCode.BadFormat);
+    }
+    @Test
+    public void logFileNameFormatIsIsRequired() throws Exception {
+        request.putParameter(LogCrunchFilterServlet.RequestParameters.SearchRange, AllTimeInTheWorld.toString());
+        request.putParameter(LogCrunchFilterServlet.RequestParameters.LogFileNamePattern);
 
         logCrunchFilterServlet.doGet(request, response);
 
@@ -153,6 +169,7 @@ public class LogCrunchFilterServletTest {
     @Test
     public void filteredLogLinesAreWrittenToResponse() throws Exception {
         request.putParameter(LogCrunchFilterServlet.RequestParameters.SearchRange, AllTimeInTheWorld.toString());
+        request.putParameter(LogCrunchFilterServlet.RequestParameters.LogFileNamePattern, "xyz-%d{yyyMMdd}.log");
 
         logCrunchFilterServlet.doGet(request, response);
 

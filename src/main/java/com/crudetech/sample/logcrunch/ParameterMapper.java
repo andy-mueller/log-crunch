@@ -3,7 +3,6 @@ package com.crudetech.sample.logcrunch;
 import com.crudetech.sample.filter.BinaryFunction;
 import com.crudetech.sample.filter.FilterIterable;
 import com.crudetech.sample.filter.Predicate;
-import org.joda.time.Interval;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -54,7 +53,7 @@ public class ParameterMapper {
                     return entry.getValue();
                 }
             }
-            return null;
+            throw new IllegalArgumentException("Could not find entry for key type " + key);
         }
     }
 
@@ -96,7 +95,7 @@ public class ParameterMapper {
         this.parameters = parameters;
     }
 
-    public void registerParameterFactory(Class<Interval> type, ParameterFactory factory) {
+    public void registerParameterFactory(Class<?> type, ParameterFactory factory) {
         factories.put(type, factory);
     }
 

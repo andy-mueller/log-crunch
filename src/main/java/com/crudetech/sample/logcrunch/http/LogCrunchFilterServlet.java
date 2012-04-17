@@ -3,8 +3,10 @@ package com.crudetech.sample.logcrunch.http;
 import com.crudetech.sample.logcrunch.LogFile;
 import com.crudetech.sample.logcrunch.LogFileFilterInteractor;
 import com.crudetech.sample.logcrunch.LogFileFilterInteractorFactory;
+import com.crudetech.sample.logcrunch.LogFileNamePattern;
 import com.crudetech.sample.logcrunch.LogLine;
 import com.crudetech.sample.logcrunch.ParameterMapper;
+import com.crudetech.sample.logcrunch.logback.LogbackLogFileNamePattern;
 import org.joda.time.Interval;
 
 import javax.servlet.ServletConfig;
@@ -52,6 +54,12 @@ public class LogCrunchFilterServlet extends HttpServlet {
 
         ParameterMapper mapper = new ParameterMapper(getParametersMap(req));
         mapper.registerParameterFactory(Interval.class, new ParameterMapper.ReflectionParameterFactory("parse", String.class));
+        mapper.registerParameterFactory(LogFileNamePattern.class, new ParameterMapper.ParameterFactory() {
+            @Override
+            public Object create(Class<?> parameterType, String parameterValue) {
+                return new LogbackLogFileNamePattern(parameterValue);
+            }
+        });
 
         try {
             mapper.mapTo(query);

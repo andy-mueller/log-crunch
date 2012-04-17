@@ -23,7 +23,7 @@ public class LogFileFilterInteractor {
         private List<Pattern> loggers = new ArrayList<Pattern>();
         private List<Pattern> messageRegex = new ArrayList<Pattern>();
 
-//        @Parameter("logFileNamePattern")
+        @Parameter(value = "logFileNamePattern")
         public void setLogFileNamePattern(LogFileNamePattern logFileNamePattern) {
             this.logFileNamePattern = logFileNamePattern;
         }
