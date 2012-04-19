@@ -21,8 +21,9 @@ import static java.util.Arrays.asList;
 
 
 public abstract class TestLogFile extends ExternalResource implements LogFile {
-    static final Charset Encoding = Charset.forName("UTF-8");
-    private static DateTimeFormatter DateFormat = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
+    public static final Charset Encoding = Charset.forName("UTF-8");
+    public static String DateFormatPattern = "yyyy-MM-dd HH:mm:ss";
+    static DateTimeFormatter DateFormat = DateTimeFormat.forPattern(DateFormatPattern);
     static DateTime SampleInfoLineDate = new DateTime(2009, 6, 7, 13,23, 57);
     static final LogLine SampleInfoLine = LogbackBridge.createLogLine(MessageFormat.format("{0} demo.ZeroToFour main INFO: This is an informative message", DateFormat.print(SampleInfoLineDate)), DateFormat);
 

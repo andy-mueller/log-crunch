@@ -6,8 +6,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.net.URLEncoder;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
@@ -18,12 +16,6 @@ public class LogbackLogFileNamePatternTest {
 
         String fileName = "logFile.2009-08-21.log";
         assertThat(namePattern.matches(fileName), is(true));
-    }
-    @Test
-    public void xox() throws Exception {
-        String s = URLEncoder.encode("machine101-%d{yyyMMdd}.log", "UTF-8");
-
-        System.out.println(s);
     }
 
     @Test
@@ -44,11 +36,13 @@ public class LogbackLogFileNamePatternTest {
         expectedException.expect(IllegalArgumentException.class);
         new LogbackLogFileNamePattern("logFile.log");
     }
+
     @Test
     public void nullInCtorThrows() throws Exception {
         expectedException.expect(IllegalArgumentException.class);
         new LogbackLogFileNamePattern(null);
     }
+
     @Test
     public void patternWithMultipleDatesThrows() throws Exception {
         expectedException.expect(IllegalArgumentException.class);

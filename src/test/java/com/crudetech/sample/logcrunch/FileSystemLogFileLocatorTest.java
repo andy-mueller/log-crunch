@@ -48,7 +48,7 @@ public class FileSystemLogFileLocatorTest {
         return new DateTime(2007, 5, 8, 0, 0);
     }
 
-    private DateTime get6thOfMay() throws ParseException {
+    private DateTime get6thOfMay() {
         return new DateTime(2007, 5, 6, 0, 0);
     }
 

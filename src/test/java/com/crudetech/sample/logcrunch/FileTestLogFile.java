@@ -2,18 +2,14 @@ package com.crudetech.sample.logcrunch;
 
 import com.crudetech.sample.TempDir;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
+import java.io.*;
 
-class FileTestLogFile extends TestLogFile {
-    static final File Directory = new File(new TempDir(), "testLogFiles");
+public class FileTestLogFile extends TestLogFile {
+    public static final File Directory = new File(new TempDir(), "testLogFiles");
 
     private File file;
 
-    FileTestLogFile(String name) {
+    public FileTestLogFile(String name) {
         super(name);
     }
 

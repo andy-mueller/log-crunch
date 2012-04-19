@@ -13,23 +13,16 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import javax.servlet.ServletConfig;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class LogCrunchFilterServletTest {
 
@@ -57,23 +50,6 @@ public class LogCrunchFilterServletTest {
                 return interactorStub;
             }
         };
-    }
-
-    static class HttpServletRequestStub extends HttpServletRequestWrapper {
-        private Map<String, String[]> parameters = new HashMap<String, String[]>();
-
-        HttpServletRequestStub() {
-            super(mock(HttpServletRequest.class));
-        }
-
-        void putParameter(String name, String... value) {
-            parameters.put(name, value);
-        }
-
-        @Override
-        public Map getParameterMap() {
-            return parameters;
-        }
     }
 
     @Test

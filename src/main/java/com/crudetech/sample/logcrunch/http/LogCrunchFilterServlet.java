@@ -1,11 +1,6 @@
 package com.crudetech.sample.logcrunch.http;
 
-import com.crudetech.sample.logcrunch.LogFile;
-import com.crudetech.sample.logcrunch.LogFileFilterInteractor;
-import com.crudetech.sample.logcrunch.LogFileFilterInteractorFactory;
-import com.crudetech.sample.logcrunch.LogFileNamePattern;
-import com.crudetech.sample.logcrunch.LogLine;
-import com.crudetech.sample.logcrunch.ParameterMapper;
+import com.crudetech.sample.logcrunch.*;
 import com.crudetech.sample.logcrunch.logback.LogbackLogFileNamePattern;
 import org.joda.time.Interval;
 
@@ -47,7 +42,7 @@ public class LogCrunchFilterServlet extends HttpServlet {
     }
 
 
-    // GET http://localhost:8080/logcrunch/filter?logFileNamePattern=machine101-%25d{yyyyMMdd}.log&searchRange=2007-05-07T13:55:22,100/2009-07-02&level=Info&level=Warn
+    // GET http://localhost:8080/logcrunch/filter?logFileNamePattern=machinename101-%25d{yyyyMMdd}.log&searchRange=2007-05-06/2007-05-08&level=Info&level=Warn
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         LogFileFilterInteractor.Query query = new LogFileFilterInteractor.Query();
