@@ -45,7 +45,7 @@ public class LogCrunchFilterServlet extends HttpServlet {
     // GET http://localhost:8080/logcrunch/filter?logFileNamePattern=machinename101-%25d{yyyyMMdd}.log&searchRange=2007-05-06/2007-05-08&level=Info&level=Warn
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        LogFileFilterInteractor.Query query = new LogFileFilterInteractor.Query();
+        LogFileFilterInteractor.Query query = new ParameterQuery();
 
         ParameterMapper mapper = new ParameterMapper(getParametersMap(req));
         mapper.registerParameterFactory(Interval.class, new ParameterMapper.ReflectionParameterFactory("parse", String.class));

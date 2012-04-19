@@ -1,4 +1,4 @@
-package com.crudetech.sample.logcrunch;
+package com.crudetech.sample.logcrunch.http;
 
 import com.crudetech.sample.filter.BinaryFunction;
 import com.crudetech.sample.filter.FilterIterable;

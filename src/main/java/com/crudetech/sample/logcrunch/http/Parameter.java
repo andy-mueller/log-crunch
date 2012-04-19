@@ -1,4 +1,4 @@
-package com.crudetech.sample.logcrunch;
+package com.crudetech.sample.logcrunch.http;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

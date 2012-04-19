@@ -1,5 +1,6 @@
 package com.crudetech.sample.logcrunch;
 
+import com.crudetech.sample.logcrunch.http.ParameterQuery;
 import org.joda.time.Interval;
 import org.junit.Before;
 import org.junit.Rule;
@@ -13,10 +14,7 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class LogFileFilterInteractorTest {
     @Rule
@@ -40,7 +38,7 @@ public class LogFileFilterInteractorTest {
         when(locator.find(logFileNamePattern, asList(testInterval))).thenReturn(asList((LogFile) logFileStub1, logFileStub2));
         LogFileFilterInteractor interactor = new LogFileFilterInteractor(locator);
 
-        LogFileFilterInteractor.Query request = new LogFileFilterInteractor.Query();
+        ParameterQuery request = new ParameterQuery();
         request.setLogFileNamePattern(logFileNamePattern);
         request.addSearchInterval(testInterval);
 
@@ -80,7 +78,7 @@ public class LogFileFilterInteractorTest {
         setupLocator(logFileStub1, logFileStub2);
         LogFileFilterInteractor interactor = new LogFileFilterInteractor(locator);
 
-        LogFileFilterInteractor.Query request = new LogFileFilterInteractor.Query();
+        ParameterQuery request = new ParameterQuery();
         request.addSearchInterval(allTimeOfTheWorld());
         request.setLogFileNamePattern(logFileNamePattern);
         request.addLevel(LogLevel.Info);
@@ -116,7 +114,7 @@ public class LogFileFilterInteractorTest {
         setupLocator(logFileStub1);
         LogFileFilterInteractor interactor = new LogFileFilterInteractor(locator);
 
-        LogFileFilterInteractor.Query request = new LogFileFilterInteractor.Query();
+        ParameterQuery request = new ParameterQuery();
         request.setLogFileNamePattern(logFileNamePattern);
         request.addSearchInterval(new Interval(TestLogFile.SampleInfoLineDate, TestLogFile.SampleInfoLineDate.plusSeconds(1)));
 

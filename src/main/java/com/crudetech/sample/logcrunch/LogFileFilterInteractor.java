@@ -6,7 +6,6 @@ import com.crudetech.sample.filter.PredicateBuilder;
 import com.crudetech.sample.filter.UnaryFunction;
 import org.joda.time.Interval;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -15,61 +14,12 @@ import static com.crudetech.sample.logcrunch.LogLinePredicates.isInDateTimeRange
 
 public class LogFileFilterInteractor {
     private final LogFileLocator locator;
-
-    public static class Query {
-        private LogFileNamePattern logFileNamePattern;
-        private List<Interval> searchIntervals = new ArrayList<Interval>();
-        private List<LogLevel> levels = new ArrayList<LogLevel>();
-        private List<Pattern> loggers = new ArrayList<Pattern>();
-        private List<Pattern> messageRegex = new ArrayList<Pattern>();
-
-        @Parameter(value = "logFileNamePattern")
-        public void setLogFileNamePattern(LogFileNamePattern logFileNamePattern) {
-            this.logFileNamePattern = logFileNamePattern;
-        }
-
-        @Parameter("searchRange")
-        public void addSearchInterval(Interval searchInterval) {
-            searchIntervals.add(searchInterval);
-        }
-
-        @Parameter(value = "level", required = false)
-        public void addLevel(LogLevel level) {
-            levels.add(level);
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            Query query = (Query) o;
-
-            return equals(logFileNamePattern, query.logFileNamePattern)
-                    && levels.equals(query.levels)
-                    && searchIntervals.equals(query.searchIntervals);
-
-        }
-         private static boolean equals(Object lhs, Object rhs){
-             return lhs != null ? lhs.equals(rhs) : lhs == rhs;
-         }
-        @Override
-        public int hashCode() {
-            int result = searchIntervals != null ? searchIntervals.hashCode() : 0;
-            result = 31 * result + (levels != null ? levels.hashCode() : 0);
-            return result;
-        }
-
-        @Override
-        public String toString() {
-            return "Query{" +
-                    "logFileNamePattern=" + logFileNamePattern +
-                    ", searchIntervals=" + searchIntervals +
-                    ", levels=" + levels +
-                    ", loggers=" + loggers +
-                    ", messageRegex=" + messageRegex +
-                    '}';
-        }
+    public static interface Query {
+        LogFileNamePattern getLogFileNamePattern();
+        List<Interval> getSearchIntervals();
+        List<LogLevel> getLevels();
+        List<Pattern> getLoggers();
+        List<Pattern> getMessageRegex();
     }
 
     public LogFileFilterInteractor(LogFileLocator locator) {
@@ -77,14 +27,14 @@ public class LogFileFilterInteractor {
     }
 
     public Iterable<LogFile> getFilteredLogFiles(Query model) {
-        Iterable<LogFile> logFiles = locator.find(model.logFileNamePattern, model.searchIntervals);
+        Iterable<LogFile> logFiles = locator.find(model.getLogFileNamePattern(), model.getSearchIntervals());
 
         FilterChain<LogLine> lineFilter = new FilterChain<LogLine>();
         PredicateBuilder<LogLine> filterBuilder = lineFilter.filterBuilder();
 
-        buildLogLevelFilter(model.levels, filterBuilder);
+        buildLogLevelFilter(model.getLevels(), filterBuilder);
 
-        buildTimeIntervalFilter(model.searchIntervals, filterBuilder);
+        buildTimeIntervalFilter(model.getSearchIntervals(), filterBuilder);
 
         return new MappingIterable<LogFile, LogFile>(logFiles, filterFiles(lineFilter));
     }

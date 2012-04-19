@@ -43,7 +43,7 @@ public class LogCrunchFilterServletTest {
         responseWriter = mock(PrintWriter.class);
         when(response.getWriter()).thenReturn(responseWriter);
         interactorStub = mock(LogFileFilterInteractor.class);
-        when(interactorStub.getFilteredLogFiles(any(LogFileFilterInteractor.Query.class))).thenReturn(Arrays.<LogFile>asList(logfile));
+        when(interactorStub.getFilteredLogFiles(any(ParameterQuery.class))).thenReturn(Arrays.<LogFile>asList(logfile));
         logCrunchFilterServlet = new LogCrunchFilterServlet() {
             @Override
             LogFileFilterInteractor newInteractor() {
@@ -59,7 +59,7 @@ public class LogCrunchFilterServletTest {
         request.putParameter(LogCrunchFilterServlet.RequestParameters.LogFileNamePattern, "machine101-%d{yyyMMdd}.log");
         logCrunchFilterServlet.doGet(request, response);
 
-        LogFileFilterInteractor.Query expectedQuery = new LogFileFilterInteractor.Query();
+        ParameterQuery expectedQuery = new ParameterQuery();
         expectedQuery.addLevel(LogLevel.Info);
         expectedQuery.addLevel(LogLevel.Debug);
         expectedQuery.addSearchInterval(AllTimeInTheWorld);
@@ -74,7 +74,7 @@ public class LogCrunchFilterServletTest {
 
         logCrunchFilterServlet.doGet(request, response);
 
-        LogFileFilterInteractor.Query expectedQuery = new LogFileFilterInteractor.Query();
+        ParameterQuery expectedQuery = new ParameterQuery();
         expectedQuery.addSearchInterval(AllTimeInTheWorld);
         expectedQuery.setLogFileNamePattern(new LogbackLogFileNamePattern("machine101-%d{yyyMMdd}.log"));
         verify(interactorStub).getFilteredLogFiles(expectedQuery);
@@ -87,7 +87,7 @@ public class LogCrunchFilterServletTest {
 
         logCrunchFilterServlet.doGet(request, response);
 
-        LogFileFilterInteractor.Query expectedQuery = new LogFileFilterInteractor.Query();
+        ParameterQuery expectedQuery = new ParameterQuery();
         Interval expectedInterval = new Interval(new DateTime(2007, 5, 7, 13, 55, 22, 100), new DateTime(2009, 7, 2, 0, 0));
         expectedQuery.addSearchInterval(expectedInterval);
         expectedQuery.setLogFileNamePattern(new LogbackLogFileNamePattern("machine101-%d{yyyMMdd}.log"));
@@ -100,7 +100,7 @@ public class LogCrunchFilterServletTest {
 
         logCrunchFilterServlet.doGet(request, response);
 
-        LogFileFilterInteractor.Query expectedQuery = new LogFileFilterInteractor.Query();
+        ParameterQuery expectedQuery = new ParameterQuery();
         expectedQuery.addSearchInterval(AllTimeInTheWorld);
         expectedQuery.setLogFileNamePattern(new LogbackLogFileNamePattern("xyz-%d{yyyMMdd}.log"));
         verify(interactorStub).getFilteredLogFiles(expectedQuery);
