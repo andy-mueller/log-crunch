@@ -1,7 +1,5 @@
 package com.crudetech.sample.logcrunch;
 
-import com.crudetech.sample.logcrunch.logback.LogbackLogLineFactory;
-
 import java.io.File;
 import java.nio.charset.Charset;
 
@@ -28,5 +26,5 @@ public abstract class LogFileFilterInteractorFactory {
         return new LogFileFilterInteractor(locator);
     }
 
-    protected abstract LogbackLogLineFactory logLineFactory();
+    protected abstract BufferedReaderLogFile.LogLineFactory logLineFactory();
 }

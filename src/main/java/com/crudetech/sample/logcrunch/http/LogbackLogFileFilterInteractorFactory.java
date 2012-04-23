@@ -1,5 +1,6 @@
 package com.crudetech.sample.logcrunch.http;
 
+import com.crudetech.sample.logcrunch.BufferedReaderLogFile;
 import com.crudetech.sample.logcrunch.LogFileFilterInteractorFactory;
 import com.crudetech.sample.logcrunch.logback.LogbackLogLineFactory;
 
@@ -15,7 +16,7 @@ public class LogbackLogFileFilterInteractorFactory extends LogFileFilterInteract
     }
 
     @Override
-    protected LogbackLogLineFactory logLineFactory() {
+    protected BufferedReaderLogFile.LogLineFactory logLineFactory() {
         return new LogbackLogLineFactory(logLineFormat);
     }
 }
