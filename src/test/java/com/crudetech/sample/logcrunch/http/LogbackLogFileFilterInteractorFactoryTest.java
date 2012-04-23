@@ -1,6 +1,7 @@
 package com.crudetech.sample.logcrunch.http;
 
 import com.crudetech.sample.TempDir;
+import com.crudetech.sample.logcrunch.logback.LogbackLogFileFilterInteractorFactory;
 import org.junit.Test;
 
 import java.nio.charset.Charset;

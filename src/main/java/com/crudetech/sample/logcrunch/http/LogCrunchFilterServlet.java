@@ -1,6 +1,11 @@
 package com.crudetech.sample.logcrunch.http;
 
-import com.crudetech.sample.logcrunch.*;
+import com.crudetech.sample.logcrunch.LogFile;
+import com.crudetech.sample.logcrunch.LogFileFilterInteractor;
+import com.crudetech.sample.logcrunch.LogFileFilterInteractorFactory;
+import com.crudetech.sample.logcrunch.LogFileNamePattern;
+import com.crudetech.sample.logcrunch.LogLine;
+import com.crudetech.sample.logcrunch.logback.LogbackLogFileFilterInteractorFactory;
 import com.crudetech.sample.logcrunch.logback.LogbackLogFileNamePattern;
 import org.joda.time.Interval;
 

@@ -14,6 +14,13 @@
             logback->logcrunch
             servlet loads logback only via xml??
 
+-interactor hurts OCP.
+    -Externalize building of filters
+    -prepare standard filters in logcrunch package
+    -move actual wiring code into the factory implementation
+     under logback
+
+
 -use only complete days to search for the files on disk
     ->use decorator to normalize search dates
 

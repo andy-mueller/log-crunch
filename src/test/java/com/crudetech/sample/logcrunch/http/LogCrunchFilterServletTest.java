@@ -4,6 +4,7 @@ import com.crudetech.sample.logcrunch.InMemoryTestLogFile;
 import com.crudetech.sample.logcrunch.LogFile;
 import com.crudetech.sample.logcrunch.LogFileFilterInteractor;
 import com.crudetech.sample.logcrunch.LogLevel;
+import com.crudetech.sample.logcrunch.logback.LogbackLogFileFilterInteractorFactory;
 import com.crudetech.sample.logcrunch.logback.LogbackLogFileNamePattern;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
@@ -22,7 +23,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class LogCrunchFilterServletTest {
 

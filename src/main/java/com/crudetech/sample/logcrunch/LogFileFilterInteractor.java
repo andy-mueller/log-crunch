@@ -36,6 +36,11 @@ public class LogFileFilterInteractor {
 
         buildTimeIntervalFilter(model.getSearchIntervals(), filterBuilder);
 
+        // At this point, the open closed principle is hurt!
+        // to add more filters, we have to change this class
+        // For more information, google for "open closed principle", OCP,
+        // SOLID principles and Bob Martin
+
         return new MappingIterable<LogFile, LogFile>(logFiles, filterFiles(lineFilter));
     }
 
