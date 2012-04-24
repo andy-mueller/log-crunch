@@ -1,4 +1,4 @@
-package com.crudetech.sample.logcrunch.http;
+package com.crudetech.sample.logcrunch.logback;
 
 import com.crudetech.sample.TempDir;
 import com.crudetech.sample.logcrunch.LogFileFilterInteractorFactory;
@@ -49,17 +49,6 @@ public class LogbackLogFileFilterInteractorFactoryTest {
         assertThat(unmarshalledFactory, is(notNullValue()));
         assertThat(unmarshalledFactory, is(factory));
 
-        Document d = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new ByteArrayInputStream(out.toByteArray()));
-        Node item = d.getDocumentElement();
-        Node nodeValue = item.cloneNode(true);
-        Document d2 = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-
-        d2.adoptNode(nodeValue);
-
-
-        Writer stringOut = new StringWriter();
-        XMLEventWriter xmlEventWriter = XMLOutputFactory.newFactory().createXMLEventWriter(stringOut);
-        xmlEventWriter.add();
 
     }
 }
