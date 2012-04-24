@@ -4,7 +4,7 @@
     <factoryConfig>
         <logFileFilterInteractorFactory>
             <logLineFormat>yyyyMMdd</logLineFormat>
-            <searchPath>C:\Users\Andy\AppData\Local\Temp</searchPath>
+            <searchPath>/some/path</searchPath>
             <encoding>UTF-8</encoding>
         </logFileFilterInteractorFactory>
     </factoryConfig>

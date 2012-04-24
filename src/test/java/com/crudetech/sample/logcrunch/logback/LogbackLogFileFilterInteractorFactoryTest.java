@@ -2,19 +2,11 @@ package com.crudetech.sample.logcrunch.logback;
 
 import com.crudetech.sample.TempDir;
 import com.crudetech.sample.logcrunch.LogFileFilterInteractorFactory;
-import com.crudetech.sample.logcrunch.logback.LogbackLogFileFilterInteractorFactory;
 import org.junit.Test;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 
 import javax.xml.bind.JAXB;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.stream.XMLEventWriter;
-import javax.xml.stream.XMLOutputFactory;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.nio.charset.Charset;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -52,3 +44,4 @@ public class LogbackLogFileFilterInteractorFactoryTest {
 
     }
 }
+

@@ -4,10 +4,12 @@ import com.crudetech.sample.logcrunch.BufferedReaderLogFile;
 import com.crudetech.sample.logcrunch.LogFileFilterInteractorFactory;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.File;
 import java.nio.charset.Charset;
 
+@XmlRootElement(name = "logFileFilterInteractorFactory")
 public class LogbackLogFileFilterInteractorFactory extends LogFileFilterInteractorFactory {
     @XmlElement
     private String logLineFormat;
