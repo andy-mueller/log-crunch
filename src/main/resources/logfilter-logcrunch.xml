@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<logbackLogFileFilterInteractorFactory>
+    <logLineFormat>yyyyMMdd</logLineFormat>
+    <searchPath>C:\Users\Andy\AppData\Local\Temp</searchPath>
+    <encoding>UTF-8</encoding>
+</logbackLogFileFilterInteractorFactory>
