@@ -75,7 +75,7 @@ public class FileSystemLogFileLocatorTest {
     }
 
     @Test
-    public void locationIsSuccessful() throws Exception {
+    public void givenFileToLocateInConfiguredLocation_fileIsFound() throws Exception {
         Iterable<LogFile> located = locator.find(namePattern, asList(sixthOfMay2007));
 
         assertThat(Iterables.getFirst(located), is(notNullValue()));
@@ -83,20 +83,20 @@ public class FileSystemLogFileLocatorTest {
     }
 
     @Test
-    public void locatedFileHasCorrectContent() throws Exception {
+    public void givenFileToLocateInConfiguredLocation_locatedFileHasCorrectContent() throws Exception {
         Iterable<LogFile> located = locator.find(namePattern, asList(sixthOfMay2007));
 
         assertThat(Iterables.getFirst(located), is(equalTo(fileTestLogFile20070506)));
     }
 
     @Test
-    public void noLocationGivesNoLogFiles() throws Exception {
+    public void givenNoFileAtConfiguredLocation_noLogFileIsFound() throws Exception {
         Iterable<LogFile> located = locator.find(namePattern, asList(noMatch));
         assertThat(Iterables.size(located), is(0));
     }
 
     @Test
-    public void multipleFilesFound() throws Exception {
+    public void givenMultipleFilesInConfiguredLocation_multipleLogFilesAreFound() throws Exception {
         Interval sixthAndSeventhOfMay = new Interval(get6thOfMay(), get8thOfMay());
         Iterable<LogFile> located = locator.find(namePattern, asList(sixthOfMay2007, sixthAndSeventhOfMay));
 
@@ -104,7 +104,7 @@ public class FileSystemLogFileLocatorTest {
     }
 
     @Test
-    public void multipleFilesFoundWithMultipleIntervals() throws Exception {
+    public void givenMultipleFilesInConfiguredLocation_filesWithinCorrectTimeIntervalAreFound() throws Exception {
         Interval seventhOfMay2007 = new Interval(getSeventhOfMay(), get8thOfMay());
         Iterable<LogFile> located = locator.find(namePattern, asList(sixthOfMay2007, seventhOfMay2007));
 
@@ -112,7 +112,7 @@ public class FileSystemLogFileLocatorTest {
     }
 
     @Test
-    public void multipleFilesFoundHaveCorrectContent() throws Exception {
+    public void givenMultipleFilesInConfiguredLocation_filesWithinCorrectTimeIntervalFoundHaveCorrectContent() throws Exception {
         Interval seventhOfMay2007 = new Interval(getSeventhOfMay(), get8thOfMay());
         Iterable<LogFile> located = locator.find(namePattern, asList(sixthOfMay2007, seventhOfMay2007));
 
