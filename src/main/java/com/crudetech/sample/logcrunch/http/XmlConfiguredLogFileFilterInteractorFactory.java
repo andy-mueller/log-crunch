@@ -117,7 +117,7 @@ class XmlConfiguredLogFileFilterInteractorFactory implements LogFileFilterIntera
 
         private Document xmlDocumentFromStream(InputStream resourceStream) {
             try {
-                return DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(resourceStream);
+                return getDocumentBuilder().parse(resourceStream);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
