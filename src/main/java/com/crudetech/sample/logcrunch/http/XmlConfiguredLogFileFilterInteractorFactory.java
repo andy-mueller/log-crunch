@@ -10,8 +10,6 @@ import javax.xml.bind.JAXB;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -28,95 +26,103 @@ class XmlConfiguredLogFileFilterInteractorFactory implements LogFileFilterIntera
     private final LogFileFilterInteractorFactory decorated;
 
     XmlConfiguredLogFileFilterInteractorFactory(InputStream resourceStream) {
-        Document configDocument = xmlDocumentFromStream(resourceStream);
-        Node factoryClassName = configDocument.getElementsByTagName(FactoryClassSection).item(0);
-        Class<? extends LogFileFilterInteractorFactory> factoryClass = classFromName(factoryClassName.getTextContent());
-
-        String jaxbXmlText = getConfigXml(configDocument);
-
-        StringReader jaxbStream = new StringReader(jaxbXmlText);
-
-        decorated = JAXB.unmarshal(jaxbStream, factoryClass);
+        XmlConfiguration xmlConf = new XmlConfiguration(resourceStream);
+        decorated = xmlConf.load();
     }
+    private static class XmlConfiguration{
+        private final Document configDocument;
 
-    private String getConfigXml(Document configDocument) {
-        Node factoryConfig = configDocument.getElementsByTagName(FactoryConfigSection).item(0);
-        NodeList childNodes = factoryConfig.getChildNodes();
-        for(int i = 0; i < childNodes.getLength(); ++i){
-            Node current = childNodes.item(i);
-            if(current.getNodeType() != Node.ELEMENT_NODE){
-                continue;
+        public XmlConfiguration(InputStream resourceStream) {
+            configDocument = xmlDocumentFromStream(resourceStream);
+        }
+        LogFileFilterInteractorFactory load() {
+            Class<? extends LogFileFilterInteractorFactory> factoryClass = classFromName(getFactoryClassNode(configDocument));
+
+            String jaxbXmlText = getJaxbConfigPartOfXml(configDocument);
+            StringReader jaxbStream = new StringReader(jaxbXmlText);
+
+            return JAXB.unmarshal(jaxbStream, factoryClass);
+        }
+
+        private String getFactoryClassNode(Document configDocument) {
+            return configDocument.getElementsByTagName(FactoryClassSection).item(0).getTextContent();
+        }
+
+        private String getJaxbConfigPartOfXml(Document configDocument) {
+            Node factoryConfig = configDocument.getElementsByTagName(FactoryConfigSection).item(0);
+            NodeList childNodes = factoryConfig.getChildNodes();
+            for(int i = 0; i < childNodes.getLength(); ++i){
+                Node current = childNodes.item(i);
+                if(current.getNodeType() != Node.ELEMENT_NODE){
+                    continue;
+                }
+                return nodeToString(current);
             }
-            return nodeToString(current);
+            throw new IllegalArgumentException();
         }
-        throw new IllegalArgumentException();
-    }
 
-    private String nodeToString(Node node) {
-        Transformer transformer = newTransformer();
-        StringWriter writer = new StringWriter();
+        private String nodeToString(Node node) {
+            Document jaxbDoc = getDocumentBuilder().newDocument();
+            node = jaxbDoc.importNode(node, true);
+            jaxbDoc.appendChild(node);
 
-        Document jaxbDoc = getDocumentBuilder().newDocument();
-        node = jaxbDoc.importNode(node, true);
-        node = jaxbDoc.adoptNode(node);
-        jaxbDoc.appendChild(node);
-
-
-        Source source = new DOMSource(jaxbDoc);
-        Result result = new StreamResult(writer);
-        transform(transformer, result, source);
-        return writer.toString();
-    }
-
-    private void transform(Transformer transformer, Result result, Source source) {
-        try {
-            transformer.transform(source, result);
-        } catch (TransformerException e) {
-            throw new RuntimeException(e);
+            return documentToString(jaxbDoc);
         }
-    }
 
-    private Transformer newTransformer() {
-        try {
-            return TransformerFactory.newInstance().newTransformer();
-        } catch (TransformerConfigurationException e) {
-            throw new RuntimeException(e);
+        private String documentToString(Document source) {
+            Transformer transformer = newTransformer();
+            StringWriter writer = new StringWriter();
+            try {
+                transformer.transform(new DOMSource(source), new StreamResult(writer));
+                return writer.toString();
+            } catch (TransformerException e) {
+                throw new RuntimeException(e);
+            }
         }
-    }
 
-    @SuppressWarnings("unchecked")
-    private Class<? extends LogFileFilterInteractorFactory> classFromName(String factoryClassName) {
-        try {
-            return (Class<? extends LogFileFilterInteractorFactory>) Class.forName(factoryClassName);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
+        private Transformer newTransformer() {
+            try {
+                return TransformerFactory.newInstance().newTransformer();
+            } catch (TransformerConfigurationException e) {
+                throw new RuntimeException(e);
+            }
         }
-    }
 
-    private Document xmlDocumentFromStream(InputStream resourceStream) {
-        try {
-            return DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(resourceStream);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        @SuppressWarnings("unchecked")
+        private Class<? extends LogFileFilterInteractorFactory> classFromName(String factoryClassName) {
+            try {
+                return (Class<? extends LogFileFilterInteractorFactory>) Class.forName(factoryClassName);
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
         }
-    }
 
-    private volatile DocumentBuilder documentBuilder;
-    private DocumentBuilder getDocumentBuilder(){
-        if(documentBuilder == null){
-            documentBuilder = newDocumentBuilder();
+
+        private volatile DocumentBuilder documentBuilder;
+        private DocumentBuilder getDocumentBuilder(){
+            if(documentBuilder == null){
+                documentBuilder = newDocumentBuilder();
+            }
+            return documentBuilder;
         }
-        return documentBuilder;
-    }
 
-    private DocumentBuilder newDocumentBuilder() {
-        try {
-            return DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        } catch (ParserConfigurationException e) {
-            throw new RuntimeException(e);
+        private DocumentBuilder newDocumentBuilder() {
+            try {
+                return DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            } catch (ParserConfigurationException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+
+        private Document xmlDocumentFromStream(InputStream resourceStream) {
+            try {
+                return DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(resourceStream);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
     }
-
     public LogFileFilterInteractorFactory getDecorated() {
         return decorated;
     }
