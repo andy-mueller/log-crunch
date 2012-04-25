@@ -17,10 +17,11 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.InputStream;
+import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 
-class XmlConfiguredLogFileFilterInteractorFactory implements LogFileFilterInteractorFactory{
+class XmlConfiguredLogFileFilterInteractorFactory implements LogFileFilterInteractorFactory {
     private static final String FactoryClassSection = "factoryClass";
     private static final String FactoryConfigSection = "factoryConfig";
     private final LogFileFilterInteractorFactory decorated;
@@ -29,44 +30,51 @@ class XmlConfiguredLogFileFilterInteractorFactory implements LogFileFilterIntera
         XmlConfiguration xmlConf = new XmlConfiguration(resourceStream);
         decorated = xmlConf.load();
     }
-    private static class XmlConfiguration{
+
+    private static class XmlConfiguration {
         private final Document configDocument;
 
         public XmlConfiguration(InputStream resourceStream) {
             configDocument = xmlDocumentFromStream(resourceStream);
         }
+
         LogFileFilterInteractorFactory load() {
-            Class<? extends LogFileFilterInteractorFactory> factoryClass = classFromName(getFactoryClassNode(configDocument));
-
-            String jaxbXmlText = getJaxbConfigPartOfXml(configDocument);
-            StringReader jaxbStream = new StringReader(jaxbXmlText);
-
+            Class<? extends LogFileFilterInteractorFactory> factoryClass = getFactoryType();
+            Reader jaxbStream = getJaxbConfigPartOfXml(configDocument);
             return JAXB.unmarshal(jaxbStream, factoryClass);
         }
 
-        private String getFactoryClassNode(Document configDocument) {
-            return configDocument.getElementsByTagName(FactoryClassSection).item(0).getTextContent();
+        private Class<? extends LogFileFilterInteractorFactory> getFactoryType() {
+            String factoryClassTypeName = configDocument.getElementsByTagName(FactoryClassSection).item(0).getTextContent();
+            return classFromName(factoryClassTypeName);
         }
 
-        private String getJaxbConfigPartOfXml(Document configDocument) {
+        private Reader getJaxbConfigPartOfXml(Document configDocument) {
             Node factoryConfig = configDocument.getElementsByTagName(FactoryConfigSection).item(0);
-            NodeList childNodes = factoryConfig.getChildNodes();
-            for(int i = 0; i < childNodes.getLength(); ++i){
-                Node current = childNodes.item(i);
-                if(current.getNodeType() != Node.ELEMENT_NODE){
-                    continue;
+            Node configElement = getFirstElementOf(factoryConfig.getChildNodes());
+            return new StringReader(nodeToString(configElement));
+        }
+
+        private Node getFirstElementOf(NodeList nodes) {
+            for (int i = 0; i < nodes.getLength(); ++i) {
+                Node current = nodes.item(i);
+                if (current.getNodeType() == Node.ELEMENT_NODE) {
+                    return current;
                 }
-                return nodeToString(current);
             }
             throw new IllegalArgumentException();
         }
 
         private String nodeToString(Node node) {
-            Document jaxbDoc = getDocumentBuilder().newDocument();
-            node = jaxbDoc.importNode(node, true);
-            jaxbDoc.appendChild(node);
+            Document temporaryDocument = createDocumentWithNode(node);
+            return documentToString(temporaryDocument);
+        }
 
-            return documentToString(jaxbDoc);
+        private Document createDocumentWithNode(Node node) {
+            Document temporaryDocument = getDocumentBuilder().newDocument();
+            node = temporaryDocument.importNode(node, true);
+            temporaryDocument.appendChild(node);
+            return temporaryDocument;
         }
 
         private String documentToString(Document source) {
@@ -99,8 +107,9 @@ class XmlConfiguredLogFileFilterInteractorFactory implements LogFileFilterIntera
 
 
         private volatile DocumentBuilder documentBuilder;
-        private DocumentBuilder getDocumentBuilder(){
-            if(documentBuilder == null){
+
+        private DocumentBuilder getDocumentBuilder() {
+            if (documentBuilder == null) {
                 documentBuilder = newDocumentBuilder();
             }
             return documentBuilder;
@@ -114,7 +123,6 @@ class XmlConfiguredLogFileFilterInteractorFactory implements LogFileFilterIntera
             }
         }
 
-
         private Document xmlDocumentFromStream(InputStream resourceStream) {
             try {
                 return getDocumentBuilder().parse(resourceStream);
@@ -123,12 +131,13 @@ class XmlConfiguredLogFileFilterInteractorFactory implements LogFileFilterIntera
             }
         }
     }
+
     public LogFileFilterInteractorFactory getDecorated() {
         return decorated;
     }
 
     @Override
     public LogFileFilterInteractor createInteractor() {
-        return decorated.createInteractor();
+        return getDecorated().createInteractor();
     }
 }
