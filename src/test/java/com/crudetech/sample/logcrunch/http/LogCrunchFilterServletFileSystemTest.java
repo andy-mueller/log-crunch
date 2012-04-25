@@ -2,7 +2,6 @@ package com.crudetech.sample.logcrunch.http;
 
 import com.crudetech.sample.Iterables;
 import com.crudetech.sample.logcrunch.FileTestLogFile;
-import com.crudetech.sample.logcrunch.TestLogFile;
 import org.joda.time.Interval;
 import org.junit.Rule;
 import org.junit.Test;
@@ -72,7 +71,7 @@ public class LogCrunchFilterServletFileSystemTest {
         }
     }
 
-    private static class ServletConfigStub implements ServletConfig {
+    private class ServletConfigStub implements ServletConfig {
         @Override
         public String getServletName() {
             return "";
@@ -85,14 +84,8 @@ public class LogCrunchFilterServletFileSystemTest {
 
         @Override
         public String getInitParameter(String name) {
-            if (name.equals(LogCrunchFilterServlet.InitParameters.SearchPath)) {
-                return FileTestLogFile.Directory.getAbsolutePath();
-            }
-            if (name.equals(LogCrunchFilterServlet.InitParameters.Encoding)) {
-                return TestLogFile.Encoding.name();
-            }
-            if (name.equals(LogCrunchFilterServlet.InitParameters.LogLineFormat)) {
-                return TestLogFile.DateFormatPattern;
+            if (name.equals(LogCrunchFilterServlet.InitParameters.ConfigurationResource)) {
+                return "logfilter-logcrunch-test.xml";
             }
             throw new IllegalArgumentException("Unknown parameter " + name);
         }

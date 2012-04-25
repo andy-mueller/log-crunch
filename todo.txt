@@ -1,25 +1,14 @@
 -Provide http query mechanism
  GET http://localhost:8080/logcrunch/filter?fileName=machine01-%d{yyyMMdd}.log&searchRange=2007-05-07T13:55:22,100/2009-07-02&level=Info&level=Warn
 
--load interactor via configuration
-    -configure all log framework specific stuff
-    -file encoding?? or better via request?
-    -search path(s)
-    -how to build file name patterns
-    -make interactor factory config generic
-        -interface for factory
-        -just configure factory in xml document  and use jaxb to load it?
-        -dependency:
-            servlet ->logcrunch
-            logback->logcrunch
-            servlet loads logback only via xml??
-
 -interactor hurts OCP.
     -Externalize building of filters
     -prepare standard filters in logcrunch package
     -move actual wiring code into the factory implementation
      under logback
 
+-how to build file name patterns
+-allow for multiple search paths
 
 -use only complete days to search for the files on disk
     ->use decorator to normalize search dates

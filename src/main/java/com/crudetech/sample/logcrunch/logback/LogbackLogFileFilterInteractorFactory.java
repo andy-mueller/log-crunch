@@ -1,7 +1,7 @@
 package com.crudetech.sample.logcrunch.logback;
 
 import com.crudetech.sample.logcrunch.BufferedReaderLogFile;
-import com.crudetech.sample.logcrunch.LogFileFilterInteractorFactory;
+import com.crudetech.sample.logcrunch.FileSystemLogFileFilterInteractorFactory;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -10,7 +10,7 @@ import java.io.File;
 import java.nio.charset.Charset;
 
 @XmlRootElement(name = "logFileFilterInteractorFactory")
-public class LogbackLogFileFilterInteractorFactory extends LogFileFilterInteractorFactory {
+public class LogbackLogFileFilterInteractorFactory extends FileSystemLogFileFilterInteractorFactory {
     @XmlElement
     private String logLineFormat;
     @XmlElement
@@ -52,11 +52,10 @@ public class LogbackLogFileFilterInteractorFactory extends LogFileFilterInteract
 
         LogbackLogFileFilterInteractorFactory that = (LogbackLogFileFilterInteractorFactory) o;
 
-        if (!encoding.equals(that.encoding)) return false;
-        if (!logLineFormat.equals(that.logLineFormat)) return false;
-        if (!searchPath.equals(that.searchPath)) return false;
+        return encoding.equals(that.encoding)
+            && logLineFormat.equals(that.logLineFormat)
+            && searchPath.equals(that.searchPath);
 
-        return true;
     }
 
     @Override

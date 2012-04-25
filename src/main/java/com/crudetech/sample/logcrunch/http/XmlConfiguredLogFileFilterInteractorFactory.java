@@ -1,8 +1,10 @@
 package com.crudetech.sample.logcrunch.http;
 
+import com.crudetech.sample.logcrunch.LogFileFilterInteractor;
 import com.crudetech.sample.logcrunch.LogFileFilterInteractorFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import javax.xml.bind.JAXB;
 import javax.xml.parsers.DocumentBuilder;
@@ -20,34 +22,48 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 
-public class JaxbLogFileFilterInteractorFactory {
+class XmlConfiguredLogFileFilterInteractorFactory implements LogFileFilterInteractorFactory{
+    private static final String FactoryClassSection = "factoryClass";
+    private static final String FactoryConfigSection = "factoryConfig";
     private final LogFileFilterInteractorFactory decorated;
 
-    public JaxbLogFileFilterInteractorFactory(InputStream resourceStream) {
+    XmlConfiguredLogFileFilterInteractorFactory(InputStream resourceStream) {
         Document configDocument = xmlDocumentFromStream(resourceStream);
-        Node factoryClassName = configDocument.getElementsByTagName("factoryClass").item(0);
+        Node factoryClassName = configDocument.getElementsByTagName(FactoryClassSection).item(0);
         Class<? extends LogFileFilterInteractorFactory> factoryClass = classFromName(factoryClassName.getTextContent());
 
-        Node jaxBNode = configDocument.getElementsByTagName("factoryConfig").item(0);
-        String jaxbXmlText = nodeToString(jaxBNode.getFirstChild());
+        String jaxbXmlText = getConfigXml(configDocument);
 
         StringReader jaxbStream = new StringReader(jaxbXmlText);
 
         decorated = JAXB.unmarshal(jaxbStream, factoryClass);
     }
 
+    private String getConfigXml(Document configDocument) {
+        Node factoryConfig = configDocument.getElementsByTagName(FactoryConfigSection).item(0);
+        NodeList childNodes = factoryConfig.getChildNodes();
+        for(int i = 0; i < childNodes.getLength(); ++i){
+            Node current = childNodes.item(i);
+            if(current.getNodeType() != Node.ELEMENT_NODE){
+                continue;
+            }
+            return nodeToString(current);
+        }
+        throw new IllegalArgumentException();
+    }
+
     private String nodeToString(Node node) {
         Transformer transformer = newTransformer();
         StringWriter writer = new StringWriter();
-        Result result = new StreamResult(writer);
 
         Document jaxbDoc = getDocumentBuilder().newDocument();
-        Node jaxbNode = node.getChildNodes().item(0)  ;
-        jaxbNode = jaxbDoc.adoptNode(jaxbNode);
-        jaxbDoc.appendChild(jaxbNode);
+        node = jaxbDoc.importNode(node, true);
+        node = jaxbDoc.adoptNode(node);
+        jaxbDoc.appendChild(node);
 
 
         Source source = new DOMSource(jaxbDoc);
+        Result result = new StreamResult(writer);
         transform(transformer, result, source);
         return writer.toString();
     }
@@ -103,5 +119,10 @@ public class JaxbLogFileFilterInteractorFactory {
 
     public LogFileFilterInteractorFactory getDecorated() {
         return decorated;
+    }
+
+    @Override
+    public LogFileFilterInteractor createInteractor() {
+        return decorated.createInteractor();
     }
 }

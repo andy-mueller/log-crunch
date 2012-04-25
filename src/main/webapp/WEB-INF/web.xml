@@ -10,17 +10,8 @@
         <servlet-class>com.crudetech.sample.logcrunch.http.LogCrunchFilterServlet</servlet-class>
 
         <init-param>
-            <param-name>searchPath</param-name>
-            <param-value>C:\Users\Andy\AppData\Local\Temp\logcrunch</param-value>
-        </init-param>
-
-        <init-param>
-            <param-name>encoding</param-name>
-            <param-value>UTF-8</param-value>
-        </init-param>
-        <init-param>
-            <param-name>logLineFormat</param-name>
-            <param-value>yyyy-MM-dd HH:mm:ss</param-value>
+            <param-name>configurationResource</param-name>
+            <param-value>logfilter-logcrunch.xml</param-value>
         </init-param>
     </servlet>
 

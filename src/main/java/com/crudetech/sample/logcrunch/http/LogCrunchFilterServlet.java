@@ -5,7 +5,6 @@ import com.crudetech.sample.logcrunch.LogFileFilterInteractor;
 import com.crudetech.sample.logcrunch.LogFileFilterInteractorFactory;
 import com.crudetech.sample.logcrunch.LogFileNamePattern;
 import com.crudetech.sample.logcrunch.LogLine;
-import com.crudetech.sample.logcrunch.logback.LogbackLogFileFilterInteractorFactory;
 import com.crudetech.sample.logcrunch.logback.LogbackLogFileNamePattern;
 import org.joda.time.Interval;
 
@@ -14,10 +13,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
+import java.io.Closeable;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
-import java.nio.charset.Charset;
 import java.util.Map;
 
 public class LogCrunchFilterServlet extends HttpServlet {
@@ -41,9 +40,7 @@ public class LogCrunchFilterServlet extends HttpServlet {
     }
 
     static class InitParameters {
-        static final String SearchPath = "searchPath";
-        static final String Encoding = "encoding";
-        static final String LogLineFormat = "logLineFormat";
+        static final String ConfigurationResource = "configurationResource";
     }
 
 
@@ -107,10 +104,20 @@ public class LogCrunchFilterServlet extends HttpServlet {
     }
 
     private void loadLodFileFilterFromConfig(ServletConfig config) {
-        File searchPath = new File(config.getInitParameter(InitParameters.SearchPath));
-        Charset encoding = Charset.forName(config.getInitParameter(InitParameters.Encoding));
-        String logLineFormat = config.getInitParameter(InitParameters.LogLineFormat);
+        String configResource = config.getInitParameter(InitParameters.ConfigurationResource);
+        InputStream configFile = getClass().getResourceAsStream("/"+ configResource);
+        try {
+            this.logFileFilterInteractorFactory = new XmlConfiguredLogFileFilterInteractorFactory(configFile);
+        } finally {
+            close(configFile);
+        }
+    }
 
-        this.logFileFilterInteractorFactory = new LogbackLogFileFilterInteractorFactory(searchPath, encoding, logLineFormat);
+    private void close(Closeable closeable) {
+        try {
+            closeable.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
