@@ -56,23 +56,6 @@ public class LogFileFilterInteractorTest {
     }
 
 
-    static class ArrayListLogFile implements LogFile {
-        private final List<LogLine> lines;
-
-        ArrayListLogFile(List<LogLine> lines) {
-            this.lines = lines;
-        }
-
-        @Override
-        public Iterable<LogLine> getLines() {
-            return lines;
-        }
-
-        @Override
-        public void close() {
-        }
-    }
-
     @Test
     public void levelFiltersAreApplied() {
         setupLocator(logFileStub1, logFileStub2);

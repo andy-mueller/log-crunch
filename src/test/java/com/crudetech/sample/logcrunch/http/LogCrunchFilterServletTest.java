@@ -1,10 +1,6 @@
 package com.crudetech.sample.logcrunch.http;
 
-import com.crudetech.sample.logcrunch.InMemoryTestLogFile;
-import com.crudetech.sample.logcrunch.LogFile;
-import com.crudetech.sample.logcrunch.LogFileFilterInteractor;
-import com.crudetech.sample.logcrunch.LogLevel;
-import com.crudetech.sample.logcrunch.logback.LogbackLogFileFilterInteractorFactory;
+import com.crudetech.sample.logcrunch.*;
 import com.crudetech.sample.logcrunch.logback.LogbackLogFileNamePattern;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
@@ -17,14 +13,13 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Arrays;
+import java.util.Collections;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class LogCrunchFilterServletTest {
 
@@ -164,10 +159,46 @@ public class LogCrunchFilterServletTest {
     @Test
     public void newInteractorUsesFactory() throws Exception {
         LogCrunchFilterServlet servlet = new LogCrunchFilterServlet();
-        servlet.logFileFilterInteractorFactory = mock(LogbackLogFileFilterInteractorFactory.class);
+        servlet.logFileFilterInteractorFactory = mock(LogFileFilterInteractorFactory.class);
         LogFileFilterInteractor interactor = mock(LogFileFilterInteractor.class);
         when(servlet.logFileFilterInteractorFactory.createInteractor()).thenReturn(interactor);
 
         assertThat(servlet.newInteractor(), is(interactor));
+    }
+
+
+    static class CloseCountingLogFileStub extends ArrayListLogFile{
+        private int closeCount = 0;
+        CloseCountingLogFileStub() {
+            super(Collections.<LogLine>emptyList());
+        }
+
+        @Override
+        public void close() {
+            super.close();
+            ++closeCount;
+        }
+    }
+    static class CloseCountingLogFileLocatorStub implements LogFileLocator{
+        CloseCountingLogFileStub closeCountingLogFile = new CloseCountingLogFileStub();
+        @Override
+        public Iterable<LogFile> find(LogFileNamePattern fileName, Iterable<Interval> ranges) {
+            return asList((LogFile)closeCountingLogFile);
+        }
+    }
+    @Test
+    public void logFilesAreClosed() throws Exception {
+        LogCrunchFilterServlet servlet = new LogCrunchFilterServlet();
+        servlet.logFileFilterInteractorFactory = mock(LogFileFilterInteractorFactory.class);
+        CloseCountingLogFileLocatorStub locatorStub = new CloseCountingLogFileLocatorStub();
+        LogFileFilterInteractor interactor = new LogFileFilterInteractor(locatorStub);
+        when(servlet.logFileFilterInteractorFactory.createInteractor()).thenReturn(interactor);
+
+        request.putParameter(LogCrunchFilterServlet.RequestParameters.SearchRange, AllTimeInTheWorld.toString());
+        request.putParameter(LogCrunchFilterServlet.RequestParameters.LogFileNamePattern, "xyz-%d{yyyMMdd}.log");
+
+        servlet.doGet(request, response);
+
+        assertThat(locatorStub.closeCountingLogFile.closeCount, is(1));
     }
 }

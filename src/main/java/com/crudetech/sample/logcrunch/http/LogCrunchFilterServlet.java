@@ -1,10 +1,6 @@
 package com.crudetech.sample.logcrunch.http;
 
-import com.crudetech.sample.logcrunch.LogFile;
-import com.crudetech.sample.logcrunch.LogFileFilterInteractor;
-import com.crudetech.sample.logcrunch.LogFileFilterInteractorFactory;
-import com.crudetech.sample.logcrunch.LogFileNamePattern;
-import com.crudetech.sample.logcrunch.LogLine;
+import com.crudetech.sample.logcrunch.*;
 import com.crudetech.sample.logcrunch.logback.LogbackLogFileNamePattern;
 import org.joda.time.Interval;
 
@@ -72,6 +68,13 @@ public class LogCrunchFilterServlet extends HttpServlet {
         LogFileFilterInteractor logFileFilterInteractor = newInteractor();
         Iterable<LogFile> filteredLogFiles = logFileFilterInteractor.getFilteredLogFiles(query);
         writeFilteredLogFilesToOutputStream(resp.getWriter(), filteredLogFiles);
+        close(filteredLogFiles);
+    }
+
+    private void close(Iterable<LogFile> logFiles) {
+        for (LogFile logFile : logFiles) {
+            logFile.close();
+        }
     }
 
     private void writeFilteredLogFilesToOutputStream(PrintWriter responseWriter, Iterable<LogFile> filteredLogFiles) throws IOException {
