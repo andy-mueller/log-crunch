@@ -7,12 +7,11 @@ import java.nio.charset.Charset;
 public abstract class FileSystemLogFileFilterInteractorFactory implements LogFileFilterInteractorFactory {
     @Override
     public LogFileFilterInteractor createInteractor() {
-        final BufferedReaderLogFile.LogLineFactory logLineFactory = logLineFactory();
 
         FileSystemLogFileLocator.LogFileFactory logfileFactory = new FileSystemLogFileLocator.LogFileFactory() {
             @Override
             public LogFile create(File logFile) {
-                return new FileLogFile(logFile, logLineFactory, getEncoding());
+                return new FileLogFile(logFile, logLineFactory(), getEncoding());
             }
         };
         LogFileLocator locator = new FileSystemLogFileLocator(getSearchPath(), logfileFactory);

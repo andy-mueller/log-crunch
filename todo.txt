@@ -1,13 +1,28 @@
 -Provide http query mechanism
  GET http://localhost:8080/logcrunch/filter?fileName=machine01-%d{yyyMMdd}.log&searchRange=2007-05-07T13:55:22,100/2009-07-02&level=Info&level=Warn
 
--interactor hurts OCP.
-    -Externalize building of filters
-    -prepare standard filters in logcrunch package
-    -move actual wiring code into the factory implementation
-     under logback
+-return a 404 "nothing found", if the filtered returns nothing.
+ Elaborate on the reason in the log message:
+    -no file(s) found in path
+    -no lines to display
+
+-logging facilities for this application
+    -log full request in debug mode
+
+
+-More filtering
+    -filter logger with regex
+    -filter message with regex
+    -interactor hurts OCP.
+        -Externalize building of filters
+        -prepare standard filters in logcrunch package
+        -move actual wiring code into the factory implementation
+         under logback
 
 -how to build file name patterns
+    -should they be provided from the client?
+    -alt.:interactor build them from different parts of the query
+
 -allow for multiple search paths
 
 -use only complete days to search for the files on disk
@@ -21,5 +36,4 @@
 
 -parse multiline log lines
 
--filter logger with regex
--filter message with regex
+

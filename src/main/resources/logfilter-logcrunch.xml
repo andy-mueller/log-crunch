@@ -3,8 +3,8 @@
     <factoryClass>com.crudetech.sample.logcrunch.logback.LogbackLogFileFilterInteractorFactory</factoryClass>
     <factoryConfig>
         <logFileFilterInteractorFactory>
-            <logLineFormat>yyyyMMdd</logLineFormat>
-            <searchPath>C:\Users\Andy\AppData\Local\Temp</searchPath>
+            <logLineFormat>yyyy-MM-dd HH:mm:ss</logLineFormat>
+            <searchPath>C:\Users\Andy\AppData\Local\Temp\logcrunch</searchPath>
             <encoding>UTF-8</encoding>
         </logFileFilterInteractorFactory>
     </factoryConfig>
