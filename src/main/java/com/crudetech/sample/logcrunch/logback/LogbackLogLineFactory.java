@@ -1,5 +1,7 @@
 package com.crudetech.sample.logcrunch.logback;
 
+import com.crudetech.sample.filter.MappingIterable;
+import com.crudetech.sample.filter.UnaryFunction;
 import com.crudetech.sample.logcrunch.BufferedReaderLogFile;
 import com.crudetech.sample.logcrunch.LogLine;
 import org.joda.time.format.DateTimeFormat;
@@ -13,8 +15,17 @@ public class LogbackLogLineFactory implements BufferedReaderLogFile.LogLineFacto
     }
 
     @Override
-    public LogLine newLogLine(String lineContent) {
-        DateTimeFormatter formatter = DateTimeFormat.forPattern(dateFormat);
-        return new LogbackLogLine(lineContent, formatter);
+    public Iterable<LogLine> logLines(Iterable<String> lines) {
+        return new MappingIterable<String, LogLine>(lines, createSingleLine());
+    }
+
+    private UnaryFunction<LogLine, String> createSingleLine() {
+        final DateTimeFormatter formatter = DateTimeFormat.forPattern(dateFormat);
+        return new UnaryFunction<LogLine, String>() {
+            @Override
+            public LogLine evaluate(String lineContent) {
+                return new LogbackLogLine(lineContent, formatter);
+            }
+        };
     }
 }

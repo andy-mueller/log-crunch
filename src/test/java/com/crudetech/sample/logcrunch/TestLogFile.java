@@ -97,8 +97,17 @@ public abstract class TestLogFile extends ExternalResource implements LogFile {
     public static BufferedReaderLogFile.LogLineFactory logLineFactory(){
         return new BufferedReaderLogFile.LogLineFactory() {
             @Override
-            public LogLine newLogLine(String lineContent) {
-                return LogbackBridge.createLogLine(lineContent, DateFormat);
+            public Iterable<LogLine> logLines(Iterable<String> lines) {
+                return new MappingIterable<String, LogLine>(lines, createSingleLine());
+            }
+
+            private UnaryFunction<LogLine, String> createSingleLine() {
+                return new UnaryFunction<LogLine, String>() {
+                    @Override
+                    public LogLine evaluate(String lineContent) {
+                        return LogbackBridge.createLogLine(lineContent, DateFormat);
+                    }
+                };
             }
         };
     }
