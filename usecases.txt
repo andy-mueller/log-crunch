@@ -14,7 +14,7 @@ Primary Course
        date range
     4. System filters lines of the found files according to
        the above data
-    6. System delivers filtered log lines to user
+    5. System delivers filtered log lines to user
 
 Exception course: Validation error
     1. System delivers error to user

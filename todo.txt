@@ -6,8 +6,6 @@
     -no file(s) found in path
     -no lines to display
 
--interactor shall do the printout loop and closing of files!
-
 -logging facilities for this application
     -log full request in debug mode
 
