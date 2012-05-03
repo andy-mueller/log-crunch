@@ -3,8 +3,7 @@ package com.crudetech.sample.filter;
 import java.util.NoSuchElementException;
 
 public abstract class StateFullIterator<T> {
-    private Cursor cursor;
-    private boolean isPositioned = false;
+    private Cursor<T> cursor;
 
     public boolean hasNext() {
         if (cursor == null) {
@@ -13,15 +12,23 @@ public abstract class StateFullIterator<T> {
         return cursor.hasNext;
     }
 
-    protected abstract Cursor incrementCursor();
+    protected abstract Cursor<T> incrementCursor();
 
-    protected class Cursor {
+    protected static class Cursor<T> {
         private final boolean hasNext;
         private final T current;
 
         protected Cursor(T current, boolean hasNext) {
             this.hasNext = hasNext;
             this.current = current;
+        }
+
+        public  static <T> Cursor<T> on(T value) {
+            return new Cursor<T>(value, true);
+        }
+
+        public static <T> Cursor<T> end() {
+            return new Cursor<T>(null, false);
         }
     }
 

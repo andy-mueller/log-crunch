@@ -22,11 +22,11 @@ public class StateFullIteratorTest {
         }
 
         @Override
-        protected Cursor incrementCursor() {
+        protected Cursor<Integer> incrementCursor() {
             if(inner.hasNext()){
-                return new Cursor(inner.next(), true);
+                return Cursor.on(inner.next());
             }
-            return new Cursor(null, false);
+            return Cursor.end();
         }
     }
     @Test
