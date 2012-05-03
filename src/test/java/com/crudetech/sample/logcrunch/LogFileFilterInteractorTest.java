@@ -6,15 +6,17 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
 
-import static com.crudetech.sample.logcrunch.LogFileMatcher.equalTo;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class LogFileFilterInteractorTest {
     @Rule
@@ -27,7 +29,6 @@ public class LogFileFilterInteractorTest {
     @Before
     public void setUp() throws Exception {
         logFileNamePattern = mock(LogFileNamePattern.class);
-//        logFileNamePattern = new LogbackLogFileNamePattern("machine101-%d{yyyyMMdd}");
         locator = mock(LogFileLocator.class);
     }
 
@@ -35,14 +36,14 @@ public class LogFileFilterInteractorTest {
     public void findFiles() {
         Interval testInterval = new Interval(1, 5);
         setupLocator(asList(testInterval), logFileStub1, logFileStub2);
-        when(locator.find(logFileNamePattern, asList(testInterval))).thenReturn(asList((LogFile) logFileStub1, logFileStub2));
+        setupLocator(logFileStub1, logFileStub2);
         LogFileFilterInteractor interactor = new LogFileFilterInteractor(locator);
 
         ParameterQuery request = new ParameterQuery();
         request.setLogFileNamePattern(logFileNamePattern);
         request.addSearchInterval(testInterval);
 
-        interactor.getFilteredLogFiles(request);
+        interactor.getFilteredLines(request, new CollectingLogLineReceiverStub());
 
         verify(locator).find(logFileNamePattern, asList(testInterval));
     }
@@ -50,6 +51,7 @@ public class LogFileFilterInteractorTest {
     private void setupLocator(Iterable<Interval> intervals, LogFile... logFiles) {
         when(locator.find(logFileNamePattern, intervals)).thenReturn(asList(logFiles));
     }
+
     @SuppressWarnings("unchecked")
     private void setupLocator(LogFile... logFiles) {
         when(locator.find(eq(logFileNamePattern), any(Iterable.class))).thenReturn(asList(logFiles));
@@ -67,12 +69,15 @@ public class LogFileFilterInteractorTest {
         request.addLevel(LogLevel.Info);
         request.addLevel(LogLevel.Warn);
 
-        Iterable<LogFile> logFiles = interactor.getFilteredLogFiles(request);
+        CollectingLogLineReceiverStub lineCollector = new CollectingLogLineReceiverStub();
+        interactor.getFilteredLines(request, lineCollector);
 
-        LogFile expected1 = new ArrayListLogFile(asList(TestLogFile.SampleInfoLine, logFileStub1.logLines.get(2), logFileStub1.logLines.get(3)));
-        LogFile expected2 = new ArrayListLogFile(asList(TestLogFile.SampleInfoLine, logFileStub2.logLines.get(2), logFileStub2.logLines.get(3)));
 
-        assertLogFileIterablesEqual(logFiles, asList(expected1, expected2));
+        List<LogLine> expectedLines = new ArrayList<LogLine>();
+        expectedLines.addAll(asList(TestLogFile.SampleInfoLine, logFileStub1.logLines.get(2), logFileStub1.logLines.get(3)));
+        expectedLines.addAll(asList(TestLogFile.SampleInfoLine, logFileStub2.logLines.get(2), logFileStub2.logLines.get(3)));
+
+        assertThat(lineCollector.collectedLines, is(expectedLines));
     }
 
     private Interval allTimeOfTheWorld() {
@@ -80,16 +85,14 @@ public class LogFileFilterInteractorTest {
     }
 
 
-    private void assertLogFileIterablesEqual(Iterable<LogFile> lhs, List<LogFile> rhs) {
-        Iterator<LogFile> ilhs = lhs.iterator();
-        Iterator<LogFile> irhs = rhs.iterator();
 
-        int count = 0;
-        while (ilhs.hasNext() && irhs.hasNext()) {
-            assertThat(Integer.toString(count++), ilhs.next(), equalTo(irhs.next()));
+    static class CollectingLogLineReceiverStub implements LogFileFilterInteractor.LogLineReceiver {
+        private List<LogLine> collectedLines = new ArrayList<LogLine>();
+
+        @Override
+        public void receive(LogLine line) {
+            collectedLines.add(line);
         }
-
-        assertThat("ranges have same length",ilhs.hasNext(), is(irhs.hasNext()));
     }
 
     @Test
@@ -102,10 +105,9 @@ public class LogFileFilterInteractorTest {
         request.addSearchInterval(new Interval(TestLogFile.SampleInfoLineDate, TestLogFile.SampleInfoLineDate.plusSeconds(1)));
 
 
-        Iterable<LogFile> logFiles = interactor.getFilteredLogFiles(request);
+        CollectingLogLineReceiverStub lineCollector = new CollectingLogLineReceiverStub();
+        interactor.getFilteredLines(request, lineCollector);
 
-
-        LogFile expected = new ArrayListLogFile(asList(TestLogFile.SampleInfoLine));
-        assertLogFileIterablesEqual(logFiles, asList(expected));
+        assertThat(lineCollector.collectedLines, is(asList(TestLogFile.SampleInfoLine)));
     }
 }

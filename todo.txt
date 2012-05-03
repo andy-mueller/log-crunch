@@ -6,6 +6,8 @@
     -no file(s) found in path
     -no lines to display
 
+-interactor shall do the printout loop and closing of files!
+
 -logging facilities for this application
     -log full request in debug mode
 
@@ -35,5 +37,8 @@
 -provide decorator base class for LogFile. Fix FilterLogFile then
 
 -parse multiline log lines
+    -implementation inside LogLineFactory. This is probably logback
+     specific and should be implemented in  the according package
+
 
 

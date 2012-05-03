@@ -11,42 +11,70 @@ import org.junit.rules.ExpectedException;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.util.Arrays;
 import java.util.Collections;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class LogCrunchFilterServletTest {
 
     private HttpServletRequestStub request;
     private HttpServletResponse response;
-    private LogFileFilterInteractor interactorStub;
+    private InteractorStub interactorStub;
     private LogCrunchFilterServlet logCrunchFilterServlet;
     private static final Interval AllTimeInTheWorld = new Interval(0, Long.MAX_VALUE / 2);
-    private PrintWriter responseWriter;
+    private PrintWriterStub responseWriter;
 
     @Rule
     public InMemoryTestLogFile logfile = new InMemoryTestLogFile("foobo.log");
 
+    static class PrintWriterStub extends PrintWriter{
+        private String writtenObject;
+
+        PrintWriterStub() {
+            super(mock(OutputStream.class));
+        }
+
+        @Override
+        public void println(String writtenObject) {
+            this.writtenObject = writtenObject;
+        }
+    }
     @Before
     public void setUp() throws Exception {
         request = new HttpServletRequestStub();
         response = mock(HttpServletResponse.class);
-        responseWriter = mock(PrintWriter.class);
+        responseWriter = new PrintWriterStub();
         when(response.getWriter()).thenReturn(responseWriter);
-        interactorStub = mock(LogFileFilterInteractor.class);
-        when(interactorStub.getFilteredLogFiles(any(ParameterQuery.class))).thenReturn(Arrays.<LogFile>asList(logfile));
+        interactorStub = new InteractorStub();
+
         logCrunchFilterServlet = new LogCrunchFilterServlet() {
             @Override
             LogFileFilterInteractor newInteractor() {
                 return interactorStub;
             }
         };
+    }
+
+    static class InteractorStub extends LogFileFilterInteractor{
+        private Query query;
+        private LogLineReceiver receiver;
+
+        public InteractorStub() {
+            super(mock(LogFileLocator.class));
+        }
+
+        @Override
+        public void getFilteredLines(Query query, LogLineReceiver receiver) {
+            this.query = query;
+            this.receiver = receiver;
+        }
     }
 
     @Test
@@ -61,7 +89,8 @@ public class LogCrunchFilterServletTest {
         expectedQuery.addLevel(LogLevel.Debug);
         expectedQuery.addSearchInterval(AllTimeInTheWorld);
         expectedQuery.setLogFileNamePattern(new LogbackLogFileNamePattern("machine101-%d{yyyMMdd}.log"));
-        verify(interactorStub).getFilteredLogFiles(expectedQuery);
+
+        assertThat(expectedQuery, is(interactorStub.query));
     }
 
     @Test
@@ -74,7 +103,7 @@ public class LogCrunchFilterServletTest {
         ParameterQuery expectedQuery = new ParameterQuery();
         expectedQuery.addSearchInterval(AllTimeInTheWorld);
         expectedQuery.setLogFileNamePattern(new LogbackLogFileNamePattern("machine101-%d{yyyMMdd}.log"));
-        verify(interactorStub).getFilteredLogFiles(expectedQuery);
+        assertThat(expectedQuery, is(interactorStub.query));
     }
 
     @Test
@@ -88,7 +117,7 @@ public class LogCrunchFilterServletTest {
         Interval expectedInterval = new Interval(new DateTime(2007, 5, 7, 13, 55, 22, 100), new DateTime(2009, 7, 2, 0, 0));
         expectedQuery.addSearchInterval(expectedInterval);
         expectedQuery.setLogFileNamePattern(new LogbackLogFileNamePattern("machine101-%d{yyyMMdd}.log"));
-        verify(interactorStub).getFilteredLogFiles(expectedQuery);
+        assertThat(expectedQuery, is(interactorStub.query));
     }
     @Test
     public void logFileNamePatternIsExtractedToQuery() throws Exception {
@@ -100,7 +129,7 @@ public class LogCrunchFilterServletTest {
         ParameterQuery expectedQuery = new ParameterQuery();
         expectedQuery.addSearchInterval(AllTimeInTheWorld);
         expectedQuery.setLogFileNamePattern(new LogbackLogFileNamePattern("xyz-%d{yyyMMdd}.log"));
-        verify(interactorStub).getFilteredLogFiles(expectedQuery);
+        assertThat(expectedQuery, is(interactorStub.query));
     }
 
     @Rule
@@ -140,23 +169,6 @@ public class LogCrunchFilterServletTest {
     }
 
     @Test
-    public void filteredLogLinesAreWrittenToResponse() throws Exception {
-        request.putParameter(LogCrunchFilterServlet.RequestParameters.SearchRange, AllTimeInTheWorld.toString());
-        request.putParameter(LogCrunchFilterServlet.RequestParameters.LogFileNamePattern, "xyz-%d{yyyMMdd}.log");
-
-        logCrunchFilterServlet.doGet(request, response);
-
-        assertLogLinesAreInOutput();
-    }
-
-    private void assertLogLinesAreInOutput() {
-        for(String line : logfile.getLinesAsString()){
-            verify(responseWriter).print(line);
-        }
-        verify(responseWriter, times(4)).println();
-    }
-
-    @Test
     public void newInteractorUsesFactory() throws Exception {
         LogCrunchFilterServlet servlet = new LogCrunchFilterServlet();
         servlet.logFileFilterInteractorFactory = mock(LogFileFilterInteractorFactory.class);
@@ -187,7 +199,7 @@ public class LogCrunchFilterServletTest {
         }
     }
     @Test
-    public void logFilesAreClosed() throws Exception {
+    public void logFilesAreClosedAfterRequest() throws Exception {
         LogCrunchFilterServlet servlet = new LogCrunchFilterServlet();
         servlet.logFileFilterInteractorFactory = mock(LogFileFilterInteractorFactory.class);
         CloseCountingLogFileLocatorStub locatorStub = new CloseCountingLogFileLocatorStub();
@@ -200,5 +212,25 @@ public class LogCrunchFilterServletTest {
         servlet.doGet(request, response);
 
         assertThat(locatorStub.closeCountingLogFile.closeCount, is(1));
+    }
+    @Test
+    public void resultLogLinesAreWrittenToResponse() throws Exception {
+        request.putParameter(LogCrunchFilterServlet.RequestParameters.SearchRange, AllTimeInTheWorld.toString());
+        request.putParameter(LogCrunchFilterServlet.RequestParameters.LogFileNamePattern, "xyz-%d{yyyMMdd}.log");
+
+        interactorStub = new InteractorStub(){
+            @Override
+            public void getFilteredLines(Query query, LogLineReceiver receiver) {
+                super.getFilteredLines(query,receiver);
+                receiver.receive(TestLogFile.SampleInfoLine);
+            }
+        };
+
+
+        logCrunchFilterServlet.doGet(request, response);
+
+        PrintWriterStub expected = new PrintWriterStub();
+        TestLogFile.SampleInfoLine.print(expected);
+        assertThat(responseWriter.writtenObject, is(expected.writtenObject));
     }
 }

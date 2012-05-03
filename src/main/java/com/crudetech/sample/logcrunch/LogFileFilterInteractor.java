@@ -14,6 +14,7 @@ import static com.crudetech.sample.logcrunch.LogLinePredicates.isInDateTimeRange
 
 public class LogFileFilterInteractor {
     private final LogFileLocator locator;
+
     public static interface Query {
         LogFileNamePattern getLogFileNamePattern();
         List<Interval> getSearchIntervals();
@@ -22,11 +23,25 @@ public class LogFileFilterInteractor {
         List<Pattern> getMessageRegex();
     }
 
+    public static interface LogLineReceiver{
+        void receive(LogLine line);
+    }
+
     public LogFileFilterInteractor(LogFileLocator locator) {
         this.locator = locator;
     }
 
-    public Iterable<LogFile> getFilteredLogFiles(Query model) {
+    public void getFilteredLines(Query query, LogLineReceiver receiver) {
+        Iterable<LogFile> filteredLogFiles = getFilteredLogFiles(query);
+        for (LogFile filteredLogFile : filteredLogFiles) {
+            for (LogLine logLine : filteredLogFile.getLines()) {
+                receiver.receive(logLine);
+            }
+            filteredLogFile.close();
+        }
+    }
+
+    private Iterable<LogFile> getFilteredLogFiles(Query model) {
         Iterable<LogFile> logFiles = locator.find(model.getLogFileNamePattern(), model.getSearchIntervals());
 
         FilterChain<LogLine> lineFilter = new FilterChain<LogLine>();

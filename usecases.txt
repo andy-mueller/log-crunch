@@ -1,0 +1,24 @@
+
+UC001 <Find and filter files by date, level, logger and message>
+
+Data:
+<LogFileNamePattern>    <Logger Pattern>
+<Time Intervals>        <Message Pattern>
+<Log Levels>
+
+Primary Course
+    1. User issues "Filter Log Files" query with the above
+       data
+    2. System validates data
+    3. System searches for log files within the specific
+       date range
+    4. System filters lines of the found files according to
+       the above data
+    6. System delivers filtered log lines to user
+
+Exception course: Validation error
+    1. System delivers error to user
+
+Exception course: No files found
+    1. ???
+

@@ -1,6 +1,9 @@
 package com.crudetech.sample.logcrunch.http;
 
-import com.crudetech.sample.logcrunch.*;
+import com.crudetech.sample.logcrunch.LogFileFilterInteractor;
+import com.crudetech.sample.logcrunch.LogFileFilterInteractorFactory;
+import com.crudetech.sample.logcrunch.LogFileNamePattern;
+import com.crudetech.sample.logcrunch.LogLine;
 import com.crudetech.sample.logcrunch.logback.LogbackLogFileNamePattern;
 import org.joda.time.Interval;
 
@@ -45,14 +48,7 @@ public class LogCrunchFilterServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         LogFileFilterInteractor.Query query = new ParameterQuery();
 
-        ParameterMapper mapper = new ParameterMapper(getParametersMap(req));
-        mapper.registerParameterFactory(Interval.class, new ParameterMapper.ReflectionParameterFactory("parse", String.class));
-        mapper.registerParameterFactory(LogFileNamePattern.class, new ParameterMapper.ParameterFactory() {
-            @Override
-            public Object create(Class<?> parameterType, String parameterValue) {
-                return new LogbackLogFileNamePattern(parameterValue);
-            }
-        });
+        ParameterMapper mapper = buildParameterMapper(req);
 
         try {
             mapper.mapTo(query);
@@ -66,28 +62,27 @@ public class LogCrunchFilterServlet extends HttpServlet {
 
 
         LogFileFilterInteractor logFileFilterInteractor = newInteractor();
-        Iterable<LogFile> filteredLogFiles = logFileFilterInteractor.getFilteredLogFiles(query);
-        writeFilteredLogFilesToOutputStream(resp.getWriter(), filteredLogFiles);
-        close(filteredLogFiles);
-    }
 
-    private void close(Iterable<LogFile> logFiles) {
-        for (LogFile logFile : logFiles) {
-            logFile.close();
-        }
-    }
+        final PrintWriter responseWriter = resp.getWriter();
+        logFileFilterInteractor.getFilteredLines(query, new LogFileFilterInteractor.LogLineReceiver() {
+            @Override
+            public void receive(LogLine logLine) {
+                logLine.print(responseWriter);
+                responseWriter.println();
+            }
+        });
+       }
 
-    private void writeFilteredLogFilesToOutputStream(PrintWriter responseWriter, Iterable<LogFile> filteredLogFiles) throws IOException {
-        for (LogFile filteredLogFile : filteredLogFiles) {
-            writeFilteredLogLineToOutputStream(responseWriter, filteredLogFile);
-        }
-    }
-
-    private void writeFilteredLogLineToOutputStream(PrintWriter responseWriter, LogFile filteredLogFile) {
-        for (LogLine logLine : filteredLogFile.getLines()) {
-            logLine.print(responseWriter);
-            responseWriter.println();
-        }
+    private ParameterMapper buildParameterMapper(HttpServletRequest req) {
+        ParameterMapper mapper = new ParameterMapper(getParametersMap(req));
+        mapper.registerParameterFactory(Interval.class, new ParameterMapper.ReflectionParameterFactory("parse", String.class));
+        mapper.registerParameterFactory(LogFileNamePattern.class, new ParameterMapper.ParameterFactory() {
+            @Override
+            public Object create(Class<?> parameterType, String parameterValue) {
+                return new LogbackLogFileNamePattern(parameterValue);
+            }
+        });
+        return mapper;
     }
 
     @SuppressWarnings("unchecked")
