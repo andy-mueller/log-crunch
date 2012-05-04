@@ -6,16 +6,6 @@ import java.util.NoSuchElementException;
 public abstract class CursorIterator<T> implements Iterator<T> {
     private Cursor<T> cursor;
 
-    @Override
-    public boolean hasNext() {
-        if (cursor == null) {
-            cursor = incrementCursor();
-        }
-        return cursor.hasNext;
-    }
-
-    protected abstract Cursor<T> incrementCursor();
-
     protected static class Cursor<T> {
         private final boolean hasNext;
         private final T current;
@@ -33,6 +23,20 @@ public abstract class CursorIterator<T> implements Iterator<T> {
             return new Cursor<T>(null, false);
         }
     }
+
+    @Override
+    public boolean hasNext() {
+        positionCursor();
+        return cursor.hasNext;
+    }
+
+    private void positionCursor() {
+        if (cursor == null) {
+            cursor = incrementCursor();
+        }
+    }
+
+    protected abstract Cursor<T> incrementCursor();
 
 
     @Override
