@@ -1,16 +1,19 @@
 package com.crudetech.sample.logcrunch;
 
 
+import com.crudetech.sample.filter.CursorIterator;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 
 class TextFileLineIterable implements Iterable<String> {
     interface BufferedReaderProvider {
         BufferedReader newReader();
+
         void closeReader(BufferedReader reader);
+
         boolean isClosed(BufferedReader reader);
     }
 
@@ -25,15 +28,22 @@ class TextFileLineIterable implements Iterable<String> {
         return new LineIterator();
     }
 
-    private class LineIterator implements Iterator<String> {
+    private class LineIterator extends CursorIterator<String> {
         private final BufferedReader reader;
-        private String next = null;
-        private boolean isPositioned = false;
         private boolean closedReader = false;
 
         LineIterator() {
             this.reader = readerProvider.newReader();
             closeReaderOnEnd();
+        }
+
+        @Override
+        protected Cursor<String> incrementCursor() {
+            String nextLine = readNextLine();
+            if (nextLine != null) {
+                return Cursor.on(nextLine);
+            }
+            return Cursor.end();
         }
 
         private void closeReaderOnEnd() {
@@ -44,22 +54,8 @@ class TextFileLineIterable implements Iterable<String> {
 
         @Override
         public boolean hasNext() {
-            if (isBufferedReaderClosed()) {
-                return false;
-            }
-            positionOnNextElement();
-            return next != null;
-        }
-
-        private boolean isBufferedReaderClosed() {
-            return readerProvider.isClosed(reader);
-        }
-
-        private void positionOnNextElement() {
-            if (!isPositioned) {
-                next = readNextLine();
-                isPositioned = true;
-            }
+            return isBufferedReaderOpen()
+                && super.hasNext();
         }
 
         private String readNextLine() {
@@ -72,30 +68,19 @@ class TextFileLineIterable implements Iterable<String> {
 
         @Override
         public String next() {
-            verifyConcurrentModification();
-            verifyHasNextElement();
             try {
-                return next;
+                return super.next();
             } finally {
-                moved();
                 closeReaderOnEnd();
             }
         }
 
-        private void verifyConcurrentModification() {
-            if(isBufferedReaderClosed() && !closedReader){
+        @Override
+        protected void verifyNextElement() {
+            if (isBufferedReaderClosed() && !closedReader) {
                 throw new ConcurrentModificationException();
             }
-        }
-
-        private void moved() {
-            isPositioned = false;
-        }
-
-        private void verifyHasNextElement() {
-            if (!hasNext()) {
-                throw new NoSuchElementException();
-            }
+            super.verifyNextElement();
         }
 
         private void closeReader() {
@@ -103,9 +88,11 @@ class TextFileLineIterable implements Iterable<String> {
             closedReader = true;
         }
 
-        @Override
-        public void remove() {
-            throw new UnsupportedOperationException();
+        private boolean isBufferedReaderClosed() {
+            return readerProvider.isClosed(reader);
+        }
+        private boolean isBufferedReaderOpen() {
+            return !isBufferedReaderClosed();
         }
     }
 }

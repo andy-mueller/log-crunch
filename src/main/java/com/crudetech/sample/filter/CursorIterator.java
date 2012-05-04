@@ -1,10 +1,12 @@
 package com.crudetech.sample.filter;
 
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-public abstract class StateFullIterator<T> {
+public abstract class CursorIterator<T> implements Iterator<T> {
     private Cursor<T> cursor;
 
+    @Override
     public boolean hasNext() {
         if (cursor == null) {
             cursor = incrementCursor();
@@ -18,12 +20,12 @@ public abstract class StateFullIterator<T> {
         private final boolean hasNext;
         private final T current;
 
-        protected Cursor(T current, boolean hasNext) {
+        private Cursor(T current, boolean hasNext) {
             this.hasNext = hasNext;
             this.current = current;
         }
 
-        public  static <T> Cursor<T> on(T value) {
+        public static <T> Cursor<T> on(T value) {
             return new Cursor<T>(value, true);
         }
 
@@ -33,14 +35,24 @@ public abstract class StateFullIterator<T> {
     }
 
 
+    @Override
     public T next() {
+        verifyNextElement();
+        try {
+            return cursor.current;
+        } finally {
+            cursor = incrementCursor();
+        }
+    }
+
+    protected void verifyNextElement() {
         if (!hasNext()) {
             throw new NoSuchElementException();
         }
-        T val = cursor.current;
-        if (cursor.hasNext) {
-            cursor = incrementCursor();
-        }
-        return val;
+    }
+
+    @Override
+    public void remove() {
+        throw new UnsupportedOperationException("This operation is not supported!");
     }
 }
