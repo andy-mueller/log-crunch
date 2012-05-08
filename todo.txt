@@ -9,7 +9,6 @@
 -logging facilities for this application
     -log full request in debug mode
 
-
 -More filtering
     -filter logger with regex
     -filter message with regex
