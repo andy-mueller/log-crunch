@@ -2,7 +2,7 @@
  GET http://localhost:8080/logcrunch/filter?fileName=machine01-%d{yyyMMdd}.log&searchRange=2007-05-07T13:55:22,100/2009-07-02&level=Info&level=Warn
 
 -return a 404 "nothing found", if the filtered returns nothing.
- Elaborate on the reason in the log message:
+  Elaborate on the reason in the log message:
     -no file(s) found in path
     -no lines to display
 
