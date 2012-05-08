@@ -24,11 +24,15 @@ public class FileSystemLogFileLocator implements LogFileLocator {
     }
 
     public FileSystemLogFileLocator(File logFilePath, LogFileFactory logFileFactory) {
+        verifyPathIsDirectory(logFilePath);
+        this.logFilePath = logFilePath;
+        this.logFileFactory = logFileFactory;
+    }
+
+    private void verifyPathIsDirectory(File logFilePath) {
         if (!logFilePath.isDirectory()) {
             throw new IllegalArgumentException(String.format("\"%s\" is not a directory", logFilePath));
         }
-        this.logFilePath = logFilePath;
-        this.logFileFactory = logFileFactory;
     }
 
     @Override
@@ -38,16 +42,19 @@ public class FileSystemLogFileLocator implements LogFileLocator {
         FilterChain<File> fileFilterChain = new FilterChain<File>();
         PredicateBuilder<File> filterBuilder = fileFilterChain.filterBuilder();
 
+        setupFileNamePatternFilter(fileNamePattern, ranges, filterBuilder);
+
+        Iterable<File> matchingFiles = fileFilterChain.apply(allPossibleFiles);
+
+        return new MappingIterable<File, LogFile>(matchingFiles, createLogFile());
+    }
+
+    private void setupFileNamePatternFilter(LogFileNamePattern fileNamePattern, Iterable<Interval> ranges, PredicateBuilder<File> filterBuilder) {
         filterBuilder.start(fileNameMatches(fileNamePattern));
         //JDK8: filterBuilder.start( (File f)=>fileName.matches(f.getName()); );
 
         accumulate(filterBuilder.andOpenBrace(), ranges, addRangeWithOr(fileNamePattern)).closeBrace();
         // JDK8: accumulate(filterBuilder.andOpenBrace(), ranges, (File f)=>builder.or(range.contains(fileName.dateOf(f.getName());).closeBrace();
-
-        Iterable<File> matchingFiles = fileFilterChain.apply(allPossibleFiles);
-
-        return new MappingIterable<File, LogFile>(matchingFiles, createLogFile());
-        //JDK8: new MappingIterable<File, LogFile>(matchingFiles, (File f) => logFileFactory.create(f); );
     }
 
     private BinaryFunction<PredicateBuilder<File>, PredicateBuilder<File>, Interval> addRangeWithOr(final LogFileNamePattern fileName) {
