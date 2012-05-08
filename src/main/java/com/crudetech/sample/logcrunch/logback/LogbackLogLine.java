@@ -18,7 +18,8 @@ public class LogbackLogLine implements LogLine {
     private final DateTimeFormatter dateFormat;
     private final String logger;
 
-    // %date{HH:mm:ss.SSS} %-4relative [%thread] %-5level %logger{35} - %msg %n
+    // 2007-05-06 13:23:57 demo.ZeroToFour main INFO: This is an informative message
+    // %date{yyyy-MM-dd HH:mm:ss} %logger{35} [%thread] %-5level: %msg %n
     // see: http://logback.qos.ch/manual/layouts.html
 
     public LogbackLogLine(String line, DateTimeFormatter dateFormat) {

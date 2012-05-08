@@ -2,6 +2,8 @@ package com.crudetech.sample.logcrunch;
 
 import java.io.File;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Collection;
 
 
 public abstract class FileSystemLogFileFilterInteractorFactory implements LogFileFilterInteractorFactory {
@@ -15,7 +17,14 @@ public abstract class FileSystemLogFileFilterInteractorFactory implements LogFil
             }
         };
         LogFileLocator locator = new FileSystemLogFileLocator(getSearchPath(), logfileFactory);
-        return new LogFileFilterInteractor(locator);
+        return new LogFileFilterInteractor(locator, getFilterBuilder());
+    }
+
+    protected Collection<LogFileFilterInteractor.FilterBuilder> getFilterBuilder() {
+        return new ArrayList<LogFileFilterInteractor.FilterBuilder>(){{
+            add(new LogFileFilterInteractor.LogLevelFilterBuilder());
+            add(new LogFileFilterInteractor.SearchIntervalFilterBuilder());
+        }};
     }
 
     protected abstract File getSearchPath();

@@ -13,11 +13,6 @@
 -More filtering
     -filter logger with regex
     -filter message with regex
-    -interactor hurts OCP.
-        -Externalize building of filters
-        -prepare standard filters in logcrunch package
-        -move actual wiring code into the factory implementation
-         under logback
 
 -how to build file name patterns
     -should they be provided from the client?

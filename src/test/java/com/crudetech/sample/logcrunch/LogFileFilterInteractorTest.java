@@ -1,5 +1,7 @@
 package com.crudetech.sample.logcrunch;
 
+import com.crudetech.sample.logcrunch.LogFileFilterInteractor.LogLevelFilterBuilder;
+import com.crudetech.sample.logcrunch.LogFileFilterInteractor.SearchIntervalFilterBuilder;
 import com.crudetech.sample.logcrunch.http.ParameterQuery;
 import org.joda.time.Interval;
 import org.junit.Before;
@@ -25,11 +27,15 @@ public class LogFileFilterInteractorTest {
     public InMemoryTestLogFile logFileStub2 = new InMemoryTestLogFile("machine101-20090611");
     private LogFileLocator locator;
     private LogFileNamePattern logFileNamePattern;
+    private LogFileFilterInteractor interactor;
 
     @Before
     public void setUp() throws Exception {
         logFileNamePattern = mock(LogFileNamePattern.class);
         locator = mock(LogFileLocator.class);
+        interactor = new LogFileFilterInteractor(
+                locator,
+                asList(new LogLevelFilterBuilder(), new SearchIntervalFilterBuilder()));
     }
 
     @Test
@@ -37,7 +43,6 @@ public class LogFileFilterInteractorTest {
         Interval testInterval = new Interval(1, 5);
         setupLocator(asList(testInterval), logFileStub1, logFileStub2);
         setupLocator(logFileStub1, logFileStub2);
-        LogFileFilterInteractor interactor = new LogFileFilterInteractor(locator);
 
         ParameterQuery request = new ParameterQuery();
         request.setLogFileNamePattern(logFileNamePattern);
@@ -61,7 +66,6 @@ public class LogFileFilterInteractorTest {
     @Test
     public void levelFiltersAreApplied() {
         setupLocator(logFileStub1, logFileStub2);
-        LogFileFilterInteractor interactor = new LogFileFilterInteractor(locator);
 
         ParameterQuery request = new ParameterQuery();
         request.addSearchInterval(allTimeOfTheWorld());
@@ -85,7 +89,6 @@ public class LogFileFilterInteractorTest {
     }
 
 
-
     static class CollectingLogLineReceiverStub implements LogFileFilterInteractor.LogLineReceiver {
         private List<LogLine> collectedLines = new ArrayList<LogLine>();
 
@@ -98,7 +101,6 @@ public class LogFileFilterInteractorTest {
     @Test
     public void timeFiltersAreApplied() {
         setupLocator(logFileStub1);
-        LogFileFilterInteractor interactor = new LogFileFilterInteractor(locator);
 
         ParameterQuery request = new ParameterQuery();
         request.setLogFileNamePattern(logFileNamePattern);
