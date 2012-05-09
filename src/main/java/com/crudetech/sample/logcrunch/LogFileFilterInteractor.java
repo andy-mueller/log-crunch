@@ -32,7 +32,7 @@ public class LogFileFilterInteractor {
         List<Pattern> getMessageRegex();
     }
 
-    public static interface LogLineReceiver {
+    public static interface FilteredLogLineReceiver {
         void receive(LogLine line);
     }
 
@@ -45,10 +45,10 @@ public class LogFileFilterInteractor {
         this.locator = locator;
     }
 
-    public void getFilteredLines(Query query, LogLineReceiver receiver) {
+    public void getFilteredLines(Query query, FilteredLogLineReceiver receiverFiltered) {
         for (LogFile filteredLogFile : getFilteredLogFiles(query)) {
             for (LogLine logLine : filteredLogFile.getLines()) {
-                receiver.receive(logLine);
+                receiverFiltered.receive(logLine);
             }
             filteredLogFile.close();
         }

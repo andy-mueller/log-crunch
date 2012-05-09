@@ -74,7 +74,7 @@ public class LogCrunchFilterServletTest {
         }
 
         @Override
-        public void getFilteredLines(Query query, LogLineReceiver receiver) {
+        public void getFilteredLines(Query query, FilteredLogLineReceiver receiverFiltered) {
             this.query = query;
         }
     }
@@ -235,9 +235,9 @@ public class LogCrunchFilterServletTest {
 
         interactorStub = new InteractorStub() {
             @Override
-            public void getFilteredLines(Query query, LogLineReceiver receiver) {
-                super.getFilteredLines(query, receiver);
-                receiver.receive(TestLogFile.SampleInfoLine);
+            public void getFilteredLines(Query query, FilteredLogLineReceiver receiverFiltered) {
+                super.getFilteredLines(query, receiverFiltered);
+                receiverFiltered.receive(TestLogFile.SampleInfoLine);
             }
         };
 

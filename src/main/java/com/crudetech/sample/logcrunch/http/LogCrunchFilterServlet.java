@@ -64,7 +64,7 @@ public class LogCrunchFilterServlet extends HttpServlet {
         LogFileFilterInteractor logFileFilterInteractor = newInteractor();
 
         final PrintWriter responseWriter = resp.getWriter();
-        logFileFilterInteractor.getFilteredLines(query, new LogFileFilterInteractor.LogLineReceiver() {
+        logFileFilterInteractor.getFilteredLines(query, new LogFileFilterInteractor.FilteredLogLineReceiver() {
             @Override
             public void receive(LogLine logLine) {
                 logLine.print(responseWriter);
