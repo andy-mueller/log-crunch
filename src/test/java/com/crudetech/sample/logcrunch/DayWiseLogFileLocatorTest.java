@@ -68,7 +68,7 @@ public class DayWiseLogFileLocatorTest {
         }
     };
     @Test
-    public void searchPatternIsPassedToDecorated() throws Exception {
+    public void searchPatternIsPassedToDecoratedLocator() throws Exception {
         LogFileLocatorStub logFileLocatorStub = new LogFileLocatorStub();
         DayWiseLogFileLocator dayWiseLogFileLocator = new DayWiseLogFileLocator(logFileLocatorStub);
 
@@ -83,7 +83,7 @@ public class DayWiseLogFileLocatorTest {
     }
 
     @Test
-    public void resultOfDecoratedLocatorIsPassedPack() throws Exception {
+    public void resultOfDecoratedLocatorIsPassedBackThroughDecorator() throws Exception {
         LogFileLocatorStub logFileLocatorStub = new LogFileLocatorStub();
         DayWiseLogFileLocator dayWiseLogFileLocator = new DayWiseLogFileLocator(logFileLocatorStub);
 
