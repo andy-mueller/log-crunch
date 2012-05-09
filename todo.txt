@@ -19,8 +19,6 @@
 
 -allow for multiple search paths
 
--use only complete days to search for the files on disk
-    ->use decorator to normalize search dates
 
 -LogbackLogLine: pass format string as second ctor parameter
     -eliminate date time formatter

@@ -16,7 +16,9 @@ public abstract class FileSystemLogFileFilterInteractorFactory implements LogFil
                 return new FileLogFile(logFile, logLineFactory(), getEncoding());
             }
         };
-        LogFileLocator locator = new FileSystemLogFileLocator(getSearchPath(), logfileFactory);
+        LogFileLocator locator = new DayWiseLogFileLocator(
+                new FileSystemLogFileLocator(getSearchPath(), logfileFactory)
+                );
         return new LogFileFilterInteractor(locator, getFilterBuilder());
     }
 
