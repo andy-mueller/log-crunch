@@ -10,7 +10,6 @@ import org.junit.rules.ExpectedException;
 
 import java.io.File;
 import java.nio.charset.Charset;
-import java.text.ParseException;
 import java.util.List;
 
 import static com.crudetech.sample.Iterables.copy;
@@ -40,11 +39,11 @@ public class FileSystemLogFileLocatorTest {
         return new DateTime(0);
     }
 
-    private DateTime getSeventhOfMay() throws ParseException {
+    private DateTime getSeventhOfMay() {
         return new DateTime(2007, 5, 7, 0, 0);
     }
 
-    private DateTime get8thOfMay() throws ParseException {
+    private DateTime get8thOfMay() {
         return new DateTime(2007, 5, 8, 0, 0);
     }
 

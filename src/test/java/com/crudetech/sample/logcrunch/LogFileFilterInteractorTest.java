@@ -90,7 +90,7 @@ public class LogFileFilterInteractorTest {
 
 
     static class CollectingLogLineReceiverStub implements LogFileFilterInteractor.FilteredLogLineReceiver {
-        private List<LogLine> collectedLines = new ArrayList<LogLine>();
+        private final List<LogLine> collectedLines = new ArrayList<LogLine>();
 
         @Override
         public void receive(LogLine line) {

@@ -51,7 +51,7 @@ public class LogCrunchFilterServletFileSystemTest {
             super(mock(HttpServletResponse.class));
         }
 
-        List<String> lines = new ArrayList<String>();
+        final List<String> lines = new ArrayList<String>();
         private String tmp = "";
 
         @Override

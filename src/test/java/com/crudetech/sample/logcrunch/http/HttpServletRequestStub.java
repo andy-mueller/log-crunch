@@ -8,7 +8,7 @@ import java.util.Map;
 import static org.mockito.Mockito.mock;
 
 class HttpServletRequestStub extends HttpServletRequestWrapper {
-    private Map<String, String[]> parameters = new HashMap<String, String[]>();
+    private final Map<String, String[]> parameters = new HashMap<String, String[]>();
 
     HttpServletRequestStub() {
         super(mock(HttpServletRequest.class));

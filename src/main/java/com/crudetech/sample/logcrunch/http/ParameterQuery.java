@@ -11,10 +11,10 @@ import java.util.regex.Pattern;
 
 public class ParameterQuery implements LogFileFilterInteractor.Query {
     private LogFileNamePattern logFileNamePattern;
-    private List<Interval> searchIntervals = new ArrayList<Interval>();
-    private List<LogLevel> levels = new ArrayList<LogLevel>();
-    private List<Pattern> loggers = new ArrayList<Pattern>();
-    private List<Pattern> messageRegex = new ArrayList<Pattern>();
+    private final List<Interval> searchIntervals = new ArrayList<Interval>();
+    private final List<LogLevel> levels = new ArrayList<LogLevel>();
+    private final List<Pattern> loggers = new ArrayList<Pattern>();
+    private final List<Pattern> messageRegex = new ArrayList<Pattern>();
 
     @Parameter(value = "logFileNamePattern")
     public void setLogFileNamePattern(LogFileNamePattern logFileNamePattern) {

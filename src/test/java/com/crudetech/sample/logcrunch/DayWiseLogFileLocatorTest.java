@@ -57,7 +57,7 @@ public class DayWiseLogFileLocatorTest {
             return asList(logFile);
         }
     }
-    private static LogFile logFile = new LogFile() {
+    private static final LogFile logFile = new LogFile() {
         @Override
         public Iterable<LogLine> getLines() {
             return emptyList();

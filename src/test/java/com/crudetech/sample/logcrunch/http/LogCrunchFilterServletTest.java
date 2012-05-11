@@ -198,7 +198,7 @@ public class LogCrunchFilterServletTest {
     }
 
     static class CloseCountingLogFileLocatorStub implements LogFileLocator {
-        CloseCountingLogFileStub closeCountingLogFile = new CloseCountingLogFileStub();
+        final CloseCountingLogFileStub closeCountingLogFile = new CloseCountingLogFileStub();
 
         @Override
         public Iterable<LogFile> find(LogFileNamePattern fileName, Iterable<Interval> ranges) {

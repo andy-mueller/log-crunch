@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 
 public class LogbackLogLine implements LogLine {
     private final LogLevel level;
-    private DateTime date;
+    private final DateTime date;
     private final String line;
     private final DateTimeFormatter dateFormat;
     private final String logger;

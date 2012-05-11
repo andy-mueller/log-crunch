@@ -203,6 +203,7 @@ public class ParameterMapper {
             ++called;
         }
 
+        @SuppressWarnings("UnusedReturnValue")
         private static Object invokeMethod(Method method, Object o, Object parameter) {
             method.setAccessible(true);
             try {

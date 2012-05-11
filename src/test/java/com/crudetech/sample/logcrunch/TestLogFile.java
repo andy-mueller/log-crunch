@@ -22,9 +22,9 @@ import static java.util.Arrays.asList;
 
 public abstract class TestLogFile extends ExternalResource implements LogFile {
     public static final Charset Encoding = Charset.forName("UTF-8");
-    public static String DateFormatPattern = "yyyy-MM-dd HH:mm:ss";
-    static DateTimeFormatter DateFormat = DateTimeFormat.forPattern(DateFormatPattern);
-    static DateTime SampleInfoLineDate = new DateTime(2009, 6, 7, 13,23, 57);
+    public static final String DateFormatPattern = "yyyy-MM-dd HH:mm:ss";
+    static final DateTimeFormatter DateFormat = DateTimeFormat.forPattern(DateFormatPattern);
+    static final DateTime SampleInfoLineDate = new DateTime(2009, 6, 7, 13,23, 57);
     public static final LogLine SampleInfoLine = LogbackBridge.createLogLine(MessageFormat.format("{0} demo.ZeroToFour main INFO: This is an informative message", DateFormat.print(SampleInfoLineDate)), DateFormat);
 
     final String name;

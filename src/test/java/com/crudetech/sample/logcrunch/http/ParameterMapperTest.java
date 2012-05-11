@@ -24,6 +24,7 @@ public class ParameterMapperTest {
     }
     @Test
     public void parameterIsMatchedToAnnotationWhenPresent(){
+        @SuppressWarnings("UnusedDeclaration")
         class TestClass{
             private Integer item = 0;
             @Parameter("item")
@@ -45,6 +46,7 @@ public class ParameterMapperTest {
 
     @Test
     public void primitivesAreConverted(){
+        @SuppressWarnings("UnusedDeclaration")
         class TestClass{
             private Integer item = 0;
             @Parameter("item")
@@ -69,6 +71,7 @@ public class ParameterMapperTest {
     @Test
     public void enumsAreMapped(){
 
+        @SuppressWarnings("UnusedDeclaration")
         class TestClass{
             private AnEnum item = AnEnum.E1;
             @Parameter("anEnum")
@@ -90,8 +93,9 @@ public class ParameterMapperTest {
 
     @Test
     public void multipleParametersValuesCallMethodForEach(){
+        @SuppressWarnings("UnusedDeclaration")
         class TestClass{
-            private List<Integer> items = new ArrayList<Integer>();
+            private final List<Integer> items = new ArrayList<Integer>();
             @Parameter("item")
             public void setItem(int item){
                 items.add(item);
@@ -111,7 +115,7 @@ public class ParameterMapperTest {
 
     @Test
     public void stringsAreMapped(){
-
+        @SuppressWarnings("UnusedDeclaration")
         class TestClass{
             private String item = "";
             @Parameter("aString")
@@ -131,7 +135,8 @@ public class ParameterMapperTest {
         assertThat(instance.item, is("Some Text"));
     }
 
-    class IntervalData {
+    @SuppressWarnings("UnusedDeclaration")
+    static class IntervalData {
         private Interval intervalWithParseMethod;
         @Parameter("aInterval")
         public void setItem(Interval i){
@@ -172,6 +177,7 @@ public class ParameterMapperTest {
 
     @Test
     public void allParametersAreRequiredByDefault(){
+        @SuppressWarnings("UnusedDeclaration")
         class TestClass{
             private int item = 42;
             @Parameter("unused")
@@ -189,6 +195,7 @@ public class ParameterMapperTest {
     }
     @Test
     public void parametersCanBeNotRequired(){
+        @SuppressWarnings("UnusedDeclaration")
         class TestClass{
             private int item = 42;
             @Parameter(value= "unused", required = false)

@@ -13,15 +13,11 @@ import java.nio.charset.Charset;
 
 class LogFileFilterInteractorFactoryStub extends FileSystemLogFileFilterInteractorFactory {
     @XmlElement
-    private int aMember;
+    private final int aMember;
     transient int createInteractorCalled = 0;
 
     public LogFileFilterInteractorFactoryStub(int i) {
         aMember = i;
-    }
-
-    public LogFileFilterInteractorFactoryStub() {
-        aMember = 0;
     }
 
     @Override

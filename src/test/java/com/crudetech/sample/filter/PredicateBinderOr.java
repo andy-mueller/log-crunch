@@ -57,7 +57,7 @@ public class PredicateBinderOr {
 
     @Test
     public void or(){
-
+        @SuppressWarnings("unchecked")
         Predicate<Integer> or = Predicates.or(firstPred, secondPred, thirdPred);
         
         assertThat(or.evaluate(AnyInt), is(expectedResult));
