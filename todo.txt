@@ -9,6 +9,10 @@
     -where are the exceptions located? In the interactor?
     -error handling shall be done in decorator
     -do we need a boundary/interactor interface
+  -alt.: provide onError handler for interactor
+    -in both cases, the interactor decides if this condition occurs,
+     but here exceptions are hot used for the cntroll flow!!
+    -this is tell don't ask!
 
 -logging facilities for this application
     -log full request in debug mode
