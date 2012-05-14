@@ -20,7 +20,7 @@ public class LogFileFilterInteractor {
     private final LogFileLocator locator;
     private final Iterable<FilterBuilder> filterBuilders;
 
-    public static interface Query {
+    public static interface FilterQuery {
         LogFileNamePattern getLogFileNamePattern();
 
         List<Interval> getSearchIntervals();
@@ -32,12 +32,12 @@ public class LogFileFilterInteractor {
         List<Pattern> getMessageRegex();
     }
 
-    public static interface FilteredLogLineReceiver {
-        void receive(LogLine line);
+    public static interface FilterResult {
+        void filteredLogLine(LogLine line);
     }
 
     public static interface FilterBuilder {
-        PredicateBuilder<LogLine> build(Query query, PredicateBuilder<LogLine> filterBuilder);
+        PredicateBuilder<LogLine> build(FilterQuery filterQuery, PredicateBuilder<LogLine> filterBuilder);
     }
 
     public LogFileFilterInteractor(LogFileLocator locator, Collection<? extends FilterBuilder> filterBuilders) {
@@ -45,16 +45,16 @@ public class LogFileFilterInteractor {
         this.locator = locator;
     }
 
-    public void getFilteredLines(Query query, FilteredLogLineReceiver receiverFiltered) {
-        for (LogFile filteredLogFile : getFilteredLogFiles(query)) {
+    public void getFilteredLines(FilterQuery filterQuery, FilterResult receiverFiltered) {
+        for (LogFile filteredLogFile : getFilteredLogFiles(filterQuery)) {
             for (LogLine logLine : filteredLogFile.getLines()) {
-                receiverFiltered.receive(logLine);
+                receiverFiltered.filteredLogLine(logLine);
             }
             filteredLogFile.close();
         }
     }
 
-    private Iterable<LogFile> getFilteredLogFiles(Query model) {
+    private Iterable<LogFile> getFilteredLogFiles(FilterQuery model) {
         Iterable<LogFile> logFiles = locator.find(model.getLogFileNamePattern(), model.getSearchIntervals());
 
         FilterChain<LogLine> lineFilter = new FilterChain<LogLine>();
@@ -65,11 +65,11 @@ public class LogFileFilterInteractor {
         return new MappingIterable<LogFile, LogFile>(logFiles, filterFiles(lineFilter));
     }
 
-    private BinaryFunction<PredicateBuilder<LogLine>, PredicateBuilder<LogLine>, FilterBuilder> applyFilterBuilder(final Query query) {
+    private BinaryFunction<PredicateBuilder<LogLine>, PredicateBuilder<LogLine>, FilterBuilder> applyFilterBuilder(final FilterQuery filterQuery) {
         return new BinaryFunction<PredicateBuilder<LogLine>, PredicateBuilder<LogLine>, FilterBuilder>() {
             @Override
             public PredicateBuilder<LogLine> evaluate(PredicateBuilder<LogLine> predicateBuilder, FilterBuilder filterBuilder) {
-                return filterBuilder.build(query, predicateBuilder);
+                return filterBuilder.build(filterQuery, predicateBuilder);
             }
         };
     }
@@ -106,8 +106,8 @@ public class LogFileFilterInteractor {
 
     static class SearchIntervalFilterBuilder implements FilterBuilder {
         @Override
-        public PredicateBuilder<LogLine> build(Query query, PredicateBuilder<LogLine> filterBuilder) {
-            Iterable<Interval> searchIntervals = query.getSearchIntervals();
+        public PredicateBuilder<LogLine> build(FilterQuery filterQuery, PredicateBuilder<LogLine> filterBuilder) {
+            Iterable<Interval> searchIntervals = filterQuery.getSearchIntervals();
             if (!searchIntervals.iterator().hasNext()) {
                 return filterBuilder;
             }
@@ -122,8 +122,8 @@ public class LogFileFilterInteractor {
 
     static class LogLevelFilterBuilder implements FilterBuilder {
         @Override
-        public PredicateBuilder<LogLine> build(Query query, PredicateBuilder<LogLine> filterBuilder) {
-            List<LogLevel> levels = query.getLevels();
+        public PredicateBuilder<LogLine> build(FilterQuery filterQuery, PredicateBuilder<LogLine> filterBuilder) {
+            List<LogLevel> levels = filterQuery.getLevels();
             if (!levels.iterator().hasNext()) {
                 return filterBuilder;
             }

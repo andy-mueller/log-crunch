@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class ParameterQuery implements LogFileFilterInteractor.Query {
+public class ParameterFilterQuery implements LogFileFilterInteractor.FilterQuery {
     private LogFileNamePattern logFileNamePattern;
     private final List<Interval> searchIntervals = new ArrayList<Interval>();
     private final List<LogLevel> levels = new ArrayList<LogLevel>();
@@ -61,7 +61,7 @@ public class ParameterQuery implements LogFileFilterInteractor.Query {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        ParameterQuery query = (ParameterQuery) o;
+        ParameterFilterQuery query = (ParameterFilterQuery) o;
 
         return equals(logFileNamePattern, query.logFileNamePattern)
                 && levels.equals(query.levels)
@@ -80,7 +80,7 @@ public class ParameterQuery implements LogFileFilterInteractor.Query {
 
     @Override
     public String toString() {
-        return "Query{" +
+        return "FilterQuery{" +
                 "logFileNamePattern=" + logFileNamePattern +
                 ", searchIntervals=" + searchIntervals +
                 ", levels=" + levels +

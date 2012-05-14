@@ -67,15 +67,15 @@ public class LogCrunchFilterServletTest {
     }
 
     static class InteractorStub extends LogFileFilterInteractor {
-        private Query query;
+        private FilterQuery filterQuery;
 
         public InteractorStub() {
             super(mock(LogFileLocator.class), new ArrayList<FilterBuilder>());
         }
 
         @Override
-        public void getFilteredLines(Query query, FilteredLogLineReceiver receiverFiltered) {
-            this.query = query;
+        public void getFilteredLines(FilterQuery filterQuery, FilterResult receiverFiltered) {
+            this.filterQuery = filterQuery;
         }
     }
 
@@ -86,13 +86,13 @@ public class LogCrunchFilterServletTest {
         request.putParameter(LogCrunchFilterServlet.RequestParameters.LogFileNamePattern, "machine101-%d{yyyMMdd}.log");
         logCrunchFilterServlet.doGet(request, response);
 
-        ParameterQuery expectedQuery = new ParameterQuery();
+        ParameterFilterQuery expectedQuery = new ParameterFilterQuery();
         expectedQuery.addLevel(LogLevel.Info);
         expectedQuery.addLevel(LogLevel.Debug);
         expectedQuery.addSearchInterval(AllTimeInTheWorld);
         expectedQuery.setLogFileNamePattern(new LogbackLogFileNamePattern("machine101-%d{yyyMMdd}.log"));
 
-        assertThat(expectedQuery, is(interactorStub.query));
+        assertThat(expectedQuery, is(interactorStub.filterQuery));
     }
 
     @Test
@@ -102,10 +102,10 @@ public class LogCrunchFilterServletTest {
 
         logCrunchFilterServlet.doGet(request, response);
 
-        ParameterQuery expectedQuery = new ParameterQuery();
+        ParameterFilterQuery expectedQuery = new ParameterFilterQuery();
         expectedQuery.addSearchInterval(AllTimeInTheWorld);
         expectedQuery.setLogFileNamePattern(new LogbackLogFileNamePattern("machine101-%d{yyyMMdd}.log"));
-        assertThat(expectedQuery, is(interactorStub.query));
+        assertThat(expectedQuery, is(interactorStub.filterQuery));
     }
 
     @Test
@@ -115,11 +115,11 @@ public class LogCrunchFilterServletTest {
 
         logCrunchFilterServlet.doGet(request, response);
 
-        ParameterQuery expectedQuery = new ParameterQuery();
+        ParameterFilterQuery expectedQuery = new ParameterFilterQuery();
         Interval expectedInterval = new Interval(new DateTime(2007, 5, 7, 13, 55, 22, 100), new DateTime(2009, 7, 2, 0, 0));
         expectedQuery.addSearchInterval(expectedInterval);
         expectedQuery.setLogFileNamePattern(new LogbackLogFileNamePattern("machine101-%d{yyyMMdd}.log"));
-        assertThat(expectedQuery, is(interactorStub.query));
+        assertThat(expectedQuery, is(interactorStub.filterQuery));
     }
 
     @Test
@@ -129,10 +129,10 @@ public class LogCrunchFilterServletTest {
 
         logCrunchFilterServlet.doGet(request, response);
 
-        ParameterQuery expectedQuery = new ParameterQuery();
+        ParameterFilterQuery expectedQuery = new ParameterFilterQuery();
         expectedQuery.addSearchInterval(AllTimeInTheWorld);
         expectedQuery.setLogFileNamePattern(new LogbackLogFileNamePattern("xyz-%d{yyyMMdd}.log"));
-        assertThat(expectedQuery, is(interactorStub.query));
+        assertThat(expectedQuery, is(interactorStub.filterQuery));
     }
 
     @Rule
@@ -208,7 +208,7 @@ public class LogCrunchFilterServletTest {
 
     static class FilterBuilderStub implements LogFileFilterInteractor.FilterBuilder{
         @Override
-        public PredicateBuilder<LogLine> build(LogFileFilterInteractor.Query query, PredicateBuilder<LogLine> filterBuilder) {
+        public PredicateBuilder<LogLine> build(LogFileFilterInteractor.FilterQuery filterQuery, PredicateBuilder<LogLine> filterBuilder) {
             return filterBuilder.start(Predicates.isFalse());
         }
     }
@@ -235,9 +235,9 @@ public class LogCrunchFilterServletTest {
 
         interactorStub = new InteractorStub() {
             @Override
-            public void getFilteredLines(Query query, FilteredLogLineReceiver receiverFiltered) {
-                super.getFilteredLines(query, receiverFiltered);
-                receiverFiltered.receive(TestLogFile.SampleInfoLine);
+            public void getFilteredLines(FilterQuery filterQuery, FilterResult receiverFiltered) {
+                super.getFilteredLines(filterQuery, receiverFiltered);
+                receiverFiltered.filteredLogLine(TestLogFile.SampleInfoLine);
             }
         };
 

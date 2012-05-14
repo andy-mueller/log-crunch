@@ -46,12 +46,12 @@ public class LogCrunchFilterServlet extends HttpServlet {
     // GET http://localhost:8080/logcrunch/filter?logFileNamePattern=machinename101-%25d{yyyyMMdd}.log&searchRange=2007-05-06/2007-05-08&level=Info&level=Warn
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        LogFileFilterInteractor.Query query = new ParameterQuery();
+        LogFileFilterInteractor.FilterQuery filterQuery = new ParameterFilterQuery();
 
         ParameterMapper mapper = buildParameterMapper(req);
 
         try {
-            mapper.mapTo(query);
+            mapper.mapTo(filterQuery);
         } catch (ParameterMapper.BadFormatException e) {
             resp.sendError(HttpStatusCode.BadFormat.Code, HttpStatusCode.BadFormat.Message);
             return;
@@ -64,9 +64,9 @@ public class LogCrunchFilterServlet extends HttpServlet {
         LogFileFilterInteractor logFileFilterInteractor = newInteractor();
 
         final PrintWriter responseWriter = resp.getWriter();
-        logFileFilterInteractor.getFilteredLines(query, new LogFileFilterInteractor.FilteredLogLineReceiver() {
+        logFileFilterInteractor.getFilteredLines(filterQuery, new LogFileFilterInteractor.FilterResult() {
             @Override
-            public void receive(LogLine logLine) {
+            public void filteredLogLine(LogLine logLine) {
                 logLine.print(responseWriter);
                 responseWriter.println();
             }

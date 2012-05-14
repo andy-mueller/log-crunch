@@ -2,7 +2,7 @@ package com.crudetech.sample.logcrunch;
 
 import com.crudetech.sample.logcrunch.LogFileFilterInteractor.LogLevelFilterBuilder;
 import com.crudetech.sample.logcrunch.LogFileFilterInteractor.SearchIntervalFilterBuilder;
-import com.crudetech.sample.logcrunch.http.ParameterQuery;
+import com.crudetech.sample.logcrunch.http.ParameterFilterQuery;
 import org.joda.time.Interval;
 import org.junit.Before;
 import org.junit.Rule;
@@ -44,7 +44,7 @@ public class LogFileFilterInteractorTest {
         setupLocator(asList(testInterval), logFileStub1, logFileStub2);
         setupLocator(logFileStub1, logFileStub2);
 
-        ParameterQuery request = new ParameterQuery();
+        ParameterFilterQuery request = new ParameterFilterQuery();
         request.setLogFileNamePattern(logFileNamePattern);
         request.addSearchInterval(testInterval);
 
@@ -67,7 +67,7 @@ public class LogFileFilterInteractorTest {
     public void levelFiltersAreApplied() {
         setupLocator(logFileStub1, logFileStub2);
 
-        ParameterQuery request = new ParameterQuery();
+        ParameterFilterQuery request = new ParameterFilterQuery();
         request.addSearchInterval(allTimeOfTheWorld());
         request.setLogFileNamePattern(logFileNamePattern);
         request.addLevel(LogLevel.Info);
@@ -89,11 +89,11 @@ public class LogFileFilterInteractorTest {
     }
 
 
-    static class CollectingLogLineReceiverStub implements LogFileFilterInteractor.FilteredLogLineReceiver {
+    static class CollectingLogLineReceiverStub implements LogFileFilterInteractor.FilterResult {
         private final List<LogLine> collectedLines = new ArrayList<LogLine>();
 
         @Override
-        public void receive(LogLine line) {
+        public void filteredLogLine(LogLine line) {
             collectedLines.add(line);
         }
     }
@@ -102,7 +102,7 @@ public class LogFileFilterInteractorTest {
     public void timeFiltersAreApplied() {
         setupLocator(logFileStub1);
 
-        ParameterQuery request = new ParameterQuery();
+        ParameterFilterQuery request = new ParameterFilterQuery();
         request.setLogFileNamePattern(logFileNamePattern);
         request.addSearchInterval(new Interval(TestLogFile.SampleInfoLineDate, TestLogFile.SampleInfoLineDate.plusSeconds(1)));
 

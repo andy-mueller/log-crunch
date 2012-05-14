@@ -16,8 +16,13 @@ class LogFileFilterInteractorFactoryStub extends FileSystemLogFileFilterInteract
     private final int aMember;
     transient int createInteractorCalled = 0;
 
+
     public LogFileFilterInteractorFactoryStub(int i) {
         aMember = i;
+    }
+
+    private LogFileFilterInteractorFactoryStub() {
+        aMember = 0;
     }
 
     @Override
