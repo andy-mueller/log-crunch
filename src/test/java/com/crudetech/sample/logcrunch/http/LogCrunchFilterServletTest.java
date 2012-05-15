@@ -205,10 +205,10 @@ public class LogCrunchFilterServletTest {
         }
     }
 
-    static class FilterBuilderStub implements LogFileFilterInteractor.FilterBuilder{
+    static class FindAllFilterBuilderStub implements LogFileFilterInteractor.FilterBuilder{
         @Override
         public PredicateBuilder<LogLine> build(LogFileFilterInteractor.FilterQuery filterQuery, PredicateBuilder<LogLine> filterBuilder) {
-            return filterBuilder.start(Predicates.isFalse());
+            return filterBuilder.start(Predicates.isTrue());
         }
     }
     @Test
@@ -216,11 +216,12 @@ public class LogCrunchFilterServletTest {
         LogCrunchFilterServlet servlet = new LogCrunchFilterServlet();
         servlet.logFileFilterInteractorFactory = mock(LogFileFilterInteractorFactory.class);
         CloseCountingLogFileLocatorStub locatorStub = new CloseCountingLogFileLocatorStub();
-        LogFileFilterInteractor interactor = new LogFileFilterInteractor(locatorStub, asList(new FilterBuilderStub()));
+        LogFileFilterInteractor interactor = new LogFileFilterInteractor(locatorStub, asList(new FindAllFilterBuilderStub()));
         when(servlet.logFileFilterInteractorFactory.createInteractor()).thenReturn(interactor);
 
         request.putParameter(LogCrunchFilterServlet.RequestParameters.SearchRange, AllTimeInTheWorld.toString());
         request.putParameter(LogCrunchFilterServlet.RequestParameters.LogFileNamePattern, "xyz-%d{yyyMMdd}.log");
+        request.putParameter(LogCrunchFilterServlet.RequestParameters.Level, "Info");
 
         servlet.doGet(request, response);
 

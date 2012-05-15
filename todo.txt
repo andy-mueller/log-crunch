@@ -11,7 +11,7 @@
     -do we need a boundary/interactor interface
   -alt.: provide onError handler for interactor
     -in both cases, the interactor decides if this condition occurs,
-     but here exceptions are hot used for the cntroll flow!!
+     but here exceptions are hot used for the control flow!!
     -this is tell don't ask!
 
 -logging facilities for this application

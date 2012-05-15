@@ -30,6 +30,7 @@ public abstract class TestLogFile extends ExternalResource implements LogFile {
     final String name;
     List<LogLine> logLines;
     DateTime baseLine;
+    boolean closed = false;
 
     static class LogbackBridge{
         static LogLine createLogLine(String rawLine, DateTimeFormatter dateFormat){
@@ -92,6 +93,7 @@ public abstract class TestLogFile extends ExternalResource implements LogFile {
 
     @Override
     public void close() {
+        closed = true;
     }
 
     public static BufferedReaderLogFile.LogLineFactory logLineFactory(){

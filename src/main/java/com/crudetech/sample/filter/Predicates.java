@@ -81,4 +81,13 @@ public class Predicates {
             }
         };
     }
+
+    public static <T> Predicate<T> isTrue() {
+        return new Predicate<T>() {
+            @Override
+            public Boolean evaluate(T argument) {
+                return true;
+            }
+        };
+    }
 }

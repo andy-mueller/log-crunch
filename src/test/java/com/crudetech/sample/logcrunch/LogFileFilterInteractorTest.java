@@ -62,9 +62,8 @@ public class LogFileFilterInteractorTest {
         when(locator.find(eq(logFileNamePattern), any(Iterable.class))).thenReturn(asList(logFiles));
     }
     private void setupLocatorThatFindsNothing() {
-        setupLocator(new LogFile[]{});
+        setupLocator();
     }
-
 
     @Test
     public void levelFiltersAreApplied() {
@@ -155,5 +154,34 @@ public class LogFileFilterInteractorTest {
         interactor.getFilteredLines(request, lineCollector);
 
         assertThat(lineCollector.noLinesFound, is(true));
+    }
+    @Test
+    public void givenNothingFoundInsideLogFiles_logFileIsClosed() throws Exception {
+        setupLocator(logFileStub1);
+
+        ParameterFilterQuery request = new ParameterFilterQuery();
+        request.setLogFileNamePattern(logFileNamePattern);
+        request.addSearchInterval(new Interval(TestLogFile.SampleInfoLineDate, TestLogFile.SampleInfoLineDate.plusSeconds(1)));
+        request.addLevel(LogLevel.Debug);
+
+        CollectingFilterResultStub lineCollector = new CollectingFilterResultStub();
+        interactor.getFilteredLines(request, lineCollector);
+
+        assertThat(logFileStub1.closed, is(true));
+    }
+
+    @Test
+    public void logFilesAreClosed() {
+        setupLocator(logFileStub1);
+
+        ParameterFilterQuery request = new ParameterFilterQuery();
+        request.setLogFileNamePattern(logFileNamePattern);
+        request.addSearchInterval(new Interval(TestLogFile.SampleInfoLineDate, TestLogFile.SampleInfoLineDate.plusSeconds(1)));
+
+
+        CollectingFilterResultStub filterResult = new CollectingFilterResultStub();
+        interactor.getFilteredLines(request, filterResult);
+
+        assertThat(logFileStub1.closed, is(true));
     }
 }

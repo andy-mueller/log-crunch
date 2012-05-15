@@ -34,7 +34,9 @@ public class LogFileFilterInteractor {
 
     public static interface FilterResult {
         void filteredLogLine(LogLine line);
+
         void noFilesFound();
+
         void noLinesFound();
     }
 
@@ -58,21 +60,22 @@ public class LogFileFilterInteractor {
             filteredLogFile.close();
             noFilesFound = false;
         }
-        if(noFilesFound){
+        if (noFilesFound) {
             filterResult.noFilesFound();
         }
-        if(noLinesFound){
+        if (noLinesFound) {
             filterResult.noLinesFound();
         }
     }
 
-    private Iterable<LogFile> getFilteredLogFiles(FilterQuery model) {
-        Iterable<LogFile> logFiles = locator.find(model.getLogFileNamePattern(), model.getSearchIntervals());
+
+    private Iterable<LogFile> getFilteredLogFiles(FilterQuery filterQuery) {
+        Iterable<LogFile> logFiles = locator.find(filterQuery.getLogFileNamePattern(), filterQuery.getSearchIntervals());
 
         FilterChain<LogLine> lineFilter = new FilterChain<LogLine>();
         PredicateBuilder<LogLine> filterBuilder = lineFilter.filterBuilder();
 
-        accumulate(filterBuilder, filterBuilders, applyFilterBuilder(model));
+        accumulate(filterBuilder, filterBuilders, applyFilterBuilder(filterQuery));
 
         return new MappingIterable<LogFile, LogFile>(logFiles, filterFiles(lineFilter));
     }
@@ -98,6 +101,7 @@ public class LogFileFilterInteractor {
 
     private static class FilterLogFile implements LogFile {
         private final LogFile logFile;
+
         private final FilterChain<LogLine> filterChain;
 
         public FilterLogFile(LogFile logFile, FilterChain<LogLine> filterChain) {
@@ -114,6 +118,7 @@ public class LogFileFilterInteractor {
         public void close() {
             logFile.close();
         }
+
     }
 
     static class SearchIntervalFilterBuilder implements FilterBuilder {
@@ -130,6 +135,7 @@ public class LogFileFilterInteractor {
             filterBuilder.closeBrace();
             return filterBuilder;
         }
+
     }
 
     static class LogLevelFilterBuilder implements FilterBuilder {
@@ -146,5 +152,6 @@ public class LogFileFilterInteractor {
             filterBuilder.closeBrace();
             return filterBuilder;
         }
+
     }
 }
