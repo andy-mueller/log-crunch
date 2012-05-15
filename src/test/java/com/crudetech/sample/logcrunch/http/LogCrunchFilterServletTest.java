@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Collections;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -74,7 +73,7 @@ public class LogCrunchFilterServletTest {
         }
 
         @Override
-        public void getFilteredLines(FilterQuery filterQuery, FilterResult receiverFiltered) {
+        public void getFilteredLines(FilterQuery filterQuery, FilterResult filterResult) {
             this.filterQuery = filterQuery;
         }
     }
@@ -187,7 +186,7 @@ public class LogCrunchFilterServletTest {
         private int closeCount = 0;
 
         CloseCountingLogFileStub() {
-            super(Collections.<LogLine>emptyList());
+            super(asList(TestLogFile.SampleInfoLine));
         }
 
         @Override
@@ -235,9 +234,9 @@ public class LogCrunchFilterServletTest {
 
         interactorStub = new InteractorStub() {
             @Override
-            public void getFilteredLines(FilterQuery filterQuery, FilterResult receiverFiltered) {
-                super.getFilteredLines(filterQuery, receiverFiltered);
-                receiverFiltered.filteredLogLine(TestLogFile.SampleInfoLine);
+            public void getFilteredLines(FilterQuery filterQuery, FilterResult filterResult) {
+                super.getFilteredLines(filterQuery, filterResult);
+                filterResult.filteredLogLine(TestLogFile.SampleInfoLine);
             }
         };
 

@@ -70,6 +70,16 @@ public class LogCrunchFilterServlet extends HttpServlet {
                 logLine.print(responseWriter);
                 responseWriter.println();
             }
+
+            @Override
+            public void noFilesFound() {
+                throw new UnsupportedOperationException("Implement me!");
+            }
+
+            @Override
+            public void noLinesFound() {
+                throw new UnsupportedOperationException("Implement me!");
+            }
         });
        }
 

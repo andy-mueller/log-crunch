@@ -48,7 +48,7 @@ public class LogFileFilterInteractorTest {
         request.setLogFileNamePattern(logFileNamePattern);
         request.addSearchInterval(testInterval);
 
-        interactor.getFilteredLines(request, new CollectingLogLineReceiverStub());
+        interactor.getFilteredLines(request, new CollectingFilterResultStub());
 
         verify(locator).find(logFileNamePattern, asList(testInterval));
     }
@@ -60,6 +60,9 @@ public class LogFileFilterInteractorTest {
     @SuppressWarnings("unchecked")
     private void setupLocator(LogFile... logFiles) {
         when(locator.find(eq(logFileNamePattern), any(Iterable.class))).thenReturn(asList(logFiles));
+    }
+    private void setupLocatorThatFindsNothing() {
+        setupLocator(new LogFile[]{});
     }
 
 
@@ -73,7 +76,7 @@ public class LogFileFilterInteractorTest {
         request.addLevel(LogLevel.Info);
         request.addLevel(LogLevel.Warn);
 
-        CollectingLogLineReceiverStub lineCollector = new CollectingLogLineReceiverStub();
+        CollectingFilterResultStub lineCollector = new CollectingFilterResultStub();
         interactor.getFilteredLines(request, lineCollector);
 
 
@@ -89,12 +92,24 @@ public class LogFileFilterInteractorTest {
     }
 
 
-    static class CollectingLogLineReceiverStub implements LogFileFilterInteractor.FilterResult {
+    private static class CollectingFilterResultStub implements LogFileFilterInteractor.FilterResult {
         private final List<LogLine> collectedLines = new ArrayList<LogLine>();
+        private boolean noFilesFound = false;
+        public boolean noLinesFound = false;
 
         @Override
         public void filteredLogLine(LogLine line) {
             collectedLines.add(line);
+        }
+
+        @Override
+        public void noFilesFound() {
+            noFilesFound = true;
+        }
+
+        @Override
+        public void noLinesFound() {
+            noLinesFound = true;
         }
     }
 
@@ -107,9 +122,38 @@ public class LogFileFilterInteractorTest {
         request.addSearchInterval(new Interval(TestLogFile.SampleInfoLineDate, TestLogFile.SampleInfoLineDate.plusSeconds(1)));
 
 
-        CollectingLogLineReceiverStub lineCollector = new CollectingLogLineReceiverStub();
+        CollectingFilterResultStub lineCollector = new CollectingFilterResultStub();
         interactor.getFilteredLines(request, lineCollector);
 
         assertThat(lineCollector.collectedLines, is(asList(TestLogFile.SampleInfoLine)));
+    }
+
+    @Test
+    public void givenNoLogFileFound_errorMessageIsSend(){
+        setupLocatorThatFindsNothing();
+
+        ParameterFilterQuery request = new ParameterFilterQuery();
+        request.setLogFileNamePattern(logFileNamePattern);
+        request.addSearchInterval(new Interval(TestLogFile.SampleInfoLineDate, TestLogFile.SampleInfoLineDate.plusSeconds(1)));
+
+        CollectingFilterResultStub lineCollector = new CollectingFilterResultStub();
+        interactor.getFilteredLines(request, lineCollector);
+
+        assertThat(lineCollector.noFilesFound, is(true));
+    }
+
+    @Test
+    public void givenNothingFoundInsideLogFiles_messageIsSend() throws Exception {
+        setupLocator(logFileStub1);
+
+        ParameterFilterQuery request = new ParameterFilterQuery();
+        request.setLogFileNamePattern(logFileNamePattern);
+        request.addSearchInterval(new Interval(TestLogFile.SampleInfoLineDate, TestLogFile.SampleInfoLineDate.plusSeconds(1)));
+        request.addLevel(LogLevel.Debug);
+
+        CollectingFilterResultStub lineCollector = new CollectingFilterResultStub();
+        interactor.getFilteredLines(request, lineCollector);
+
+        assertThat(lineCollector.noLinesFound, is(true));
     }
 }

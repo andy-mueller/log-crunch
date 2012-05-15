@@ -34,6 +34,8 @@ public class LogFileFilterInteractor {
 
     public static interface FilterResult {
         void filteredLogLine(LogLine line);
+        void noFilesFound();
+        void noLinesFound();
     }
 
     public static interface FilterBuilder {
@@ -45,12 +47,22 @@ public class LogFileFilterInteractor {
         this.locator = locator;
     }
 
-    public void getFilteredLines(FilterQuery filterQuery, FilterResult receiverFiltered) {
+    public void getFilteredLines(FilterQuery filterQuery, FilterResult filterResult) {
+        boolean noFilesFound = true;
+        boolean noLinesFound = true;
         for (LogFile filteredLogFile : getFilteredLogFiles(filterQuery)) {
             for (LogLine logLine : filteredLogFile.getLines()) {
-                receiverFiltered.filteredLogLine(logLine);
+                filterResult.filteredLogLine(logLine);
+                noLinesFound = false;
             }
             filteredLogFile.close();
+            noFilesFound = false;
+        }
+        if(noFilesFound){
+            filterResult.noFilesFound();
+        }
+        if(noLinesFound){
+            filterResult.noLinesFound();
         }
     }
 
