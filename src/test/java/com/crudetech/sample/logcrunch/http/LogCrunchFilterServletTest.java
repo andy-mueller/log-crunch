@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -44,8 +45,13 @@ public class LogCrunchFilterServletTest {
         }
 
         @Override
-        public void println(String writtenObject) {
+        public void print(String writtenObject) {
             this.writtenObject = writtenObject;
+        }
+
+        void assertWrittenObject(String expected){
+            assertThat(writtenObject, is(notNullValue()));
+            assertThat(writtenObject, is(expected));
         }
     }
 
@@ -60,9 +66,13 @@ public class LogCrunchFilterServletTest {
         logCrunchFilterServlet = new LogCrunchFilterServlet() {
             @Override
             LogFileFilterInteractor newInteractor() {
-                return interactorStub;
+                return getInteractorStub();
             }
         };
+    }
+
+    private LogFileFilterInteractor getInteractorStub() {
+        return interactorStub;
     }
 
     static class InteractorStub extends LogFileFilterInteractor {
@@ -236,7 +246,6 @@ public class LogCrunchFilterServletTest {
         interactorStub = new InteractorStub() {
             @Override
             public void getFilteredLines(FilterQuery filterQuery, FilterResult filterResult) {
-                super.getFilteredLines(filterQuery, filterResult);
                 filterResult.filteredLogLine(TestLogFile.SampleInfoLine);
             }
         };
@@ -246,6 +255,42 @@ public class LogCrunchFilterServletTest {
 
         PrintWriterStub expected = new PrintWriterStub();
         TestLogFile.SampleInfoLine.print(expected);
-        assertThat(responseWriter.writtenObject, is(expected.writtenObject));
+        responseWriter.assertWrittenObject(expected.writtenObject);
+    }
+
+    @Test
+    public void givenNoFilesFound_NotFoundIsReturned() throws Exception {
+        request.putParameter(LogCrunchFilterServlet.RequestParameters.SearchRange, AllTimeInTheWorld.toString());
+        request.putParameter(LogCrunchFilterServlet.RequestParameters.LogFileNamePattern, "xyz-%d{yyyMMdd}.log");
+
+        interactorStub = new InteractorStub() {
+            @Override
+            public void getFilteredLines(FilterQuery filterQuery, FilterResult filterResult) {
+                filterResult.noFilesFound();
+            }
+        };
+
+
+        logCrunchFilterServlet.doGet(request, response);
+
+        verifyErrorResponse(response, LogCrunchFilterServlet.HttpStatusCode.NotFound);
+    }
+    @Test
+    public void givenNoLinesFound_OkAndMessageAreReturned() throws Exception {
+        request.putParameter(LogCrunchFilterServlet.RequestParameters.SearchRange, AllTimeInTheWorld.toString());
+        request.putParameter(LogCrunchFilterServlet.RequestParameters.LogFileNamePattern, "xyz-%d{yyyMMdd}.log");
+
+        interactorStub = new InteractorStub() {
+            @Override
+            public void getFilteredLines(FilterQuery filterQuery, FilterResult filterResult) {
+                filterResult.noLinesFound();
+            }
+        };
+
+
+        logCrunchFilterServlet.doGet(request, response);
+
+        verify(response).setStatus(LogCrunchFilterServlet.HttpStatusCode.OkNoLinesFound.Code);
+        assertThat(responseWriter.writtenObject, is(LogCrunchFilterServlet.HttpStatusCode.OkNoLinesFound.Message));
     }
 }

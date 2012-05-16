@@ -65,6 +65,7 @@ public class LogFileFilterInteractorTest {
         setupLocator();
     }
 
+
     @Test
     public void levelFiltersAreApplied() {
         setupLocator(logFileStub1, logFileStub2);

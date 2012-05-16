@@ -28,7 +28,10 @@ public class LogCrunchFilterServlet extends HttpServlet {
     }
 
     static enum HttpStatusCode {
-        Ok(200, ""), BadFormat(400, "Bad format!");
+        Ok(200, ""),
+        OkNoLinesFound(200, "No lines found that match the criteria"),
+        BadFormat(400, "Bad format!"),
+        NotFound(404, "No files found!");
         final String Message;
         final int Code;
 
@@ -45,7 +48,7 @@ public class LogCrunchFilterServlet extends HttpServlet {
 
     // GET http://localhost:8080/logcrunch/filter?logFileNamePattern=machinename101-%25d{yyyyMMdd}.log&searchRange=2007-05-06/2007-05-08&level=Info&level=Warn
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
         LogFileFilterInteractor.FilterQuery filterQuery = new ParameterFilterQuery();
 
         ParameterMapper mapper = buildParameterMapper(req);
@@ -53,10 +56,10 @@ public class LogCrunchFilterServlet extends HttpServlet {
         try {
             mapper.mapTo(filterQuery);
         } catch (ParameterMapper.BadFormatException e) {
-            resp.sendError(HttpStatusCode.BadFormat.Code, HttpStatusCode.BadFormat.Message);
+            sendErrorResponse(resp, HttpStatusCode.BadFormat);
             return;
         } catch (ParameterMapper.NoParameterException e) {
-            resp.sendError(HttpStatusCode.BadFormat.Code, HttpStatusCode.BadFormat.Message);
+            sendErrorResponse(resp, HttpStatusCode.BadFormat);
             return;
         }
 
@@ -73,15 +76,24 @@ public class LogCrunchFilterServlet extends HttpServlet {
 
             @Override
             public void noFilesFound() {
-                throw new UnsupportedOperationException("Implement me!");
+                sendErrorResponse(resp, HttpStatusCode.NotFound);
             }
 
             @Override
             public void noLinesFound() {
-                throw new UnsupportedOperationException("Implement me!");
+                responseWriter.print(HttpStatusCode.OkNoLinesFound.Message);
+                resp.setStatus(HttpStatusCode.OkNoLinesFound.Code);
             }
         });
-       }
+    }
+
+    private void sendErrorResponse(HttpServletResponse resp, HttpStatusCode code) {
+        try {
+            resp.sendError(code.Code, code.Message);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     private ParameterMapper buildParameterMapper(HttpServletRequest req) {
         ParameterMapper mapper = new ParameterMapper(getParametersMap(req));
@@ -113,7 +125,7 @@ public class LogCrunchFilterServlet extends HttpServlet {
 
     private void loadLodFileFilterFromConfig(ServletConfig config) {
         String configResource = config.getInitParameter(InitParameters.ConfigurationResource);
-        InputStream configFile = getClass().getResourceAsStream("/"+ configResource);
+        InputStream configFile = getClass().getResourceAsStream("/" + configResource);
         try {
             this.logFileFilterInteractorFactory = new XmlConfiguredLogFileFilterInteractorFactory(configFile);
         } finally {

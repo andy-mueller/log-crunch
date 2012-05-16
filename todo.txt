@@ -1,18 +1,6 @@
 -Provide http query and filter mechanism for lines and files
  GET http://localhost:8080/logcrunch/filter?fileName=machine01-%d{yyyMMdd}.log&searchRange=2007-05-07T13:55:22,100/2009-07-02&level=Info&level=Warn
 
--return a 404 "nothing found", if the filtered returns nothing.
-  -Elaborate on the reason in the log message:
-    -no file(s) found in path
-    -no lines to display
-  -is it appropriate to throw exception in this case??
-    -where are the exceptions located? In the interactor?
-    -error handling shall be done in decorator
-    -do we need a boundary/interactor interface
-  -alt.: provide onError handler for interactor
-    -in both cases, the interactor decides if this condition occurs,
-     but here exceptions are hot used for the control flow!!
-    -this is tell don't ask!
 
 -Provide http query mechanism to list all files in a date range
   GET http://localhost:8080/logcrunch/listFiles?fileName=machine01-%d{yyyMMdd}.log&searchRange=2007-05-07T13:55:22,100/2009-07-02
