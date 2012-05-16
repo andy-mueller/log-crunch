@@ -1,7 +1,7 @@
 package com.crudetech.sample.logcrunch;
 
-import com.crudetech.sample.logcrunch.LogFileFilterInteractor.LogLevelFilterBuilder;
-import com.crudetech.sample.logcrunch.LogFileFilterInteractor.SearchIntervalFilterBuilder;
+import com.crudetech.sample.logcrunch.FilterLogFileInteractor.LogLevelFilterBuilder;
+import com.crudetech.sample.logcrunch.FilterLogFileInteractor.SearchIntervalFilterBuilder;
 import com.crudetech.sample.logcrunch.http.ParameterFilterQuery;
 import org.joda.time.Interval;
 import org.junit.Before;
@@ -20,20 +20,20 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class LogFileFilterInteractorTest {
+public class FilterLogFileInteractorTest {
     @Rule
     public InMemoryTestLogFile logFileStub1 = new InMemoryTestLogFile("machine101-20090610");
     @Rule
     public InMemoryTestLogFile logFileStub2 = new InMemoryTestLogFile("machine101-20090611");
     private LogFileLocator locator;
     private LogFileNamePattern logFileNamePattern;
-    private LogFileFilterInteractor interactor;
+    private FilterLogFileInteractor logFileInteractor;
 
     @Before
     public void setUp() throws Exception {
         logFileNamePattern = mock(LogFileNamePattern.class);
         locator = mock(LogFileLocator.class);
-        interactor = new LogFileFilterInteractor(
+        logFileInteractor = new FilterLogFileInteractor(
                 locator,
                 asList(new LogLevelFilterBuilder(), new SearchIntervalFilterBuilder()));
     }
@@ -48,7 +48,7 @@ public class LogFileFilterInteractorTest {
         request.setLogFileNamePattern(logFileNamePattern);
         request.addSearchInterval(testInterval);
 
-        interactor.getFilteredLines(request, new CollectingFilterResultStub());
+        logFileInteractor.getFilteredLines(request, new CollectingFilterResultStub());
 
         verify(locator).find(logFileNamePattern, asList(testInterval));
     }
@@ -77,7 +77,7 @@ public class LogFileFilterInteractorTest {
         request.addLevel(LogLevel.Warn);
 
         CollectingFilterResultStub lineCollector = new CollectingFilterResultStub();
-        interactor.getFilteredLines(request, lineCollector);
+        logFileInteractor.getFilteredLines(request, lineCollector);
 
 
         List<LogLine> expectedLines = new ArrayList<LogLine>();
@@ -92,7 +92,7 @@ public class LogFileFilterInteractorTest {
     }
 
 
-    private static class CollectingFilterResultStub implements LogFileFilterInteractor.FilterResult {
+    private static class CollectingFilterResultStub implements FilterLogFileInteractor.FilterResult {
         private final List<LogLine> collectedLines = new ArrayList<LogLine>();
         private boolean noFilesFound = false;
         public boolean noLinesFound = false;
@@ -123,7 +123,7 @@ public class LogFileFilterInteractorTest {
 
 
         CollectingFilterResultStub lineCollector = new CollectingFilterResultStub();
-        interactor.getFilteredLines(request, lineCollector);
+        logFileInteractor.getFilteredLines(request, lineCollector);
 
         assertThat(lineCollector.collectedLines, is(asList(TestLogFile.SampleInfoLine)));
     }
@@ -137,7 +137,7 @@ public class LogFileFilterInteractorTest {
         request.addSearchInterval(new Interval(TestLogFile.SampleInfoLineDate, TestLogFile.SampleInfoLineDate.plusSeconds(1)));
 
         CollectingFilterResultStub lineCollector = new CollectingFilterResultStub();
-        interactor.getFilteredLines(request, lineCollector);
+        logFileInteractor.getFilteredLines(request, lineCollector);
 
         assertThat(lineCollector.noFilesFound, is(true));
     }
@@ -152,7 +152,7 @@ public class LogFileFilterInteractorTest {
         request.addLevel(LogLevel.Debug);
 
         CollectingFilterResultStub lineCollector = new CollectingFilterResultStub();
-        interactor.getFilteredLines(request, lineCollector);
+        logFileInteractor.getFilteredLines(request, lineCollector);
 
         assertThat(lineCollector.noLinesFound, is(true));
     }
@@ -166,7 +166,7 @@ public class LogFileFilterInteractorTest {
         request.addLevel(LogLevel.Debug);
 
         CollectingFilterResultStub lineCollector = new CollectingFilterResultStub();
-        interactor.getFilteredLines(request, lineCollector);
+        logFileInteractor.getFilteredLines(request, lineCollector);
 
         assertThat(logFileStub1.closed, is(true));
     }
@@ -181,7 +181,7 @@ public class LogFileFilterInteractorTest {
 
 
         CollectingFilterResultStub filterResult = new CollectingFilterResultStub();
-        interactor.getFilteredLines(request, filterResult);
+        logFileInteractor.getFilteredLines(request, filterResult);
 
         assertThat(logFileStub1.closed, is(true));
     }

@@ -16,7 +16,7 @@ import static com.crudetech.sample.filter.Algorithm.accumulate;
 import static com.crudetech.sample.logcrunch.LogLinePredicates.hasLogLevel;
 import static com.crudetech.sample.logcrunch.LogLinePredicates.isInDateTimeRange;
 
-public class LogFileFilterInteractor {
+public class FilterLogFileInteractor {
     private final LogFileLocator locator;
     private final Iterable<FilterBuilder> filterBuilders;
 
@@ -44,7 +44,7 @@ public class LogFileFilterInteractor {
         PredicateBuilder<LogLine> build(FilterQuery filterQuery, PredicateBuilder<LogLine> filterBuilder);
     }
 
-    public LogFileFilterInteractor(LogFileLocator locator, Collection<? extends FilterBuilder> filterBuilders) {
+    public FilterLogFileInteractor(LogFileLocator locator, Collection<? extends FilterBuilder> filterBuilders) {
         this.filterBuilders = new ArrayList<FilterBuilder>(filterBuilders);
         this.locator = locator;
     }

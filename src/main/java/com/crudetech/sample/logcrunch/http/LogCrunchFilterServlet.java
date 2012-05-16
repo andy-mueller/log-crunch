@@ -1,7 +1,7 @@
 package com.crudetech.sample.logcrunch.http;
 
-import com.crudetech.sample.logcrunch.LogFileFilterInteractor;
-import com.crudetech.sample.logcrunch.LogFileFilterInteractorFactory;
+import com.crudetech.sample.logcrunch.FilterLogFileInteractor;
+import com.crudetech.sample.logcrunch.FilterLogFileInteractorFactory;
 import com.crudetech.sample.logcrunch.LogFileNamePattern;
 import com.crudetech.sample.logcrunch.LogLine;
 import com.crudetech.sample.logcrunch.logback.LogbackLogFileNamePattern;
@@ -19,7 +19,7 @@ import java.io.PrintWriter;
 import java.util.Map;
 
 public class LogCrunchFilterServlet extends HttpServlet {
-    LogFileFilterInteractorFactory logFileFilterInteractorFactory;
+    FilterLogFileInteractorFactory filterLogFileInteractorFactory;
 
     class RequestParameters {
         static final String Level = "level";
@@ -49,7 +49,7 @@ public class LogCrunchFilterServlet extends HttpServlet {
     // GET http://localhost:8080/logcrunch/filter?logFileNamePattern=machinename101-%25d{yyyyMMdd}.log&searchRange=2007-05-06/2007-05-08&level=Info&level=Warn
     @Override
     protected void doGet(HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
-        LogFileFilterInteractor.FilterQuery filterQuery = new ParameterFilterQuery();
+        FilterLogFileInteractor.FilterQuery filterQuery = new ParameterFilterQuery();
 
         ParameterMapper mapper = buildParameterMapper(req);
 
@@ -64,10 +64,10 @@ public class LogCrunchFilterServlet extends HttpServlet {
         }
 
 
-        LogFileFilterInteractor logFileFilterInteractor = newInteractor();
+        FilterLogFileInteractor filterLogFileInteractor = newInteractor();
 
         final PrintWriter responseWriter = resp.getWriter();
-        logFileFilterInteractor.getFilteredLines(filterQuery, new LogFileFilterInteractor.FilterResult() {
+        filterLogFileInteractor.getFilteredLines(filterQuery, new FilterLogFileInteractor.FilterResult() {
             @Override
             public void filteredLogLine(LogLine logLine) {
                 logLine.print(responseWriter);
@@ -112,8 +112,8 @@ public class LogCrunchFilterServlet extends HttpServlet {
         return req.getParameterMap();
     }
 
-    LogFileFilterInteractor newInteractor() {
-        return logFileFilterInteractorFactory.createInteractor();
+    FilterLogFileInteractor newInteractor() {
+        return filterLogFileInteractorFactory.createInteractor();
     }
 
     @Override
@@ -127,7 +127,7 @@ public class LogCrunchFilterServlet extends HttpServlet {
         String configResource = config.getInitParameter(InitParameters.ConfigurationResource);
         InputStream configFile = getClass().getResourceAsStream("/" + configResource);
         try {
-            this.logFileFilterInteractorFactory = new XmlConfiguredLogFileFilterInteractorFactory(configFile);
+            this.filterLogFileInteractorFactory = new XmlConfiguredFilterLogFileInteractorFactory(configFile);
         } finally {
             close(configFile);
         }

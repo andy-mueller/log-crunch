@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 
-public abstract class FileSystemLogFileFilterInteractorFactory implements LogFileFilterInteractorFactory {
+public abstract class FileSystemFilterLogFileInteractorFactory implements FilterLogFileInteractorFactory {
     @Override
-    public LogFileFilterInteractor createInteractor() {
+    public FilterLogFileInteractor createInteractor() {
 
         FileSystemLogFileLocator.LogFileFactory logfileFactory = new FileSystemLogFileLocator.LogFileFactory() {
             @Override
@@ -19,13 +19,13 @@ public abstract class FileSystemLogFileFilterInteractorFactory implements LogFil
         LogFileLocator locator = new DayWiseLogFileLocator(
                 new FileSystemLogFileLocator(getSearchPath(), logfileFactory)
                 );
-        return new LogFileFilterInteractor(locator, getFilterBuilder());
+        return new FilterLogFileInteractor(locator, getFilterBuilder());
     }
 
-    protected Collection<LogFileFilterInteractor.FilterBuilder> getFilterBuilder() {
-        return new ArrayList<LogFileFilterInteractor.FilterBuilder>(){{
-            add(new LogFileFilterInteractor.LogLevelFilterBuilder());
-            add(new LogFileFilterInteractor.SearchIntervalFilterBuilder());
+    protected Collection<FilterLogFileInteractor.FilterBuilder> getFilterBuilder() {
+        return new ArrayList<FilterLogFileInteractor.FilterBuilder>(){{
+            add(new FilterLogFileInteractor.LogLevelFilterBuilder());
+            add(new FilterLogFileInteractor.SearchIntervalFilterBuilder());
         }};
     }
 

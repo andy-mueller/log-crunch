@@ -29,7 +29,7 @@ public class LogCrunchFilterServletTest {
 
     private HttpServletRequestStub request;
     private HttpServletResponse response;
-    private InteractorStub interactorStub;
+    private LogFileInteractorStub interactorStub;
     private LogCrunchFilterServlet logCrunchFilterServlet;
     private static final Interval AllTimeInTheWorld = new Interval(0, Long.MAX_VALUE / 2);
     private PrintWriterStub responseWriter;
@@ -61,24 +61,24 @@ public class LogCrunchFilterServletTest {
         response = mock(HttpServletResponse.class);
         responseWriter = new PrintWriterStub();
         when(response.getWriter()).thenReturn(responseWriter);
-        interactorStub = new InteractorStub();
+        interactorStub = new LogFileInteractorStub();
 
         logCrunchFilterServlet = new LogCrunchFilterServlet() {
             @Override
-            LogFileFilterInteractor newInteractor() {
+            FilterLogFileInteractor newInteractor() {
                 return getInteractorStub();
             }
         };
     }
 
-    private LogFileFilterInteractor getInteractorStub() {
+    private FilterLogFileInteractor getInteractorStub() {
         return interactorStub;
     }
 
-    static class InteractorStub extends LogFileFilterInteractor {
+    static class LogFileInteractorStub extends FilterLogFileInteractor {
         private FilterQuery filterQuery;
 
-        public InteractorStub() {
+        public LogFileInteractorStub() {
             super(mock(LogFileLocator.class), new ArrayList<FilterBuilder>());
         }
 
@@ -184,11 +184,11 @@ public class LogCrunchFilterServletTest {
     @Test
     public void newInteractorUsesFactory() throws Exception {
         LogCrunchFilterServlet servlet = new LogCrunchFilterServlet();
-        servlet.logFileFilterInteractorFactory = mock(LogFileFilterInteractorFactory.class);
-        LogFileFilterInteractor interactor = mock(LogFileFilterInteractor.class);
-        when(servlet.logFileFilterInteractorFactory.createInteractor()).thenReturn(interactor);
+        servlet.filterLogFileInteractorFactory = mock(FilterLogFileInteractorFactory.class);
+        FilterLogFileInteractor logFileInteractor = mock(FilterLogFileInteractor.class);
+        when(servlet.filterLogFileInteractorFactory.createInteractor()).thenReturn(logFileInteractor);
 
-        assertThat(servlet.newInteractor(), is(interactor));
+        assertThat(servlet.newInteractor(), is(logFileInteractor));
     }
 
 
@@ -215,19 +215,19 @@ public class LogCrunchFilterServletTest {
         }
     }
 
-    static class FindAllFilterBuilderStub implements LogFileFilterInteractor.FilterBuilder{
+    static class FindAllFilterBuilderStub implements FilterLogFileInteractor.FilterBuilder{
         @Override
-        public PredicateBuilder<LogLine> build(LogFileFilterInteractor.FilterQuery filterQuery, PredicateBuilder<LogLine> filterBuilder) {
+        public PredicateBuilder<LogLine> build(FilterLogFileInteractor.FilterQuery filterQuery, PredicateBuilder<LogLine> filterBuilder) {
             return filterBuilder.start(Predicates.isTrue());
         }
     }
     @Test
     public void logFilesAreClosedAfterRequest() throws Exception {
         LogCrunchFilterServlet servlet = new LogCrunchFilterServlet();
-        servlet.logFileFilterInteractorFactory = mock(LogFileFilterInteractorFactory.class);
+        servlet.filterLogFileInteractorFactory = mock(FilterLogFileInteractorFactory.class);
         CloseCountingLogFileLocatorStub locatorStub = new CloseCountingLogFileLocatorStub();
-        LogFileFilterInteractor interactor = new LogFileFilterInteractor(locatorStub, asList(new FindAllFilterBuilderStub()));
-        when(servlet.logFileFilterInteractorFactory.createInteractor()).thenReturn(interactor);
+        FilterLogFileInteractor logFileInteractor = new FilterLogFileInteractor(locatorStub, asList(new FindAllFilterBuilderStub()));
+        when(servlet.filterLogFileInteractorFactory.createInteractor()).thenReturn(logFileInteractor);
 
         request.putParameter(LogCrunchFilterServlet.RequestParameters.SearchRange, AllTimeInTheWorld.toString());
         request.putParameter(LogCrunchFilterServlet.RequestParameters.LogFileNamePattern, "xyz-%d{yyyMMdd}.log");
@@ -243,7 +243,7 @@ public class LogCrunchFilterServletTest {
         request.putParameter(LogCrunchFilterServlet.RequestParameters.SearchRange, AllTimeInTheWorld.toString());
         request.putParameter(LogCrunchFilterServlet.RequestParameters.LogFileNamePattern, "xyz-%d{yyyMMdd}.log");
 
-        interactorStub = new InteractorStub() {
+        interactorStub = new LogFileInteractorStub() {
             @Override
             public void getFilteredLines(FilterQuery filterQuery, FilterResult filterResult) {
                 filterResult.filteredLogLine(TestLogFile.SampleInfoLine);
@@ -263,7 +263,7 @@ public class LogCrunchFilterServletTest {
         request.putParameter(LogCrunchFilterServlet.RequestParameters.SearchRange, AllTimeInTheWorld.toString());
         request.putParameter(LogCrunchFilterServlet.RequestParameters.LogFileNamePattern, "xyz-%d{yyyMMdd}.log");
 
-        interactorStub = new InteractorStub() {
+        interactorStub = new LogFileInteractorStub() {
             @Override
             public void getFilteredLines(FilterQuery filterQuery, FilterResult filterResult) {
                 filterResult.noFilesFound();
@@ -280,7 +280,7 @@ public class LogCrunchFilterServletTest {
         request.putParameter(LogCrunchFilterServlet.RequestParameters.SearchRange, AllTimeInTheWorld.toString());
         request.putParameter(LogCrunchFilterServlet.RequestParameters.LogFileNamePattern, "xyz-%d{yyyMMdd}.log");
 
-        interactorStub = new InteractorStub() {
+        interactorStub = new LogFileInteractorStub() {
             @Override
             public void getFilteredLines(FilterQuery filterQuery, FilterResult filterResult) {
                 filterResult.noLinesFound();

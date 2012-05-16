@@ -1,6 +1,6 @@
 package com.crudetech.sample.logcrunch.http;
 
-import com.crudetech.sample.logcrunch.LogFileFilterInteractor;
+import com.crudetech.sample.logcrunch.FilterLogFileInteractor;
 import com.crudetech.sample.logcrunch.LogFileNamePattern;
 import com.crudetech.sample.logcrunch.LogLevel;
 import org.joda.time.Interval;
@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class ParameterFilterQuery implements LogFileFilterInteractor.FilterQuery {
+public class ParameterFilterQuery implements FilterLogFileInteractor.FilterQuery {
     private LogFileNamePattern logFileNamePattern;
     private final List<Interval> searchIntervals = new ArrayList<Interval>();
     private final List<LogLevel> levels = new ArrayList<LogLevel>();

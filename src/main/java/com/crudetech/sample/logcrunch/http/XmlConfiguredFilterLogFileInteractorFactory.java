@@ -1,7 +1,7 @@
 package com.crudetech.sample.logcrunch.http;
 
-import com.crudetech.sample.logcrunch.LogFileFilterInteractor;
-import com.crudetech.sample.logcrunch.LogFileFilterInteractorFactory;
+import com.crudetech.sample.logcrunch.FilterLogFileInteractor;
+import com.crudetech.sample.logcrunch.FilterLogFileInteractorFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -21,12 +21,12 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 
-class XmlConfiguredLogFileFilterInteractorFactory implements LogFileFilterInteractorFactory {
+class XmlConfiguredFilterLogFileInteractorFactory implements FilterLogFileInteractorFactory {
     private static final String FactoryClassSection = "factoryClass";
     private static final String FactoryConfigSection = "factoryConfig";
-    private final LogFileFilterInteractorFactory decorated;
+    private final FilterLogFileInteractorFactory decorated;
 
-    XmlConfiguredLogFileFilterInteractorFactory(InputStream resourceStream) {
+    XmlConfiguredFilterLogFileInteractorFactory(InputStream resourceStream) {
         XmlConfiguration xmlConf = new XmlConfiguration(resourceStream);
         decorated = xmlConf.load();
     }
@@ -38,13 +38,13 @@ class XmlConfiguredLogFileFilterInteractorFactory implements LogFileFilterIntera
             configDocument = xmlDocumentFromStream(resourceStream);
         }
 
-        LogFileFilterInteractorFactory load() {
-            Class<? extends LogFileFilterInteractorFactory> factoryClass = getFactoryType();
+        FilterLogFileInteractorFactory load() {
+            Class<? extends FilterLogFileInteractorFactory> factoryClass = getFactoryType();
             Reader jaxbStream = getJaxbConfigPartOfXml(configDocument);
             return JAXB.unmarshal(jaxbStream, factoryClass);
         }
 
-        private Class<? extends LogFileFilterInteractorFactory> getFactoryType() {
+        private Class<? extends FilterLogFileInteractorFactory> getFactoryType() {
             String factoryClassTypeName = configDocument.getElementsByTagName(FactoryClassSection).item(0).getTextContent();
             return classFromName(factoryClassTypeName);
         }
@@ -97,9 +97,9 @@ class XmlConfiguredLogFileFilterInteractorFactory implements LogFileFilterIntera
         }
 
         @SuppressWarnings("unchecked")
-        private Class<? extends LogFileFilterInteractorFactory> classFromName(String factoryClassName) {
+        private Class<? extends FilterLogFileInteractorFactory> classFromName(String factoryClassName) {
             try {
-                return (Class<? extends LogFileFilterInteractorFactory>) Class.forName(factoryClassName);
+                return (Class<? extends FilterLogFileInteractorFactory>) Class.forName(factoryClassName);
             } catch (ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
@@ -132,12 +132,12 @@ class XmlConfiguredLogFileFilterInteractorFactory implements LogFileFilterIntera
         }
     }
 
-    public LogFileFilterInteractorFactory getDecorated() {
+    public FilterLogFileInteractorFactory getDecorated() {
         return decorated;
     }
 
     @Override
-    public LogFileFilterInteractor createInteractor() {
+    public FilterLogFileInteractor createInteractor() {
         return getDecorated().createInteractor();
     }
 }

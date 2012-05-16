@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <filterInteractorFactory>
-    <factoryClass>com.crudetech.sample.logcrunch.http.LogFileFilterInteractorFactoryStub</factoryClass>
+    <factoryClass>com.crudetech.sample.logcrunch.http.FilterLogFileInteractorFactoryStub</factoryClass>
     <factoryConfig>
         <logFileFilterInteractorFactoryStub>
             <aMember>42</aMember>

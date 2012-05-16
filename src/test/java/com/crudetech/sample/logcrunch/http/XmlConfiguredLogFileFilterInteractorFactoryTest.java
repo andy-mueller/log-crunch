@@ -1,6 +1,6 @@
 package com.crudetech.sample.logcrunch.http;
 
-import com.crudetech.sample.logcrunch.LogFileFilterInteractorFactory;
+import com.crudetech.sample.logcrunch.FilterLogFileInteractorFactory;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExternalResource;
@@ -17,24 +17,24 @@ public class XmlConfiguredLogFileFilterInteractorFactoryTest {
 
     @Test
     public void constructsFromXml() {
-        XmlConfiguredLogFileFilterInteractorFactory xmlConfiguredFactory =
-                new XmlConfiguredLogFileFilterInteractorFactory(xmlConfig.resourceStream);
+        XmlConfiguredFilterLogFileInteractorFactory xmlConfiguredFactory =
+                new XmlConfiguredFilterLogFileInteractorFactory(xmlConfig.resourceStream);
 
-        LogFileFilterInteractorFactory innerFactory = xmlConfiguredFactory.getDecorated();
+        FilterLogFileInteractorFactory innerFactoryLogFile = xmlConfiguredFactory.getDecorated();
 
 
-        LogFileFilterInteractorFactory expected = new LogFileFilterInteractorFactoryStub(42);
+        FilterLogFileInteractorFactory expected = new FilterLogFileInteractorFactoryStub(42);
 
-        assertThat(innerFactory, is(expected));
+        assertThat(innerFactoryLogFile, is(expected));
     }
 
     @Test
     public void jaxbDecoratorForwardsToInnerInteractor() {
-        XmlConfiguredLogFileFilterInteractorFactory xmlConfiguredFactory =
-                new XmlConfiguredLogFileFilterInteractorFactory(xmlConfig.resourceStream);
+        XmlConfiguredFilterLogFileInteractorFactory xmlConfiguredFactory =
+                new XmlConfiguredFilterLogFileInteractorFactory(xmlConfig.resourceStream);
 
         xmlConfiguredFactory.createInteractor();
-        LogFileFilterInteractorFactoryStub innerFactory = (LogFileFilterInteractorFactoryStub) xmlConfiguredFactory.getDecorated();
+        FilterLogFileInteractorFactoryStub innerFactory = (FilterLogFileInteractorFactoryStub) xmlConfiguredFactory.getDecorated();
         assertThat(innerFactory.createInteractorCalled, is(1));
     }
 

@@ -1,9 +1,9 @@
 package com.crudetech.sample.logcrunch.http;
 
 import com.crudetech.sample.logcrunch.BufferedReaderLogFile;
-import com.crudetech.sample.logcrunch.FileSystemLogFileFilterInteractorFactory;
+import com.crudetech.sample.logcrunch.FileSystemFilterLogFileInteractorFactory;
 import com.crudetech.sample.logcrunch.FileTestLogFile;
-import com.crudetech.sample.logcrunch.LogFileFilterInteractor;
+import com.crudetech.sample.logcrunch.FilterLogFileInteractor;
 import com.crudetech.sample.logcrunch.TestLogFile;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -11,22 +11,22 @@ import java.io.File;
 import java.nio.charset.Charset;
 
 
-class LogFileFilterInteractorFactoryStub extends FileSystemLogFileFilterInteractorFactory {
+class FilterLogFileInteractorFactoryStub extends FileSystemFilterLogFileInteractorFactory {
     @XmlElement
     private final int aMember;
     transient int createInteractorCalled = 0;
 
 
-    public LogFileFilterInteractorFactoryStub(int i) {
+    public FilterLogFileInteractorFactoryStub(int i) {
         aMember = i;
     }
 
-    private LogFileFilterInteractorFactoryStub() {
+    private FilterLogFileInteractorFactoryStub() {
         aMember = 0;
     }
 
     @Override
-    public LogFileFilterInteractor createInteractor() {
+    public FilterLogFileInteractor createInteractor() {
         createInteractorCalled++;
         return super.createInteractor();
     }
@@ -50,7 +50,7 @@ class LogFileFilterInteractorFactoryStub extends FileSystemLogFileFilterInteract
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        LogFileFilterInteractorFactoryStub that = (LogFileFilterInteractorFactoryStub) o;
+        FilterLogFileInteractorFactoryStub that = (FilterLogFileInteractorFactoryStub) o;
         return aMember == that.aMember;
     }
 

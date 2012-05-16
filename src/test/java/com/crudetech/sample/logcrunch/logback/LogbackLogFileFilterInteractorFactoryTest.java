@@ -1,7 +1,7 @@
 package com.crudetech.sample.logcrunch.logback;
 
 import com.crudetech.sample.TempDir;
-import com.crudetech.sample.logcrunch.LogFileFilterInteractorFactory;
+import com.crudetech.sample.logcrunch.FilterLogFileInteractorFactory;
 import org.junit.Test;
 
 import javax.xml.bind.JAXB;
@@ -18,8 +18,8 @@ import static org.hamcrest.Matchers.sameInstance;
 public class LogbackLogFileFilterInteractorFactoryTest {
     @Test
     public void factoryCratesWiredInteractor() {
-        LogbackLogFileFilterInteractorFactory factory =
-                new LogbackLogFileFilterInteractorFactory(new TempDir(), Charset.forName("UTF-8"), "yyyyMMdd");
+        LogbackFilterLogFileInteractorFactory factory =
+                new LogbackFilterLogFileInteractorFactory(new TempDir(), Charset.forName("UTF-8"), "yyyyMMdd");
 
         assertThat(factory.createInteractor(), is(notNullValue()));
     }
@@ -27,19 +27,19 @@ public class LogbackLogFileFilterInteractorFactoryTest {
 
     @Test
     public void jaxbSerialization() throws Exception {
-        LogFileFilterInteractorFactory factory =
-                new LogbackLogFileFilterInteractorFactory(new TempDir(), Charset.forName("UTF-8"), "yyyyMMdd");
+        FilterLogFileInteractorFactory factoryLogFile =
+                new LogbackFilterLogFileInteractorFactory(new TempDir(), Charset.forName("UTF-8"), "yyyyMMdd");
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        JAXB.marshal(factory, out);
+        JAXB.marshal(factoryLogFile, out);
 
         ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
 
-        LogFileFilterInteractorFactory unmarshalledFactory = JAXB.unmarshal(in, LogbackLogFileFilterInteractorFactory.class);
+        FilterLogFileInteractorFactory unmarshalledFactoryLogFile = JAXB.unmarshal(in, LogbackFilterLogFileInteractorFactory.class);
 
-        assertThat(unmarshalledFactory, is(not(sameInstance(factory))));
-        assertThat(unmarshalledFactory, is(notNullValue()));
-        assertThat(unmarshalledFactory, is(factory));
+        assertThat(unmarshalledFactoryLogFile, is(not(sameInstance(factoryLogFile))));
+        assertThat(unmarshalledFactoryLogFile, is(notNullValue()));
+        assertThat(unmarshalledFactoryLogFile, is(factoryLogFile));
 
 
     }

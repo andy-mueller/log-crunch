@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <filterInteractorFactory>
-    <factoryClass>com.crudetech.sample.logcrunch.logback.LogbackLogFileFilterInteractorFactory</factoryClass>
+    <factoryClass>com.crudetech.sample.logcrunch.logback.LogbackFilterLogFileInteractorFactory</factoryClass>
     <factoryConfig>
         <logFileFilterInteractorFactory>
             <logLineFormat>yyyy-MM-dd HH:mm:ss</logLineFormat>
