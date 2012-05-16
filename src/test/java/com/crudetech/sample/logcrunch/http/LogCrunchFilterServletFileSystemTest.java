@@ -28,18 +28,18 @@ public class LogCrunchFilterServletFileSystemTest {
 
     @Test
     public void foundFilesAreFilteredAndWrittenToOutput() throws Exception {
-        LogCrunchFilterServlet servlet = new LogCrunchFilterServlet();
+        FilterLogFileServlet logFileServlet = new FilterLogFileServlet();
         ServletConfig configuration = new ServletConfigStub();
-        servlet.init(configuration);
+        logFileServlet.init(configuration);
 
         HttpServletRequestStub request = new HttpServletRequestStub();
-        request.putParameter(LogCrunchFilterServlet.RequestParameters.SearchRange, AllTimeInTheWorld.toString());
-        request.putParameter(LogCrunchFilterServlet.RequestParameters.LogFileNamePattern, "machinename101-%d{yyyyMMdd}.log");
+        request.putParameter(FilterLogFileServlet.RequestParameters.SearchRange, AllTimeInTheWorld.toString());
+        request.putParameter(FilterLogFileServlet.RequestParameters.LogFileNamePattern, "machinename101-%d{yyyyMMdd}.log");
 
 
         HttpServletResponseStub response = new HttpServletResponseStub();
 
-        servlet.doGet(request, response);
+        logFileServlet.doGet(request, response);
 
 
         List<String> expected = Iterables.copy(logfile1.getLinesAsString());
@@ -84,7 +84,7 @@ public class LogCrunchFilterServletFileSystemTest {
 
         @Override
         public String getInitParameter(String name) {
-            if (name.equals(LogCrunchFilterServlet.InitParameters.ConfigurationResource)) {
+            if (name.equals(FilterLogFileServlet.InitParameters.ConfigurationResource)) {
                 return "logfilter-logcrunch-test.xml";
             }
             throw new IllegalArgumentException("Unknown parameter " + name);

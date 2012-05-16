@@ -7,7 +7,7 @@
 
     <servlet>
         <servlet-name>filter</servlet-name>
-        <servlet-class>com.crudetech.sample.logcrunch.http.LogCrunchFilterServlet</servlet-class>
+        <servlet-class>com.crudetech.sample.logcrunch.http.FilterLogFileServlet</servlet-class>
 
         <init-param>
             <param-name>configurationResource</param-name>

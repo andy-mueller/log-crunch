@@ -18,7 +18,7 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.Map;
 
-public class LogCrunchFilterServlet extends HttpServlet {
+public class FilterLogFileServlet extends HttpServlet {
     FilterLogFileInteractorFactory filterLogFileInteractorFactory;
 
     class RequestParameters {
