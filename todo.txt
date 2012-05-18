@@ -5,6 +5,7 @@
 -Provide http query mechanism to list all files in a date range
   GET http://localhost:8080/logcrunch/listFiles?fileName=machine01-%d{yyyMMdd}.log&searchRange=2007-05-07T13:55:22,100/2009-07-02
 
+    -close log  files!
 
 -logging facilities for this application
     -log full request in debug mode

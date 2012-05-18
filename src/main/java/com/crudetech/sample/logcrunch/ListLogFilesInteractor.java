@@ -1,0 +1,27 @@
+package com.crudetech.sample.logcrunch;
+
+import org.joda.time.Interval;
+
+public class ListLogFilesInteractor {
+    private final LogFileLocator logFileLocator;
+
+    public interface Query{
+        LogFileNamePattern getLogFileNamePattern();
+
+        Iterable<Interval> getSearchIntervals();
+    }
+    public ListLogFilesInteractor(LogFileLocator logFileLocator) {
+        this.logFileLocator = logFileLocator;
+    }
+
+    public interface Result {
+        void listFile(LogFile logFile);
+    }
+    public void listFiles(Query query, Result result){
+        for (LogFile logFile : logFileLocator.find(query.getLogFileNamePattern(), query.getSearchIntervals())) {
+            result.listFile(logFile);
+            logFile.close();
+        }
+    }
+
+}

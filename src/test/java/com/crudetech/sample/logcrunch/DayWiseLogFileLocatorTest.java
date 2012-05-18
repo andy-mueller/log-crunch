@@ -1,12 +1,9 @@
 package com.crudetech.sample.logcrunch;
 
-import com.crudetech.sample.Iterables;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.junit.Test;
-
-import java.util.List;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -16,7 +13,7 @@ import static org.hamcrest.Matchers.is;
 public class DayWiseLogFileLocatorTest {
     @Test
     public void givenSearchIntervalStartingAnyTime_adaptsToFullDays() throws Exception {
-        LogFileLocatorStub logFileLocatorStub = new LogFileLocatorStub();
+        LogFileLocatorStub logFileLocatorStub = new LogFileLocatorStub(asList(logFile));
         DayWiseLogFileLocator dayWiseLogFileLocator = new DayWiseLogFileLocator(logFileLocatorStub);
 
         DateTime sixthOfMayInTheAfternoon = new DateTime(2007, 5, 6, 13, 25);
@@ -33,30 +30,9 @@ public class DayWiseLogFileLocatorTest {
     }
 
     private LogFileNamePattern anyPattern() {
-        return new LogFileNamePattern() {
-            @Override
-            public boolean matches(String fileName) {
-                return false;
-            }
-
-            @Override
-            public DateTime dateOf(String fileName) {
-                return new DateTime(0);
-            }
-        };
+        return new LogFileNamePatternStub();
     }
 
-    private static class LogFileLocatorStub implements LogFileLocator {
-        List<Interval> searchIntervals;
-        LogFileNamePattern pattern;
-
-        @Override
-        public Iterable<LogFile> find(LogFileNamePattern pattern , Iterable<Interval> ranges) {
-            searchIntervals = Iterables.copy(ranges);
-            this.pattern = pattern;
-            return asList(logFile);
-        }
-    }
     private static final LogFile logFile = new LogFile() {
         @Override
         public Iterable<LogLine> getLines() {
@@ -67,9 +43,10 @@ public class DayWiseLogFileLocatorTest {
         public void close() {
         }
     };
+
     @Test
     public void searchPatternIsPassedToDecoratedLocator() throws Exception {
-        LogFileLocatorStub logFileLocatorStub = new LogFileLocatorStub();
+        LogFileLocatorStub logFileLocatorStub = new LogFileLocatorStub(asList(logFile));
         DayWiseLogFileLocator dayWiseLogFileLocator = new DayWiseLogFileLocator(logFileLocatorStub);
 
         LogFileNamePattern pattern = anyPattern();
@@ -84,7 +61,7 @@ public class DayWiseLogFileLocatorTest {
 
     @Test
     public void resultOfDecoratedLocatorIsPassedBackThroughDecorator() throws Exception {
-        LogFileLocatorStub logFileLocatorStub = new LogFileLocatorStub();
+        LogFileLocatorStub logFileLocatorStub = new LogFileLocatorStub(asList(logFile));
         DayWiseLogFileLocator dayWiseLogFileLocator = new DayWiseLogFileLocator(logFileLocatorStub);
 
         LogFileNamePattern pattern = anyPattern();
@@ -92,4 +69,5 @@ public class DayWiseLogFileLocatorTest {
 
         assertThat(asList(logFile), is(actualFiles));
     }
+
 }
