@@ -62,19 +62,25 @@ public class ListLogFilesServletTest {
 
         HttpServletResponseStub response = new HttpServletResponseStub();
         servlet.doGet(request, response);
-        assertThat(response.sc, is(HttpStatusCode.BadFormat.Code));
-        assertThat(response.msg, is(HttpStatusCode.BadFormat.Message));
+
+        assertResponseStatus(response, HttpStatusCode.BadFormat);
     }
+
+    private void assertResponseStatus(HttpServletResponseStub response, HttpStatusCode code) {
+        assertThat(response.sc, is(code.Code));
+        assertThat(response.msg, is(code.Message));
+    }
+
     @Test
     public void givenMissingParameters_servletReturnsBadFormat() throws Exception {
         HttpServletRequestStub request = new HttpServletRequestStub();
         request.putParameter("logFileNamePattern", "machinename101-%d{yyyyMMdd}.log");
+        request.putParameter("searchRange");
 
         HttpServletResponseStub response = new HttpServletResponseStub();
         servlet.doGet(request, response);
 
-        assertThat(response.sc, is(HttpStatusCode.BadFormat.Code));
-        assertThat(response.msg, is(HttpStatusCode.BadFormat.Message));
+        assertResponseStatus(response, HttpStatusCode.BadFormat);
     }
     // found->result
     //not found->404
