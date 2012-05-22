@@ -16,6 +16,8 @@ public class ListLogFilesInteractor {
 
     public interface Result {
         void listFile(LogFile logFile);
+
+        void noFilesFound();
     }
     public void listFiles(Query query, Result result){
         for (LogFile logFile : logFileLocator.find(query.getLogFileNamePattern(), query.getSearchIntervals())) {

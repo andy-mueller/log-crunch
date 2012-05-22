@@ -7,6 +7,7 @@ import com.crudetech.sample.filter.PredicateBuilder;
 import com.crudetech.sample.filter.UnaryFunction;
 import org.joda.time.Interval;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -117,6 +118,11 @@ public class FilterLogFileInteractor {
         @Override
         public void close() {
             logFile.close();
+        }
+
+        @Override
+        public void print(PrintWriter w) {
+            logFile.print(w);
         }
 
     }

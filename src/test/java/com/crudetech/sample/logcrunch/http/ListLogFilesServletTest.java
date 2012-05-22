@@ -1,6 +1,7 @@
 package com.crudetech.sample.logcrunch.http;
 
 
+import com.crudetech.sample.logcrunch.ArrayListLogFile;
 import com.crudetech.sample.logcrunch.ListLogFilesInteractor;
 import com.crudetech.sample.logcrunch.logback.LogbackLogFileNamePattern;
 import org.joda.time.Interval;
@@ -17,7 +18,7 @@ public class ListLogFilesServletTest {
 
     @Before
     public void setUp() throws Exception {
-        listLogFilesInteractorStub = new ListLogFilesInteractorStub();
+        listLogFilesInteractorStub = new ListLogFilesInteractorStub(){};
         servlet = new ListLogFilesServlet() {
             @Override
             ListLogFilesInteractor createInteractor() {
@@ -28,6 +29,7 @@ public class ListLogFilesServletTest {
 
     static class ListLogFilesInteractorStub extends ListLogFilesInteractor {
         private Query query;
+        private Result result;
 
         ListLogFilesInteractorStub() {
             super(null);
@@ -36,6 +38,7 @@ public class ListLogFilesServletTest {
         @Override
         public void listFiles(Query query, Result result) {
             this.query = query;
+            this.result = result;
         }
     }
 
@@ -82,6 +85,34 @@ public class ListLogFilesServletTest {
 
         assertResponseStatus(response, HttpStatusCode.BadFormat);
     }
-    // found->result
-    //not found->404
+    @Test
+    public void givenFilesFound_filesAreReturned() throws Exception {
+        HttpServletRequestStub request = new HttpServletRequestStub();
+        request.putParameter("logFileNamePattern", "machinename101-%d{yyyyMMdd}.log");
+        request.putParameter("searchRange", "2007-05-06/2007-05-08");
+
+        HttpServletResponseStub response = new HttpServletResponseStub();
+        servlet.doGet(request, response);
+
+        ArrayListLogFile file = new ArrayListLogFile();
+        file.setName("machinename101-20070412.log");
+        listLogFilesInteractorStub.result.listFile(file);
+
+        assertThat(response.content, is("machinename101-20070412.log"));
+        assertThat(response.sc, is(HttpStatusCode.Ok.Code));
+    }
+    @Test
+    public void givenNoFilesFound_notFoundIsReturned() throws Exception {
+        HttpServletRequestStub request = new HttpServletRequestStub();
+        request.putParameter("logFileNamePattern", "machinename101-%d{yyyyMMdd}.log");
+        request.putParameter("searchRange", "2007-05-06/2007-05-08");
+
+        HttpServletResponseStub response = new HttpServletResponseStub();
+        servlet.doGet(request, response);
+
+        listLogFilesInteractorStub.result.noFilesFound();
+
+        assertThat(response.sc, is(HttpStatusCode.NotFound.Code));
+        assertThat(response.msg, is(HttpStatusCode.NotFound.Message));
+    }
 }

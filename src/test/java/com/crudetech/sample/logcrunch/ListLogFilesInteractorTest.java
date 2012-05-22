@@ -47,6 +47,10 @@ public class ListLogFilesInteractorTest {
         public void listFile(LogFile logFile) {
             logFiles.add(logFile);
         }
+
+        @Override
+        public void noFilesFound() {
+        }
     }
 
     @Test

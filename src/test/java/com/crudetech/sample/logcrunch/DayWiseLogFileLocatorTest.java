@@ -5,6 +5,8 @@ import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.junit.Test;
 
+import java.io.PrintWriter;
+
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -41,6 +43,10 @@ public class DayWiseLogFileLocatorTest {
 
         @Override
         public void close() {
+        }
+
+        @Override
+        public void print(PrintWriter w) {
         }
     };
 

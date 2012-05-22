@@ -113,4 +113,9 @@ public abstract class TestLogFile extends ExternalResource implements LogFile {
             }
         };
     }
+
+    @Override
+    public void print(PrintWriter w) {
+        w.print(name);
+    }
 }
