@@ -63,8 +63,7 @@ public class FilterLogFileInteractor {
         }
         if (noFilesFound) {
             filterResult.noFilesFound();
-        }
-        if (noLinesFound) {
+        } else if (noLinesFound) {
             filterResult.noLinesFound();
         }
     }

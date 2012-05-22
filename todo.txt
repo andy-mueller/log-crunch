@@ -7,7 +7,6 @@
 
     -close log  files!
 
--ERROR: weird stream closed exception on filter servlet
 -remove all logback dependencies from http into xml
 
 -logging facilities for this application

@@ -61,6 +61,7 @@ public class FilterLogFileInteractorTest {
     private void setupLocator(LogFile... logFiles) {
         when(locator.find(eq(logFileNamePattern), any(Iterable.class))).thenReturn(asList(logFiles));
     }
+
     private void setupLocatorThatFindsNothing() {
         setupLocator();
     }
@@ -129,7 +130,7 @@ public class FilterLogFileInteractorTest {
     }
 
     @Test
-    public void givenNoLogFileFound_errorMessageIsSend(){
+    public void givenNoLogFileFound_errorMessageIsSend() {
         setupLocatorThatFindsNothing();
 
         ParameterFilterQuery request = new ParameterFilterQuery();
@@ -156,6 +157,21 @@ public class FilterLogFileInteractorTest {
 
         assertThat(lineCollector.noLinesFound, is(true));
     }
+
+    @Test
+    public void givenNoLogFileFound_noNoLinesFoundIsSend() {
+        setupLocatorThatFindsNothing();
+
+        ParameterFilterQuery request = new ParameterFilterQuery();
+        request.setLogFileNamePattern(logFileNamePattern);
+        request.addSearchInterval(new Interval(TestLogFile.SampleInfoLineDate, TestLogFile.SampleInfoLineDate.plusSeconds(1)));
+
+        CollectingFilterResultStub lineCollector = new CollectingFilterResultStub();
+        logFileInteractor.getFilteredLines(request, lineCollector);
+
+        assertThat(lineCollector.noLinesFound, is(false));
+    }
+
     @Test
     public void givenNothingFoundInsideLogFiles_logFileIsClosed() throws Exception {
         setupLocator(logFileStub1);
