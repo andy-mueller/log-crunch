@@ -8,8 +8,6 @@ import org.junit.Test;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponseWrapper;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
@@ -33,11 +31,11 @@ public class LogCrunchFilterServletFileSystemTest {
         logFileServlet.init(configuration);
 
         HttpServletRequestStub request = new HttpServletRequestStub();
-        request.putParameter(FilterLogFileServlet.RequestParameters.SearchRange, AllTimeInTheWorld.toString());
-        request.putParameter(FilterLogFileServlet.RequestParameters.LogFileNamePattern, "machinename101-%d{yyyyMMdd}.log");
+        request.putParameter(RequestParameters.SearchRange, AllTimeInTheWorld.toString());
+        request.putParameter(RequestParameters.LogFileNamePattern, "machinename101-%d{yyyyMMdd}.log");
 
 
-        HttpServletResponseStub response = new HttpServletResponseStub();
+        TextCollectingHttpServletResponseStub response = new TextCollectingHttpServletResponseStub();
 
         logFileServlet.doGet(request, response);
 
@@ -46,10 +44,7 @@ public class LogCrunchFilterServletFileSystemTest {
         assertThat(response.lines, is(expected));
     }
 
-    static class HttpServletResponseStub extends HttpServletResponseWrapper {
-        HttpServletResponseStub() {
-            super(mock(HttpServletResponse.class));
-        }
+    static class TextCollectingHttpServletResponseStub extends HttpServletResponseStub {
 
         final List<String> lines = new ArrayList<String>();
         private String tmp = "";

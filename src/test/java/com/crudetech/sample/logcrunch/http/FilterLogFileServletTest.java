@@ -58,6 +58,7 @@ public class FilterLogFileServletTest {
     @Before
     public void setUp() throws Exception {
         request = new HttpServletRequestStub();
+        response = new HttpServletResponseStub();
         response = mock(HttpServletResponse.class);
         responseWriter = new PrintWriterStub();
         when(response.getWriter()).thenReturn(responseWriter);
@@ -90,9 +91,9 @@ public class FilterLogFileServletTest {
 
     @Test
     public void logLevelsAreExtractedToQuery() throws Exception {
-        request.putParameter(FilterLogFileServlet.RequestParameters.Level, "Info", "Debug");
-        request.putParameter(FilterLogFileServlet.RequestParameters.SearchRange, AllTimeInTheWorld.toString());
-        request.putParameter(FilterLogFileServlet.RequestParameters.LogFileNamePattern, "machine101-%d{yyyMMdd}.log");
+        request.putParameter(RequestParameters.Level, "Info", "Debug");
+        request.putParameter(RequestParameters.SearchRange, AllTimeInTheWorld.toString());
+        request.putParameter(RequestParameters.LogFileNamePattern, "machine101-%d{yyyMMdd}.log");
         filterLogFileServlet.doGet(request, response);
 
         ParameterFilterQuery expectedQuery = new ParameterFilterQuery();
@@ -106,8 +107,8 @@ public class FilterLogFileServletTest {
 
     @Test
     public void noLogLevelsAllowed() throws Exception {
-        request.putParameter(FilterLogFileServlet.RequestParameters.SearchRange, AllTimeInTheWorld.toString());
-        request.putParameter(FilterLogFileServlet.RequestParameters.LogFileNamePattern, "machine101-%d{yyyMMdd}.log");
+        request.putParameter(RequestParameters.SearchRange, AllTimeInTheWorld.toString());
+        request.putParameter(RequestParameters.LogFileNamePattern, "machine101-%d{yyyMMdd}.log");
 
         filterLogFileServlet.doGet(request, response);
 
@@ -119,8 +120,8 @@ public class FilterLogFileServletTest {
 
     @Test
     public void searchIntervalsAreExtractedToQuery() throws Exception {
-        request.putParameter(FilterLogFileServlet.RequestParameters.SearchRange, "2007-05-07T13:55:22,100/2009-07-02");
-        request.putParameter(FilterLogFileServlet.RequestParameters.LogFileNamePattern, "machine101-%d{yyyMMdd}.log");
+        request.putParameter(RequestParameters.SearchRange, "2007-05-07T13:55:22,100/2009-07-02");
+        request.putParameter(RequestParameters.LogFileNamePattern, "machine101-%d{yyyMMdd}.log");
 
         filterLogFileServlet.doGet(request, response);
 
@@ -133,8 +134,8 @@ public class FilterLogFileServletTest {
 
     @Test
     public void logFileNamePatternIsExtractedToQuery() throws Exception {
-        request.putParameter(FilterLogFileServlet.RequestParameters.SearchRange, AllTimeInTheWorld.toString());
-        request.putParameter(FilterLogFileServlet.RequestParameters.LogFileNamePattern, "xyz-%d{yyyMMdd}.log");
+        request.putParameter(RequestParameters.SearchRange, AllTimeInTheWorld.toString());
+        request.putParameter(RequestParameters.LogFileNamePattern, "xyz-%d{yyyMMdd}.log");
 
         filterLogFileServlet.doGet(request, response);
 
@@ -149,36 +150,36 @@ public class FilterLogFileServletTest {
 
     @Test
     public void nonIsoDateTimeReturnsBadFormat() throws Exception {
-        request.putParameter(FilterLogFileServlet.RequestParameters.SearchRange, "200705071355,100/2009-07-02");
-        request.putParameter(FilterLogFileServlet.RequestParameters.LogFileNamePattern, "xyz-%d{yyyMMdd}.log");
+        request.putParameter(RequestParameters.SearchRange, "200705071355,100/2009-07-02");
+        request.putParameter(RequestParameters.LogFileNamePattern, "xyz-%d{yyyMMdd}.log");
 
         filterLogFileServlet.doGet(request, response);
 
-        verifyErrorResponse(response, FilterLogFileServlet.HttpStatusCode.BadFormat);
+        verifyErrorResponse(response, HttpStatusCode.BadFormat);
     }
 
-    private void verifyErrorResponse(HttpServletResponse response, FilterLogFileServlet.HttpStatusCode code) throws IOException {
+    private void verifyErrorResponse(HttpServletResponse response, HttpStatusCode code) throws IOException {
         verify(response).sendError(code.Code, code.Message);
     }
 
     @Test
     public void atLeastOneTimeIntervalIsRequired() throws Exception {
-        request.putParameter(FilterLogFileServlet.RequestParameters.SearchRange);
-        request.putParameter(FilterLogFileServlet.RequestParameters.LogFileNamePattern, "xyz-%d{yyyMMdd}.log");
+        request.putParameter(RequestParameters.SearchRange);
+        request.putParameter(RequestParameters.LogFileNamePattern, "xyz-%d{yyyMMdd}.log");
 
         filterLogFileServlet.doGet(request, response);
 
-        verifyErrorResponse(response, FilterLogFileServlet.HttpStatusCode.BadFormat);
+        verifyErrorResponse(response, HttpStatusCode.BadFormat);
     }
 
     @Test
     public void logFileNameFormatIsIsRequired() throws Exception {
-        request.putParameter(FilterLogFileServlet.RequestParameters.SearchRange, AllTimeInTheWorld.toString());
-        request.putParameter(FilterLogFileServlet.RequestParameters.LogFileNamePattern);
+        request.putParameter(RequestParameters.SearchRange, AllTimeInTheWorld.toString());
+        request.putParameter(RequestParameters.LogFileNamePattern);
 
         filterLogFileServlet.doGet(request, response);
 
-        verifyErrorResponse(response, FilterLogFileServlet.HttpStatusCode.BadFormat);
+        verifyErrorResponse(response, HttpStatusCode.BadFormat);
     }
 
     @Test
@@ -229,9 +230,9 @@ public class FilterLogFileServletTest {
         FilterLogFileInteractor logFileInteractor = new FilterLogFileInteractor(locatorStub, asList(new FindAllFilterBuilderStub()));
         when(logFileServlet.filterLogFileInteractorFactory.createInteractor()).thenReturn(logFileInteractor);
 
-        request.putParameter(FilterLogFileServlet.RequestParameters.SearchRange, AllTimeInTheWorld.toString());
-        request.putParameter(FilterLogFileServlet.RequestParameters.LogFileNamePattern, "xyz-%d{yyyMMdd}.log");
-        request.putParameter(FilterLogFileServlet.RequestParameters.Level, "Info");
+        request.putParameter(RequestParameters.SearchRange, AllTimeInTheWorld.toString());
+        request.putParameter(RequestParameters.LogFileNamePattern, "xyz-%d{yyyMMdd}.log");
+        request.putParameter(RequestParameters.Level, "Info");
 
         logFileServlet.doGet(request, response);
 
@@ -240,8 +241,8 @@ public class FilterLogFileServletTest {
 
     @Test
     public void resultLogLinesAreWrittenToResponse() throws Exception {
-        request.putParameter(FilterLogFileServlet.RequestParameters.SearchRange, AllTimeInTheWorld.toString());
-        request.putParameter(FilterLogFileServlet.RequestParameters.LogFileNamePattern, "xyz-%d{yyyMMdd}.log");
+        request.putParameter(RequestParameters.SearchRange, AllTimeInTheWorld.toString());
+        request.putParameter(RequestParameters.LogFileNamePattern, "xyz-%d{yyyMMdd}.log");
 
         interactorStub = new LogFileInteractorStub() {
             @Override
@@ -260,8 +261,8 @@ public class FilterLogFileServletTest {
 
     @Test
     public void givenNoFilesFound_NotFoundIsReturned() throws Exception {
-        request.putParameter(FilterLogFileServlet.RequestParameters.SearchRange, AllTimeInTheWorld.toString());
-        request.putParameter(FilterLogFileServlet.RequestParameters.LogFileNamePattern, "xyz-%d{yyyMMdd}.log");
+        request.putParameter(RequestParameters.SearchRange, AllTimeInTheWorld.toString());
+        request.putParameter(RequestParameters.LogFileNamePattern, "xyz-%d{yyyMMdd}.log");
 
         interactorStub = new LogFileInteractorStub() {
             @Override
@@ -273,12 +274,12 @@ public class FilterLogFileServletTest {
 
         filterLogFileServlet.doGet(request, response);
 
-        verifyErrorResponse(response, FilterLogFileServlet.HttpStatusCode.NotFound);
+        verifyErrorResponse(response, HttpStatusCode.NotFound);
     }
     @Test
     public void givenNoLinesFound_OkAndMessageAreReturned() throws Exception {
-        request.putParameter(FilterLogFileServlet.RequestParameters.SearchRange, AllTimeInTheWorld.toString());
-        request.putParameter(FilterLogFileServlet.RequestParameters.LogFileNamePattern, "xyz-%d{yyyMMdd}.log");
+        request.putParameter(RequestParameters.SearchRange, AllTimeInTheWorld.toString());
+        request.putParameter(RequestParameters.LogFileNamePattern, "xyz-%d{yyyMMdd}.log");
 
         interactorStub = new LogFileInteractorStub() {
             @Override
@@ -290,7 +291,7 @@ public class FilterLogFileServletTest {
 
         filterLogFileServlet.doGet(request, response);
 
-        verify(response).setStatus(FilterLogFileServlet.HttpStatusCode.OkNoLinesFound.Code);
-        assertThat(responseWriter.writtenObject, is(FilterLogFileServlet.HttpStatusCode.OkNoLinesFound.Message));
+        verify(response).setStatus(HttpStatusCode.OkNoLinesFound.Code);
+        assertThat(responseWriter.writtenObject, is(HttpStatusCode.OkNoLinesFound.Message));
     }
 }

@@ -131,10 +131,10 @@ public class ParameterMapper {
 
         ParameterConsumer parameterTarget = new ParameterConsumer(mappingTarget, annotatedMethod);
 
-        accumulate(parameterTarget, parameterValues, applyParameter(parameterType, factory)).validate();
+        accumulate(parameterTarget, parameterValues, instantiateParameter(parameterType, factory)).validate();
     }
 
-    private BinaryFunction<ParameterConsumer, ParameterConsumer, String> applyParameter(final Class<?> parameterType, final ParameterFactory factory) {
+    private BinaryFunction<ParameterConsumer, ParameterConsumer, String> instantiateParameter(final Class<?> parameterType, final ParameterFactory factory) {
         return new BinaryFunction<ParameterConsumer, ParameterConsumer, String>() {
             @Override
             public ParameterConsumer evaluate(ParameterConsumer parameterTarget, String parameterValue) {

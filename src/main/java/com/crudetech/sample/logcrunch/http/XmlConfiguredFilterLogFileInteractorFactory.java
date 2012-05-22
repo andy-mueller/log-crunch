@@ -22,29 +22,30 @@ import java.io.StringReader;
 import java.io.StringWriter;
 
 class XmlConfiguredFilterLogFileInteractorFactory implements FilterLogFileInteractorFactory {
-    private static final String FactoryClassSection = "factoryClass";
-    private static final String FactoryConfigSection = "factoryConfig";
     private final FilterLogFileInteractorFactory decorated;
 
     XmlConfiguredFilterLogFileInteractorFactory(InputStream resourceStream) {
-        XmlConfiguration xmlConf = new XmlConfiguration(resourceStream);
+        XmlConfiguration<FilterLogFileInteractorFactory> xmlConf
+                = new XmlConfiguration<FilterLogFileInteractorFactory>(resourceStream);
         decorated = xmlConf.load();
     }
 
-    private static class XmlConfiguration {
+    private static class XmlConfiguration<T> {
         private final Document configDocument;
+        private static final String FactoryClassSection = "factoryClass";
+        private static final String FactoryConfigSection = "factoryConfig";
 
         public XmlConfiguration(InputStream resourceStream) {
             configDocument = xmlDocumentFromStream(resourceStream);
         }
 
-        FilterLogFileInteractorFactory load() {
-            Class<? extends FilterLogFileInteractorFactory> factoryClass = getFactoryType();
+        T load() {
+            Class<? extends T> factoryClass = getFactoryType();
             Reader jaxbStream = getJaxbConfigPartOfXml(configDocument);
             return JAXB.unmarshal(jaxbStream, factoryClass);
         }
 
-        private Class<? extends FilterLogFileInteractorFactory> getFactoryType() {
+        private Class<? extends T> getFactoryType() {
             String factoryClassTypeName = configDocument.getElementsByTagName(FactoryClassSection).item(0).getTextContent();
             return classFromName(factoryClassTypeName);
         }
@@ -97,9 +98,9 @@ class XmlConfiguredFilterLogFileInteractorFactory implements FilterLogFileIntera
         }
 
         @SuppressWarnings("unchecked")
-        private Class<? extends FilterLogFileInteractorFactory> classFromName(String factoryClassName) {
+        private Class<? extends T> classFromName(String factoryClassName) {
             try {
-                return (Class<? extends FilterLogFileInteractorFactory>) Class.forName(factoryClassName);
+                return (Class<? extends T>) Class.forName(factoryClassName);
             } catch (ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
