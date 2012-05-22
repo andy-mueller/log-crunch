@@ -10,7 +10,6 @@ import static org.mockito.Mockito.mock;
 
 class HttpServletResponseStub extends HttpServletResponseWrapper {
     int sc;
-    String msg = "";
     String content = "";
 
     HttpServletResponseStub() {
@@ -20,7 +19,7 @@ class HttpServletResponseStub extends HttpServletResponseWrapper {
     @Override
     public void sendError(int sc, String msg) throws IOException {
         this.sc = sc;
-        this.msg += msg;
+        this.content += msg;
     }
 
     @Override

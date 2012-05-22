@@ -71,7 +71,7 @@ public class ListLogFilesServletTest {
 
     private void assertResponseStatus(HttpServletResponseStub response, HttpStatusCode code) {
         assertThat(response.sc, is(code.Code));
-        assertThat(response.msg, is(code.Message));
+        assertThat(response.content, is(code.Message));
     }
 
     @Test
@@ -113,6 +113,6 @@ public class ListLogFilesServletTest {
         listLogFilesInteractorStub.result.noFilesFound();
 
         assertThat(response.sc, is(HttpStatusCode.NotFound.Code));
-        assertThat(response.msg, is(HttpStatusCode.NotFound.Message));
+        assertThat(response.content, is(HttpStatusCode.NotFound.Message));
     }
 }
