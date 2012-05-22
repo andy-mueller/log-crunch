@@ -22,6 +22,10 @@ class LogFileLocatorStub implements LogFileLocator {
         this(asList(logFile));
     }
 
+    public LogFileLocatorStub() {
+        this(new ArrayList<LogFile>());
+    }
+
     @Override
     public Iterable<LogFile> find(LogFileNamePattern pattern , Iterable<Interval> ranges) {
         searchIntervals = Iterables.copy(ranges);

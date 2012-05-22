@@ -20,9 +20,14 @@ public class ListLogFilesInteractor {
         void noFilesFound();
     }
     public void listFiles(Query query, Result result){
+        boolean noFilesFound = true;
         for (LogFile logFile : logFileLocator.find(query.getLogFileNamePattern(), query.getSearchIntervals())) {
             result.listFile(logFile);
             logFile.close();
+            noFilesFound = false;
+        }
+        if(noFilesFound){
+            result.noFilesFound();
         }
     }
 

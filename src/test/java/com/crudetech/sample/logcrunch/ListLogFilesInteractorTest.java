@@ -42,6 +42,7 @@ public class ListLogFilesInteractorTest {
 
     private static class ListLogFilesInteractorResultStub implements ListLogFilesInteractor.Result {
         List<LogFile> logFiles = new ArrayList<LogFile>();
+        private boolean noFilesFound = false;
 
         @Override
         public void listFile(LogFile logFile) {
@@ -50,6 +51,7 @@ public class ListLogFilesInteractorTest {
 
         @Override
         public void noFilesFound() {
+            this.noFilesFound = true;
         }
     }
 
@@ -119,5 +121,18 @@ public class ListLogFilesInteractorTest {
 
 
         assertThat(logFileStub.isClosed(), is(true));
+    }
+
+    @Test
+    public void givenLocatorFindsNoFiles_noFilesMessageIsRaised(){
+        locator = new LogFileLocatorStub();
+        finder = new ListLogFilesInteractor(locator);
+
+        ListLogFilesInteractor.Query query = new ListLogFilesInteractorQueryStub();
+        ListLogFilesInteractorResultStub result= new ListLogFilesInteractorResultStub();
+
+        finder.listFiles(query, result);
+
+        assertThat(result.noFilesFound, is(true));
     }
 }
