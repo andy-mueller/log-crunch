@@ -1,7 +1,7 @@
 package com.crudetech.sample.logcrunch.http;
 
 import com.crudetech.sample.logcrunch.FilterLogFileInteractor;
-import com.crudetech.sample.logcrunch.FilterLogFileInteractorFactory;
+import com.crudetech.sample.logcrunch.InteractorFactory;
 import com.crudetech.sample.logcrunch.LogFileNamePattern;
 import com.crudetech.sample.logcrunch.LogLine;
 import com.crudetech.sample.logcrunch.logback.LogbackLogFileNamePattern;
@@ -19,11 +19,7 @@ import java.io.PrintWriter;
 import java.util.Map;
 
 public class FilterLogFileServlet extends HttpServlet {
-    FilterLogFileInteractorFactory filterLogFileInteractorFactory;
-
-    static class InitParameters {
-        static final String ConfigurationResource = "configurationResource";
-    }
+    InteractorFactory<FilterLogFileInteractor> filterLogFileInteractorFactory;
 
     // GET http://localhost:8080/logcrunch/filter?logFileNamePattern=machinename101-%25d{yyyyMMdd}.log&searchRange=2007-05-06/2007-05-08&level=Info&level=Warn
     @Override
@@ -136,10 +132,10 @@ public class FilterLogFileServlet extends HttpServlet {
     }
 
     private void loadLodFileFilterFromConfig(ServletConfig config) {
-        String configResource = config.getInitParameter(InitParameters.ConfigurationResource);
+        String configResource = config.getInitParameter(ServletInitParameters.ConfigurationResource);
         InputStream configFile = getClass().getResourceAsStream("/" + configResource);
         try {
-            this.filterLogFileInteractorFactory = new XmlConfiguredFilterLogFileInteractorFactory(configFile);
+            this.filterLogFileInteractorFactory = new XmlConfiguredInteractorFactory<FilterLogFileInteractor>(configFile);
         } finally {
             close(configFile);
         }

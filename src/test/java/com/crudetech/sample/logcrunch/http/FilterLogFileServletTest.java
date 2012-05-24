@@ -185,11 +185,16 @@ public class FilterLogFileServletTest {
     @Test
     public void newInteractorUsesFactory() throws Exception {
         FilterLogFileServlet logFileServlet = new FilterLogFileServlet();
-        logFileServlet.filterLogFileInteractorFactory = mock(FilterLogFileInteractorFactory.class);
+        logFileServlet.filterLogFileInteractorFactory = createInteractorFactoryMock();
         FilterLogFileInteractor logFileInteractor = mock(FilterLogFileInteractor.class);
         when(logFileServlet.filterLogFileInteractorFactory.createInteractor()).thenReturn(logFileInteractor);
 
         assertThat(logFileServlet.newInteractor(), is(logFileInteractor));
+    }
+
+    @SuppressWarnings("unchecked")
+    private InteractorFactory<FilterLogFileInteractor> createInteractorFactoryMock() {
+        return mock(InteractorFactory.class);
     }
 
 
@@ -225,7 +230,7 @@ public class FilterLogFileServletTest {
     @Test
     public void logFilesAreClosedAfterRequest() throws Exception {
         FilterLogFileServlet logFileServlet = new FilterLogFileServlet();
-        logFileServlet.filterLogFileInteractorFactory = mock(FilterLogFileInteractorFactory.class);
+        logFileServlet.filterLogFileInteractorFactory = createInteractorFactoryMock();
         CloseCountingLogFileLocatorStub locatorStub = new CloseCountingLogFileLocatorStub();
         FilterLogFileInteractor logFileInteractor = new FilterLogFileInteractor(locatorStub, asList(new FindAllFilterBuilderStub()));
         when(logFileServlet.filterLogFileInteractorFactory.createInteractor()).thenReturn(logFileInteractor);

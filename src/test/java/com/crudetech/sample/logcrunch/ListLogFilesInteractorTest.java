@@ -119,7 +119,6 @@ public class ListLogFilesInteractorTest {
 
         finder.listFiles(query, result);
 
-
         assertThat(logFileStub.isClosed(), is(true));
     }
 

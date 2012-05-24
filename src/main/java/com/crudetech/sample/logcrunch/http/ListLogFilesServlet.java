@@ -1,20 +1,26 @@
 package com.crudetech.sample.logcrunch.http;
 
+import com.crudetech.sample.logcrunch.InteractorFactory;
 import com.crudetech.sample.logcrunch.ListLogFilesInteractor;
 import com.crudetech.sample.logcrunch.LogFile;
 import com.crudetech.sample.logcrunch.LogFileNamePattern;
 import com.crudetech.sample.logcrunch.logback.LogbackLogFileNamePattern;
 import org.joda.time.Interval;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.Closeable;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.Map;
 
 public class ListLogFilesServlet extends HttpServlet{
+    private InteractorFactory<ListLogFilesInteractor> listLogFilesInteractorFactory;
+
     // GET http://localhost:8080/logcrunch/list?logFileNamePattern=machinename101-%25d{yyyyMMdd}.log&searchRange=2007-05-06/2007-05-08
     @Override
     protected void doGet(HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
@@ -29,6 +35,7 @@ public class ListLogFilesServlet extends HttpServlet{
             @Override
             public void listFile(LogFile logFile) {
                 logFile.print(responseWriter);
+                responseWriter.println();
             }
 
             @Override
@@ -82,6 +89,29 @@ public class ListLogFilesServlet extends HttpServlet{
         return mapper;
     }
     ListLogFilesInteractor createInteractor() {
-        throw new UnsupportedOperationException("Implement me!");
+        return listLogFilesInteractorFactory.createInteractor();
+    }
+
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+        loadLodFileFilterFromConfig(config);
+    }
+
+    private void loadLodFileFilterFromConfig(ServletConfig config) {
+        String configResource = config.getInitParameter(ServletInitParameters.ConfigurationResource);
+        InputStream configFile = getClass().getResourceAsStream("/" + configResource);
+        try {
+            this.listLogFilesInteractorFactory = new XmlConfiguredInteractorFactory<ListLogFilesInteractor>(configFile);
+        } finally {
+            close(configFile);
+        }
+    }
+    private void close(Closeable closeable) {
+        try {
+            closeable.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

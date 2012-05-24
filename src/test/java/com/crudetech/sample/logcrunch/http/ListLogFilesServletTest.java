@@ -1,6 +1,7 @@
 package com.crudetech.sample.logcrunch.http;
 
 
+import com.crudetech.sample.filter.Strings;
 import com.crudetech.sample.logcrunch.ArrayListLogFile;
 import com.crudetech.sample.logcrunch.ListLogFilesInteractor;
 import com.crudetech.sample.logcrunch.logback.LogbackLogFileNamePattern;
@@ -98,7 +99,7 @@ public class ListLogFilesServletTest {
         file.setName("machinename101-20070412.log");
         listLogFilesInteractorStub.result.listFile(file);
 
-        assertThat(response.content, is("machinename101-20070412.log"));
+        assertThat(response.content, is("machinename101-20070412.log"+ Strings.lineSeparator()));
         assertThat(response.sc, is(HttpStatusCode.Ok.Code));
     }
     @Test

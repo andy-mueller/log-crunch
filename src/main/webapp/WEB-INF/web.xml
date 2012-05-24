@@ -3,7 +3,8 @@
         "http://java.sun.com/dtd/web-app_2_3.dtd" >
 
 <web-app>
-    <display-name>Archetype Created Web Application</display-name>
+    <display-name>An application to do funny things with log files</display-name>
+
 
     <servlet>
         <servlet-name>filter</servlet-name>
@@ -15,10 +16,26 @@
         </init-param>
     </servlet>
 
+    <servlet>
+        <servlet-name>listFiles</servlet-name>
+        <servlet-class>com.crudetech.sample.logcrunch.http.ListLogFilesServlet</servlet-class>
+
+        <init-param>
+            <param-name>configurationResource</param-name>
+            <param-value>listLogFiles-logcrunch.xml</param-value>
+        </init-param>
+    </servlet>
+
+
     <servlet-mapping>
         <servlet-name>filter</servlet-name>
         <url-pattern>/logcrunch/filter</url-pattern>
     </servlet-mapping>
 
+
+    <servlet-mapping>
+        <servlet-name>listFiles</servlet-name>
+        <url-pattern>/logcrunch/list</url-pattern>
+    </servlet-mapping>
 
 </web-app>

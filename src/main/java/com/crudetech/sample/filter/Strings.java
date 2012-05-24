@@ -3,6 +3,10 @@ package com.crudetech.sample.filter;
 import java.util.regex.Pattern;
 
 public class Strings {
+    public static String lineSeparator(){
+        return "\n";
+    }
+
     public static BinaryFunction<String, ? super String, ? super String> concat() {
         return new BinaryFunction<String, String, String>() {
             @Override
@@ -20,4 +24,14 @@ public class Strings {
             }
         };
     }
+
+    public static BinaryFunction<StringBuilder, ? super StringBuilder, CharSequence> concat(final CharSequence linebreak) {
+        return new BinaryFunction<StringBuilder, StringBuilder, CharSequence>() {
+            @Override
+            public StringBuilder evaluate(StringBuilder sb, CharSequence s) {
+                return sb.append(s).append(linebreak);
+            }
+        };
+    }
+
 }

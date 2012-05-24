@@ -1,5 +1,7 @@
 package com.crudetech.sample.logcrunch.http;
 
+import com.crudetech.sample.filter.Strings;
+
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 import java.io.IOException;
@@ -42,7 +44,7 @@ class HttpServletResponseStub extends HttpServletResponseWrapper {
 
             @Override
             public void println() {
-                content += "\n";
+                content += Strings.lineSeparator();
             }
         };
     }

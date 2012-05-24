@@ -1,7 +1,6 @@
 package com.crudetech.sample.logcrunch.http;
 
-import com.crudetech.sample.logcrunch.FilterLogFileInteractor;
-import com.crudetech.sample.logcrunch.FilterLogFileInteractorFactory;
+import com.crudetech.sample.logcrunch.InteractorFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -21,12 +20,12 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 
-class XmlConfiguredFilterLogFileInteractorFactory implements FilterLogFileInteractorFactory {
-    private final FilterLogFileInteractorFactory decorated;
+class XmlConfiguredInteractorFactory<TInteractor> implements InteractorFactory<TInteractor> {
+    private final InteractorFactory<TInteractor> decorated;
 
-    XmlConfiguredFilterLogFileInteractorFactory(InputStream resourceStream) {
-        XmlConfiguration<FilterLogFileInteractorFactory> xmlConf
-                = new XmlConfiguration<FilterLogFileInteractorFactory>(resourceStream);
+    XmlConfiguredInteractorFactory(InputStream resourceStream) {
+        XmlConfiguration<InteractorFactory<TInteractor>> xmlConf
+                = new XmlConfiguration<InteractorFactory<TInteractor>>(resourceStream);
         decorated = xmlConf.load();
     }
 
@@ -133,12 +132,12 @@ class XmlConfiguredFilterLogFileInteractorFactory implements FilterLogFileIntera
         }
     }
 
-    public FilterLogFileInteractorFactory getDecorated() {
+    InteractorFactory<TInteractor> getDecorated() {
         return decorated;
     }
 
     @Override
-    public FilterLogFileInteractor createInteractor() {
+    public TInteractor createInteractor() {
         return getDecorated().createInteractor();
     }
 }
