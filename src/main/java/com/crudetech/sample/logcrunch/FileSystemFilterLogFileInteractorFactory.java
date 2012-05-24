@@ -1,24 +1,12 @@
 package com.crudetech.sample.logcrunch;
 
-import java.io.File;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 
 
-public abstract class FileSystemFilterLogFileInteractorFactory implements InteractorFactory<FilterLogFileInteractor> {
+public abstract class FileSystemFilterLogFileInteractorFactory extends FileSystemLogFileInteractorFactory<FilterLogFileInteractor> {
     @Override
-    public FilterLogFileInteractor createInteractor() {
-
-        FileSystemLogFileLocator.LogFileFactory logfileFactory = new FileSystemLogFileLocator.LogFileFactory() {
-            @Override
-            public LogFile create(File logFile) {
-                return new FileLogFile(logFile, logLineFactory(), getEncoding());
-            }
-        };
-        LogFileLocator locator = new DayWiseLogFileLocator(
-                new FileSystemLogFileLocator(getSearchPath(), logfileFactory)
-                );
+    public FilterLogFileInteractor createInteractor(LogFileLocator locator) {
         return new FilterLogFileInteractor(locator, getFilterBuilder());
     }
 
@@ -28,10 +16,4 @@ public abstract class FileSystemFilterLogFileInteractorFactory implements Intera
             add(new FilterLogFileInteractor.SearchIntervalFilterBuilder());
         }};
     }
-
-    protected abstract File getSearchPath();
-
-    protected abstract Charset getEncoding();
-
-    protected abstract BufferedReaderLogFile.LogLineFactory logLineFactory();
 }
