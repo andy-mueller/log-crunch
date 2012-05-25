@@ -3,9 +3,7 @@ package com.crudetech.sample.filter;
 import java.util.regex.Pattern;
 
 public class Strings {
-    public static String lineSeparator(){
-        return "\n";
-    }
+    public static final String LineSeparator = "\n";
 
     public static BinaryFunction<String, ? super String, ? super String> concat() {
         return new BinaryFunction<String, String, String>() {

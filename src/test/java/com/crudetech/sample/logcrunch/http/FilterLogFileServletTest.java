@@ -2,6 +2,7 @@ package com.crudetech.sample.logcrunch.http;
 
 import com.crudetech.sample.filter.PredicateBuilder;
 import com.crudetech.sample.filter.Predicates;
+import com.crudetech.sample.filter.Strings;
 import com.crudetech.sample.logcrunch.*;
 import com.crudetech.sample.logcrunch.logback.LogbackLogFileNamePattern;
 import org.joda.time.DateTime;
@@ -11,57 +12,32 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class FilterLogFileServletTest {
 
     private HttpServletRequestStub request;
-    private HttpServletResponse response;
+    private HttpServletResponseStub response;
     private LogFileInteractorStub interactorStub;
     private FilterLogFileServlet filterLogFileServlet;
     private static final Interval AllTimeInTheWorld = new Interval(0, Long.MAX_VALUE / 2);
-    private PrintWriterStub responseWriter;
 
     @Rule
     public InMemoryTestLogFile logfile = new InMemoryTestLogFile("foobo.log");
-
-    static class PrintWriterStub extends PrintWriter {
-        private String writtenObject;
-
-        PrintWriterStub() {
-            super(mock(OutputStream.class));
-        }
-
-        @Override
-        public void print(String writtenObject) {
-            this.writtenObject = writtenObject;
-        }
-
-        void assertWrittenObject(String expected){
-            assertThat(writtenObject, is(notNullValue()));
-            assertThat(writtenObject, is(expected));
-        }
-    }
 
     @Before
     public void setUp() throws Exception {
         request = new HttpServletRequestStub();
         response = new HttpServletResponseStub();
-        response = mock(HttpServletResponse.class);
-        responseWriter = new PrintWriterStub();
-        when(response.getWriter()).thenReturn(responseWriter);
         interactorStub = new LogFileInteractorStub();
 
         filterLogFileServlet = new FilterLogFileServlet() {
@@ -158,8 +134,9 @@ public class FilterLogFileServletTest {
         verifyErrorResponse(response, HttpStatusCode.BadFormat);
     }
 
-    private void verifyErrorResponse(HttpServletResponse response, HttpStatusCode code) throws IOException {
-        verify(response).sendError(code.Code, code.Message);
+    private void verifyErrorResponse(HttpServletResponseStub response, HttpStatusCode code) throws IOException {
+        assertThat(response.sc, is(code.Code));
+        assertThat(response.content, is(code.Message));
     }
 
     @Test
@@ -221,12 +198,13 @@ public class FilterLogFileServletTest {
         }
     }
 
-    static class FindAllFilterBuilderStub implements FilterLogFileInteractor.FilterBuilder{
+    static class FindAllFilterBuilderStub implements FilterLogFileInteractor.FilterBuilder {
         @Override
         public PredicateBuilder<LogLine> build(FilterLogFileInteractor.FilterQuery filterQuery, PredicateBuilder<LogLine> filterBuilder) {
             return filterBuilder.start(Predicates.isTrue());
         }
     }
+
     @Test
     public void logFilesAreClosedAfterRequest() throws Exception {
         FilterLogFileServlet logFileServlet = new FilterLogFileServlet();
@@ -259,9 +237,15 @@ public class FilterLogFileServletTest {
 
         filterLogFileServlet.doGet(request, response);
 
-        PrintWriterStub expected = new PrintWriterStub();
-        TestLogFile.SampleInfoLine.print(expected);
-        responseWriter.assertWrittenObject(expected.writtenObject);
+
+        assertThat(response.content, is(stringOf(TestLogFile.SampleInfoLine)));
+    }
+    private String stringOf(LogLine line){
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        line.print(new PrintWriter(pw));
+        pw.print(Strings.LineSeparator);
+        return sw.toString();
     }
 
     @Test
@@ -281,6 +265,7 @@ public class FilterLogFileServletTest {
 
         verifyErrorResponse(response, HttpStatusCode.NotFound);
     }
+
     @Test
     public void givenNoLinesFound_OkAndMessageAreReturned() throws Exception {
         request.putParameter(RequestParameters.SearchRange, AllTimeInTheWorld.toString());
@@ -293,10 +278,9 @@ public class FilterLogFileServletTest {
             }
         };
 
-
         filterLogFileServlet.doGet(request, response);
 
-        verify(response).setStatus(HttpStatusCode.OkNoLinesFound.Code);
-        assertThat(responseWriter.writtenObject, is(HttpStatusCode.OkNoLinesFound.Message));
+        assertThat(response.sc, is(HttpStatusCode.OkNoLinesFound.Code));
+        assertThat(response.content, is(HttpStatusCode.OkNoLinesFound.Message));
     }
 }

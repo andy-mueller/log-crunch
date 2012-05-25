@@ -1,25 +1,16 @@
 package com.crudetech.sample.logcrunch.http;
 
 import com.crudetech.sample.logcrunch.FilterLogFileInteractor;
-import com.crudetech.sample.logcrunch.InteractorFactory;
-import com.crudetech.sample.logcrunch.LogFileNamePattern;
 import com.crudetech.sample.logcrunch.LogLine;
-import com.crudetech.sample.logcrunch.logback.LogbackLogFileNamePattern;
-import org.joda.time.Interval;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.Closeable;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.Map;
 
-public class FilterLogFileServlet extends HttpServlet {
-    InteractorFactory<FilterLogFileInteractor> filterLogFileInteractorFactory;
+public class FilterLogFileServlet extends XmlConfiguredLogFileInteractorServlet<FilterLogFileInteractor> {
 
     // GET http://localhost:8080/logcrunch/filter?logFileNamePattern=machinename101-%25d{yyyyMMdd}.log&searchRange=2007-05-06/2007-05-08&level=Info&level=Warn
     @Override
@@ -48,6 +39,11 @@ public class FilterLogFileServlet extends HttpServlet {
                 response.commitResponse(HttpStatusCode.OkNoLinesFound);
             }
         });
+        if(response.isCommitted()){
+            return;
+        }
+
+        response.commitStatusCode(HttpStatusCode.Ok);
     }
 
     private class HttpResponse {
@@ -87,6 +83,10 @@ public class FilterLogFileServlet extends HttpServlet {
         boolean isCommitted() {
             return servletResponse.isCommitted();
         }
+
+        public void commitStatusCode(HttpStatusCode code) {
+            servletResponse.setStatus(code.Code);
+        }
     }
 
     private FilterLogFileInteractor.FilterQuery buildQuery(Map<String, String[]> parameterMap, HttpResponse resp) {
@@ -103,49 +103,4 @@ public class FilterLogFileServlet extends HttpServlet {
     }
 
 
-    private ParameterMapper buildParameterMapper(Map<String, String[]> parameterMap) {
-        ParameterMapper mapper = new ParameterMapper(parameterMap);
-        mapper.registerParameterFactory(Interval.class, new ParameterMapper.ReflectionParameterFactory("parse", String.class));
-        mapper.registerParameterFactory(LogFileNamePattern.class, new ParameterMapper.ParameterFactory() {
-            @Override
-            public Object create(Class<?> parameterType, String parameterValue) {
-                return new LogbackLogFileNamePattern(parameterValue);
-            }
-        });
-        return mapper;
-    }
-
-    @SuppressWarnings("unchecked")
-    private static Map<String, String[]> getParametersMap(HttpServletRequest req) {
-        return req.getParameterMap();
-    }
-
-    FilterLogFileInteractor newInteractor() {
-        return filterLogFileInteractorFactory.createInteractor();
-    }
-
-    @Override
-    public void init(ServletConfig config) throws ServletException {
-        super.init(config);
-
-        loadLodFileFilterFromConfig(config);
-    }
-
-    private void loadLodFileFilterFromConfig(ServletConfig config) {
-        String configResource = config.getInitParameter(ServletInitParameters.ConfigurationResource);
-        InputStream configFile = getClass().getResourceAsStream("/" + configResource);
-        try {
-            this.filterLogFileInteractorFactory = new XmlConfiguredInteractorFactory<FilterLogFileInteractor>(configFile);
-        } finally {
-            close(configFile);
-        }
-    }
-
-    private void close(Closeable closeable) {
-        try {
-            closeable.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
 }

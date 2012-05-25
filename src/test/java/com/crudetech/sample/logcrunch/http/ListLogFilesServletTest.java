@@ -22,7 +22,7 @@ public class ListLogFilesServletTest {
         listLogFilesInteractorStub = new ListLogFilesInteractorStub(){};
         servlet = new ListLogFilesServlet() {
             @Override
-            ListLogFilesInteractor createInteractor() {
+            ListLogFilesInteractor newInteractor() {
                 return listLogFilesInteractorStub;
             }
         };
@@ -99,7 +99,7 @@ public class ListLogFilesServletTest {
         file.setName("machinename101-20070412.log");
         listLogFilesInteractorStub.result.listFile(file);
 
-        assertThat(response.content, is("machinename101-20070412.log"+ Strings.lineSeparator()));
+        assertThat(response.content, is("machinename101-20070412.log"+ Strings.LineSeparator));
         assertThat(response.sc, is(HttpStatusCode.Ok.Code));
     }
     @Test

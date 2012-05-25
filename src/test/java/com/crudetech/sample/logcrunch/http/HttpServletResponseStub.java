@@ -44,7 +44,7 @@ class HttpServletResponseStub extends HttpServletResponseWrapper {
 
             @Override
             public void println() {
-                content += Strings.lineSeparator();
+                content += Strings.LineSeparator;
             }
         };
     }

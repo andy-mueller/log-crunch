@@ -90,7 +90,7 @@ public class LogCrunchFullServletWithFileSystemTest {
 
         logFileServlet.doGet(request, response);
 
-        assertThat(response.content, is(logFileName+Strings.lineSeparator()));
+        assertThat(response.content, is(logFileName+Strings.LineSeparator));
     }
 
 }

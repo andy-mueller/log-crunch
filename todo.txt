@@ -1,3 +1,14 @@
+-extract cursor iterator
+
+-Strings.lineSeperator();
+    -use System.property for this
+
+-extract template method for servlet doGet??
+    -do we need a  interface for interactors
+        interface Interactor<TQuery, TResult>{
+            void doSomething(TQuery q, TResult r);
+        }
+    -extra class??
 
 -remove all logback dependencies from http into xml
 
