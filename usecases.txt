@@ -1,5 +1,6 @@
 
-UC001 <Find and filter files by date, level, logger and message>
+------------------------------------------------------------------------
+UC001 <Find and filter file content by date, level, logger and message>
 
 Data:
 <LogFileNamePattern>    <Logger Pattern>
@@ -20,5 +21,76 @@ Exception course: Validation error
     1. System delivers error to user
 
 Exception course: No files found
-    1. ???
+    1. The system delivers a "No Files Found" error message to the user
 
+Exception course: No matching lines found
+    1. The system delivers a "No Lines Found" error message to the user
+
+
+------------------------------------------------------------------------
+UC002 <Find and list file names by date>
+
+Data:
+<LogFileNamePattern>    <Time Intervals>
+
+Primary Course
+    1. User issues "List Log Files" query with the above
+       data
+    2. System validates data
+    3. System searches for log files within the specific
+       date range
+    4. System displays all log file names found according to
+       the above data to the user
+
+Exception course: Validation error
+    1. System delivers error to user
+
+Exception course: No files found
+    1. The system deliver a "No Files Found" message to the user
+
+
+------------------------------------------------------------------------
+UC003 <Find and merge file by date>
+
+Data:
+<LogFileNamePattern>    <Time Intervals>
+<Result File Name>
+
+
+Primary Course
+    1. User issues "Merge Log Files" query with the above
+       data
+    2. System validates data
+    3. System searches for log files within the specific
+       date range
+    4. System Merges the content of the found files into a new
+       file
+    5. System displays file name to the user
+
+Exception course: Validation error
+    1. System delivers error to user
+
+Exception course: No files found
+    1. The system deliver a "No Files Found" message to the user
+
+
+------------------------------------------------------------------------
+UC004 <Display File by Name>
+
+Data:
+<File Name>
+
+
+Primary Course
+    1. User issues "Display File by Name" query with the above
+       data
+    2. System validates data
+    3. System searches for log files within the specific
+       date range
+    4. System displays file content to the user
+
+Exception course: Validation error
+    1. System delivers error to user
+
+Exception course: No files found
+    1. The system deliver a "No Files Found" message to the user
