@@ -1,4 +1,3 @@
-
 -Strings.lineSeperator();
     -use System.property for this
 
